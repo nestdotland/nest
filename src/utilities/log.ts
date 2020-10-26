@@ -1,30 +1,24 @@
-import {
-  blue,
-  bold,
-  gray,
-  path,
-  red,
-  stripColor,
-  underline,
-  yellow,
-} from "../../cli_deps.ts";
+import { blue, bold, gray, path, red, stripColor, yellow } from "../../deps.ts";
 import { version } from "../version.ts";
+import { highlight } from "./fmt.ts";
 
 type logFunction = <T>(message?: T | undefined, ...args: unknown[]) => T;
 interface Logger {
   debug: logFunction;
   info: logFunction;
+  noPrefix: logFunction;
   warning: logFunction;
   error: logFunction;
   critical: logFunction;
 }
 
 const prefix = {
-  debug: bold(`${gray("debug")}:`),
-  info: bold(`${blue("info")}:`),
-  warning: bold(`${yellow("warn")}:`),
-  error: bold(`${red("error")}:`),
-  critical: bold(`${red("CRITICAL")}:`),
+  debug: bold(`${gray("debug")}`),
+  info: bold(`${blue("info")}`),
+  noPrefix: "",
+  warning: bold(`${yellow("warn")}`),
+  error: bold(`${red("error")}`),
+  critical: bold(`${red("CRITICAL")}`),
 };
 
 export let mainRecord = "";
@@ -33,14 +27,17 @@ export let errorOccurred = false;
 export enum LogLevel {
   debug,
   info,
+  noPrefix,
   warning,
   error,
   critical,
+  quiet,
 }
 
 export const log: Logger = {
   debug: (message?: any) => message,
   info: (message?: any) => message,
+  noPrefix: (message?: any) => message,
   warning: (message?: any) => message,
   error: (message?: any) => message,
   critical: (message?: any) => message,
@@ -84,15 +81,16 @@ function logToConsole(prefix: string, logLevel: LogLevel) {
 export function setupLogLevel(logLevel?: string) {
   if (logLevel === undefined || logLevel in LogLevel) {
     // ? Can we handle enums in a better way ?
-    setupLog(<unknown>logLevel as LogLevel)
+    setupLog(<unknown> logLevel as LogLevel);
   } else {
-    throw new Error(`Invalid log level: ${logLevel}`)
+    throw new Error(`Invalid log level: ${logLevel}`);
   }
 }
 
 export function setupLog(logLevel = LogLevel.info) {
   log.debug = logToMainRecord(prefix.debug);
   log.info = logToMainRecord(prefix.info);
+  log.noPrefix = logToMainRecord(prefix.noPrefix);
   log.warning = logToMainRecord(prefix.warning);
   log.error = logToMainRecord(prefix.error);
   log.critical = logToMainRecord(prefix.critical);
@@ -107,15 +105,25 @@ export function setupLog(logLevel = LogLevel.info) {
         return message;
       };
     }
-    case LogLevel.info: {
-      const logMainRecord = log.info;
-      const logConsole = logToConsole(prefix.info, logLevel);
-      log.info = (message?: any, ...args: unknown[]) => {
-        logMainRecord(message, ...args);
-        logConsole(message, ...args);
-        return message;
-      };
-    }
+    case LogLevel.info:
+      {
+        const logMainRecord = log.info;
+        const logConsole = logToConsole(prefix.info, logLevel);
+        log.info = (message?: any, ...args: unknown[]) => {
+          logMainRecord(message, ...args);
+          logConsole(message, ...args);
+          return message;
+        };
+      }
+      {
+        const logMainRecord = log.noPrefix;
+        const logConsole = logToConsole(prefix.noPrefix, logLevel);
+        log.noPrefix = (message?: any, ...args: unknown[]) => {
+          logMainRecord(message, ...args);
+          logConsole(message, ...args);
+          return message;
+        };
+      }
     case LogLevel.warning: {
       const logMainRecord = log.warning;
       const logConsole = logToConsole(prefix.warning, logLevel);
@@ -147,13 +155,15 @@ export function setupLog(logLevel = LogLevel.info) {
         };
       }
       break;
+    case LogLevel.quiet:
+      break;
     default:
       console.error("Unknown log level:", logLevel);
       break;
   }
 }
 
-export async function writeLogFile(logFile = "./eggs-debug.log") {
+export async function writeLogFile(logFile: string) {
   const encoder = new TextEncoder();
 
   const args = `Arguments:\n  ${Deno.args}\n\n`;
@@ -178,6 +188,18 @@ export async function writeLogFile(logFile = "./eggs-debug.log") {
   );
 }
 
-export function highlight(msg: string) {
-  return underline(bold(msg));
+export async function handleError(err: Error) {
+  const DEBUG_LOG_FILE = "./eggs-debug.log";
+  log.critical(`An unexpected error occurred: "${err.message}"`, err.stack);
+  await writeLogFile(DEBUG_LOG_FILE);
+  log.info(
+    `If you think this is a bug, please open a bug report at ${
+      highlight("https://github.com/nestdotland/nest/issues/new/choose")
+    }.`,
+  );
+  log.info(
+    `Visit ${
+      highlight("https://docs.nest.land/nest/")
+    } for documentation about this command.`,
+  );
 }

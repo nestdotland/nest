@@ -1,24 +1,46 @@
-// @deno-types="https://unpkg.com/cac@6.6.1/mod.d.ts"
-import { cac } from "./cli_deps.ts"
-import { setupLog, log } from "./src/utilities/log.ts";
+/* import { cac } from "./deps.ts";
+import type { CAC } from "./deps.ts"; */
+// @deno-types="https://unpkg.com/cac/mod.d.ts"
+import { cac } from "https://unpkg.com/cac@6.6.1/mod.js";
+import { handleError, log, setupLog } from "./src/utilities/log.ts";
 import { version } from "./src/version.ts";
 
 import { publishCommand } from "./src/commands/publish.ts";
+import { upgradeCommand } from "./src/commands/upgrade.ts";
 
+// const nest = <unknown> cac("nest") as CAC;
 const nest = cac("nest");
 
-nest.help();
-nest.version(version, "-V, --version");
-nest.option("-L, --log-level [level]", "Set log level");
-nest.option("-l, --log [path]", "Specify filepath to output logs");
+nest
+  .help()
+  .version(version, "-V, --version")
+  .option("-L, --log-level [level]", "Set log level")
+  .option("-l, --log [path]", "Specify filepath to output logs")
+/*   .action((dir, options) => {
+    console.log('remove ' + dir + (options.recursive ? ' recursively' : ''))
+  }) */
 
-publishCommand(nest)
+publishCommand(nest);
+upgradeCommand(nest);
 
-setupLog()
+setupLog();
 
 try {
   nest.parse(["deno", "cli"].concat(Deno.args), { run: false });
 
   await nest.runMatchedCommand();
-} catch (error) {
+  // throw new Error("bar")
+} catch (err) {
+  if (
+    err.message.match(
+      /^(missing required args for command \`|Unknown option \`|option \`)/,
+    )
+  ) {
+    nest.outputHelp();
+    console.log();
+    log.error(err.message);
+  } else {
+    await handleError(err);
+  }
+  Deno.exit(1);
 }
