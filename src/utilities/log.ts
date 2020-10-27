@@ -6,7 +6,6 @@ type logFunction = <T>(message?: T | undefined, ...args: unknown[]) => T;
 interface Logger {
   debug: logFunction;
   info: logFunction;
-  noPrefix: logFunction;
   warning: logFunction;
   error: logFunction;
   critical: logFunction;
@@ -27,7 +26,6 @@ export let errorOccurred = false;
 export enum LogLevel {
   debug,
   info,
-  noPrefix,
   warning,
   error,
   critical,
@@ -37,7 +35,6 @@ export enum LogLevel {
 export const log: Logger = {
   debug: (message?: any) => message,
   info: (message?: any) => message,
-  noPrefix: (message?: any) => message,
   warning: (message?: any) => message,
   error: (message?: any) => message,
   critical: (message?: any) => message,
@@ -79,9 +76,10 @@ function logToConsole(prefix: string, logLevel: LogLevel) {
 }
 
 export function setupLogLevel(logLevel?: string) {
-  if (logLevel === undefined || logLevel in LogLevel) {
-    // ? Can we handle enums in a better way ?
-    setupLog(<unknown> logLevel as LogLevel);
+  if (logLevel === undefined) {
+    setupLog();
+  } else if (logLevel in LogLevel) {
+    setupLog(LogLevel[logLevel as keyof typeof LogLevel]);
   } else {
     throw new Error(`Invalid log level: ${logLevel}`);
   }
@@ -90,7 +88,6 @@ export function setupLogLevel(logLevel?: string) {
 export function setupLog(logLevel = LogLevel.info) {
   log.debug = logToMainRecord(prefix.debug);
   log.info = logToMainRecord(prefix.info);
-  log.noPrefix = logToMainRecord(prefix.noPrefix);
   log.warning = logToMainRecord(prefix.warning);
   log.error = logToMainRecord(prefix.error);
   log.critical = logToMainRecord(prefix.critical);
@@ -105,25 +102,15 @@ export function setupLog(logLevel = LogLevel.info) {
         return message;
       };
     }
-    case LogLevel.info:
-      {
-        const logMainRecord = log.info;
-        const logConsole = logToConsole(prefix.info, logLevel);
-        log.info = (message?: any, ...args: unknown[]) => {
-          logMainRecord(message, ...args);
-          logConsole(message, ...args);
-          return message;
-        };
-      }
-      {
-        const logMainRecord = log.noPrefix;
-        const logConsole = logToConsole(prefix.noPrefix, logLevel);
-        log.noPrefix = (message?: any, ...args: unknown[]) => {
-          logMainRecord(message, ...args);
-          logConsole(message, ...args);
-          return message;
-        };
-      }
+    case LogLevel.info: {
+      const logMainRecord = log.info;
+      const logConsole = logToConsole(prefix.info, logLevel);
+      log.info = (message?: any, ...args: unknown[]) => {
+        logMainRecord(message, ...args);
+        logConsole(message, ...args);
+        return message;
+      };
+    }
     case LogLevel.warning: {
       const logMainRecord = log.warning;
       const logConsole = logToConsole(prefix.warning, logLevel);

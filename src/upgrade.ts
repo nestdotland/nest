@@ -20,6 +20,7 @@ export async function upgrade(givenVersion?: string) {
     return;
   }
 
+  // ! This part might change in the future
   const versions: string[] = json.packageUploadNames.map((module: string) => {
     const tmpSplit = module.split("@");
     return tmpSplit[1] || "";
@@ -29,6 +30,7 @@ export async function upgrade(givenVersion?: string) {
     .filter((version) => version !== null);
   const sorted = semver.sort(valid as string[]).reverse();
   const latest = sorted[0];
+
 
   const version = semver.valid(givenVersion || latest);
   if (version === null) {
@@ -42,7 +44,7 @@ export async function upgrade(givenVersion?: string) {
   }
 
   if (!valid.includes(version)) {
-    log.warning(`Version ${version} has not been found.`);
+    log.error(`Version ${version} has not been found.`);
     log.info("Published versions:", sorted);
     return;
   }
