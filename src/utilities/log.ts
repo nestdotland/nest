@@ -1,4 +1,5 @@
 import { blue, bold, gray, path, red, stripColor, yellow } from "../../deps.ts";
+import { CLIError } from "../global/error.ts";
 import { version } from "../version.ts";
 import { highlight } from "./fmt.ts";
 
@@ -21,7 +22,6 @@ const prefix = {
 };
 
 export let mainRecord = "";
-export let errorOccurred = false;
 
 export enum LogLevel {
   debug,
@@ -81,7 +81,14 @@ export function setupLogLevel(logLevel?: string) {
   } else if (logLevel in LogLevel) {
     setupLog(LogLevel[logLevel as keyof typeof LogLevel]);
   } else {
-    throw new Error(`Invalid log level: ${logLevel}`);
+    log.error(`Invalid log level: ${logLevel}`);
+    log.info(
+      `Allowed log levels:`,
+      Object.keys(LogLevel).filter((level) =>
+        Number.isNaN(Number.parseInt(level))
+      ),
+    );
+    throw new CLIError("Invalid value (log level)");
   }
 }
 
@@ -124,7 +131,6 @@ export function setupLog(logLevel = LogLevel.info) {
       const logMainRecord = log.error;
       const logConsole = logToConsole(prefix.error, logLevel);
       log.error = (message?: any, ...args: unknown[]) => {
-        errorOccurred = true;
         logMainRecord(message, ...args);
         logConsole(message, ...args);
         return message;
@@ -135,7 +141,6 @@ export function setupLog(logLevel = LogLevel.info) {
         const logMainRecord = log.critical;
         const logConsole = logToConsole(prefix.critical, logLevel);
         log.critical = (message?: any, ...args: unknown[]) => {
-          errorOccurred = true;
           logMainRecord(message, ...args);
           logConsole(message, ...args);
           return message;

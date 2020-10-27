@@ -1,6 +1,7 @@
 import { semver } from "../deps.ts";
 import { log } from "./utilities/log.ts";
 import { fetchTimeout } from "./utilities/fetch.ts";
+import { version as CLIVersion } from "./version.ts";
 
 export async function upgrade(givenVersion?: string) {
   // TODO update url
@@ -31,15 +32,14 @@ export async function upgrade(givenVersion?: string) {
   const sorted = semver.sort(valid as string[]).reverse();
   const latest = sorted[0];
 
-
   const version = semver.valid(givenVersion || latest);
   if (version === null) {
     log.error(`Invalid version: ${givenVersion}`);
     return;
   }
 
-  if (semver.eq(latest, version)) {
-    log.info(`You are already using v${version} !`);
+  if (semver.eq(version, CLIVersion)) {
+    log.info(`You are already using version ${CLIVersion} !`);
     return;
   }
 
