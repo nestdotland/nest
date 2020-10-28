@@ -1,7 +1,8 @@
 import { parse } from "../../deps.ts";
 import { log } from "../utilities/log.ts";
 import { upgrade } from "../upgrade.ts";
-import { globalOptions, limitArgs, limitOptions } from "../utilities/cli.ts";
+import { limitArgs, limitOptions } from "../utilities/cli.ts";
+import { globalOptions } from "./global/options.ts";
 import type { Command } from "../utilities/types.ts";
 import { CLIError } from "../error.ts";
 

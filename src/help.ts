@@ -1,11 +1,22 @@
 import { sprintf } from "../deps.ts";
 import { version } from "./version.ts";
 import { Command } from "./utilities/types.ts";
+import { globalCommands } from "./commands/global/commands.ts";
+import { globalCommand } from "./commands/global.ts";
 
-export function getHelp(command: Command) {
+export function help(name?: string) {
+  if (name && name in globalCommands) {
+    getHelp(globalCommands[name]);
+  } else {
+    getHelp(globalCommand);
+  }
+  return;
+}
+
+function getHelp(command: Command) {
   const header = `\nnest CLI v${version}\n\n`;
 
-  const description = `  ${command.description}\n\n`;
+  const description = `  ${command.description.replaceAll("\n", "\n  ")}\n\n`;
 
   const usage = `Usage:\n  $ nest ${
     command.name ? `${command.name} ` : ""

@@ -2,31 +2,6 @@ import type { Option } from "./types.ts";
 import { log } from "../utilities/log.ts";
 import { CLIError } from "../error.ts";
 
-export const globalOptions: Option[] = [
-  {
-    flag: "-h, --help",
-    description: "Show this help",
-  },
-  {
-    flag: "-V, --version",
-    description: "Display version number",
-  },
-  {
-    flag: "-L, --log-level",
-    argument: "<level>",
-    description: "Set log level",
-  },
-  {
-    flag: "-l, --log",
-    argument: "<path>",
-    description: "Specify filepath to output logs",
-  },
-  {
-    flag: "-G, --gui",
-    description: "Perform the task in the gui",
-  },
-];
-
 export function aliasesFromOptions(options: Option[]) {
   const aliases: Record<string, string> = {};
 

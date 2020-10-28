@@ -3,10 +3,10 @@ import { log } from "../utilities/log.ts";
 import { publish } from "../publish.ts";
 import {
   aliasesFromOptions,
-  globalOptions,
   limitArgs,
   limitOptions,
 } from "../utilities/cli.ts";
+import { globalOptions } from "./global/options.ts";
 import type { Command, Option } from "../utilities/types.ts";
 import { CLIError } from "../error.ts";
 
