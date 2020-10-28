@@ -1,12 +1,37 @@
 import type { Option } from "./types.ts";
 import { log } from "../utilities/log.ts";
-import { CLIError } from "../global/error.ts";
+import { CLIError } from "../error.ts";
 
-export function aliasesFromFlags(flags: Option[]) {
+export const globalOptions: Option[] = [
+  {
+    flag: "-h, --help",
+    description: "Show this help",
+  },
+  {
+    flag: "-V, --version",
+    description: "Display version number",
+  },
+  {
+    flag: "-L, --log-level",
+    argument: "<level>",
+    description: "Set log level",
+  },
+  {
+    flag: "-l, --log",
+    argument: "<path>",
+    description: "Specify filepath to output logs",
+  },
+  {
+    flag: "-G, --gui",
+    description: "Perform the task in the gui",
+  },
+];
+
+export function aliasesFromOptions(options: Option[]) {
   const aliases: Record<string, string> = {};
 
-  for (let i = 0; i < flags.length; i++) {
-    const { flag } = flags[i];
+  for (let i = 0; i < options.length; i++) {
+    const { flag } = options[i];
     if (flag.includes(", ")) {
       const [short, long] = flag.split(", ");
       aliases[short.substr(1)] = long.substr(2);
@@ -20,15 +45,34 @@ function keyToOption(key: string): string {
   return key.length === 1 ? `-${key}` : `--${key}`;
 }
 
-export function limitOptions(options: Record<string, unknown>) {
-  const keys = Object.keys(options);
-  if (keys.length === 0) return;
-  if (keys.length === 1) {
-    log.error("Unknown option:", keyToOption(keys[0]));
+function extractFlags(options: Option[]) {
+  const flags: string[] = [];
+
+  for (let i = 0; i < options.length; i++) {
+    const { flag } = options[i];
+    if (flag.includes(", ")) {
+      const [short, long] = flag.split(", ");
+      flags.push(short.substr(1));
+      flags.push(long.substr(2));
+    }
+  }
+
+  return flags;
+}
+
+export function limitOptions(
+  options: Record<string, unknown>,
+  baseOptions: Option[],
+) {
+  const ignore = extractFlags(baseOptions);
+  const delta = Object.keys(options).filter((flag) => !ignore.includes(flag));
+  if (delta.length === 0) return;
+  if (delta.length === 1) {
+    log.error("Unknown option:", keyToOption(delta[0]));
   } else {
     log.error(
       "Unknown options:",
-      keys.map((key) => keyToOption(key)).join(", "),
+      delta.map((key) => keyToOption(key)).join(", "),
     );
   }
   throw new CLIError("Unknown options");

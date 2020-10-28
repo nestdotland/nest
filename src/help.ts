@@ -3,7 +3,7 @@ import { version } from "./version.ts";
 import { Command } from "./utilities/types.ts";
 
 export function getHelp(command: Command) {
-  const header = `nest CLI v${version}\n\n`;
+  const header = `\nnest CLI v${version}\n\n`;
 
   const description = `  ${command.description}\n\n`;
 
@@ -23,7 +23,7 @@ export function getHelp(command: Command) {
             "%-25s",
             `${subCommand.name} ${subCommand.arguments.join(" ")}`,
           )
-        } ${subCommand.description.replaceAll("\n", sprintf("\n%28s", ""))}`;
+        } ${subCommand.description.replaceAll("\n", sprintf("\n%28s", ""))}\n`;
       }
     }
     commands += "\n\n";

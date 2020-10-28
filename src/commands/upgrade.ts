@@ -1,10 +1,9 @@
 import { parse } from "../../deps.ts";
 import { log } from "../utilities/log.ts";
 import { upgrade } from "../upgrade.ts";
-import { limitArgs, limitOptions } from "../cli/limit.ts";
-import type { Command } from "../cli/types.ts";
-import { globalOptions } from "../cli/globalOptions.ts";
-import { CLIError } from "../cli/error.ts";
+import { globalOptions, limitArgs, limitOptions } from "../utilities/cli.ts";
+import type { Command } from "../utilities/types.ts";
+import { CLIError } from "../error.ts";
 
 interface rawFlags {
   version?: string | number;
@@ -28,7 +27,7 @@ async function action() {
     Deno.args,
   );
 
-  limitOptions(remainingOptions);
+  limitOptions(remainingOptions, globalOptions);
   limitArgs(remainingArgs);
 
   const flags = assertFlags({ version });
