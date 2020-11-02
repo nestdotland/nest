@@ -10,8 +10,11 @@ import { upgrade } from "../functions/upgrade.ts";
 
 export const upgradeCommand: Command = {
   name: "upgrade",
-  description: "Upgrade nest cli to the given version.\nDefaults to latest.",
-  arguments: ["[version]"],
+  description: "Upgrade nest cli to the given version",
+  arguments: [{
+    name: "[version]",
+    description: "A given version, the latest by default"
+  }],
   options: mainOptions,
   subCommands: {},
   action,

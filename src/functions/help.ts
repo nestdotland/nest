@@ -1,10 +1,22 @@
 import { bold, green, magenta, sprintf, underline } from "../../deps.ts";
 import { version } from "../version.ts";
 import { Command } from "../utilities/types.ts";
+import { log } from "../utilities/log.ts";
+import { NestCLIError } from "../error.ts";
 
 export function help(main: Command, name?: string) {
-  if (name && name in main.subCommands) {
-    getHelp(main.subCommands[name]);
+  if (name) {
+    if (name in main.subCommands) {
+      getHelp(main.subCommands[name]);
+    } else {
+      log.error(`${underline(name)} is not valid command name.`);
+      log.info(
+        `List of valid commands: ${
+          Object.keys(main.subCommands).map((name) => bold(name)).join(", ")
+        }.`,
+      );
+      throw new NestCLIError("Invalid command name (help)");
+    }
   } else {
     getHelp(main);
   }
@@ -18,7 +30,16 @@ export function getHelp(command: Command) {
 
   const usage = `${underline("Usage:")} ${green("nest")} ${
     command.name ? `${bold(command.name)} ` : ""
-  }${command.arguments}\n\n`;
+  }${command.arguments.map((arg) => arg.name).join(" ")}\n\n`;
+
+  let args = "";
+
+  if (command.arguments.length > 0) {
+    args = command.arguments.map((arg) =>
+      `  ${sprintf("%-39s", bold(arg.name))} ${arg.description}`
+    ).join("\n");
+    args += "\n\n";
+  }
 
   let commands = "";
 
@@ -30,12 +51,14 @@ export function getHelp(command: Command) {
         commands += `  ${
           sprintf(
             "%-39s",
-            `${bold(subCommand.name)} ${subCommand.arguments.join(" ")}`,
+            `${bold(subCommand.name)} ${
+              subCommand.arguments.map((arg) => arg.name).join(" ")
+            }`,
           )
         } ${subCommand.description.replaceAll("\n", sprintf("\n%33s", ""))}\n`;
       }
     }
-    commands += "\n\n";
+    commands += "\n";
   }
 
   const options = `${underline("Options:")}\n\n${
@@ -46,5 +69,5 @@ export function getHelp(command: Command) {
     ).join("\n")
   }\n`;
 
-  console.log("\n" + usage + description + commands + options);
+  console.log("\n" + description + usage + args + commands + options);
 }

@@ -14,7 +14,10 @@ export const mainCommand: Command = {
   description:
     "nest.land - A module registry and CDN for Deno, on the permaweb",
   options: mainOptions,
-  arguments: ["[command]"],
+  arguments: [{
+    name: "[command]",
+    description: ""
+  }],
   subCommands: mainCommands,
   action,
 };

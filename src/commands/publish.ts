@@ -29,7 +29,10 @@ const options: Option[] = [
 export const publishCommand: Command = {
   name: "publish",
   description: "Publishes your module to the nest.land registry",
-  arguments: ["[version]"],
+  arguments: [{
+    name: "[version]",
+    description: ""
+  }],
   options: mainOptions,
   subCommands: {},
   action,

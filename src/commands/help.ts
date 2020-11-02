@@ -12,7 +12,10 @@ import { help } from "../functions/help.ts";
 export const helpCommand: Command = {
   name: "help",
   description: "Show this help or the help of a sub-command",
-  arguments: ["[command]"],
+  arguments: [{
+    name: "[command]",
+    description: ""
+  }],
   options: mainOptions,
   subCommands: {},
   action,
