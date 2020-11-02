@@ -1,6 +1,6 @@
 import type { Option } from "./types.ts";
 import { log } from "../utilities/log.ts";
-import { CLIError } from "../error.ts";
+import { NestCLIError } from "../error.ts";
 
 export function aliasesFromOptions(options: Option[]) {
   const aliases: Record<string, string> = {};
@@ -50,11 +50,11 @@ export function limitOptions(
       delta.map((key) => keyToOption(key)).join(", "),
     );
   }
-  throw new CLIError("Unknown options");
+  throw new NestCLIError("Unknown options");
 }
 
 export function limitArgs(args: unknown[]) {
   if (args.length === 0) return;
   log.error("Too many arguments:", args.join(", "));
-  throw new CLIError("Too many arguments");
+  throw new NestCLIError("Too many arguments");
 }

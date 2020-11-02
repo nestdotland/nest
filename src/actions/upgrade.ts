@@ -1,36 +1,11 @@
-import { semver } from "../deps.ts";
-import { log } from "./utilities/log.ts";
-import { fetchTimeout } from "./utilities/fetch.ts";
-import { version as CLIVersion } from "./version.ts";
+import { NestLand, semver } from "../../deps.ts";
+import { log } from "../utilities/log.ts";
+import { version as CLIVersion } from "../version.ts";
 
 export async function upgrade(givenVersion?: string) {
-  // TODO update url
-  let response: Response;
-  try {
-    response = await fetchTimeout(
-      "https://x.nest.land/api/package/eggs",
-      5000,
-    );
-  } catch {
-    log.error("Cannot connect to nest.land .");
-    return;
-  }
-  const json = await response.json();
-  if (!json.packageUploadNames) {
-    log.error("Cannot get CLI versions.");
-    return;
-  }
+  const versions = await NestLand.sortedVersions("eggs", "nestdotland");
 
-  // ! This part might change in the future
-  const versions: string[] = json.packageUploadNames.map((module: string) => {
-    const tmpSplit = module.split("@");
-    return tmpSplit[1] || "";
-  });
-  const valid = versions
-    .map((version) => semver.valid(version))
-    .filter((version) => version !== null);
-  const sorted = semver.sort(valid as string[]).reverse();
-  const latest = sorted[0];
+  const latest = versions[0];
 
   const version = semver.valid(givenVersion || latest);
   if (version === null) {
@@ -43,9 +18,9 @@ export async function upgrade(givenVersion?: string) {
     return;
   }
 
-  if (!valid.includes(version)) {
+  if (!versions.includes(version)) {
     log.error(`Version ${version} has not been found.`);
-    log.info("Published versions:", sorted);
+    log.info("Published versions:", versions);
     return;
   }
 

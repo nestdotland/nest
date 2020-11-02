@@ -1,6 +1,6 @@
-import { Option } from "../../utilities/types.ts";
+import { Command, Option } from "./utilities/types.ts";
 
-export const globalOptions: Option[] = [
+export const mainOptions: Option[] = [
   {
     flag: "-h, --help",
     description: "Show this help",
@@ -24,3 +24,13 @@ export const globalOptions: Option[] = [
     description: "Perform the task in the gui",
   },
 ];
+
+export const mainCommand: Command = {
+  name: "",
+  description:
+    "nest.land - A module registry and CDN for Deno, on the permaweb",
+  options: mainOptions,
+  arguments: ["[command]"],
+  subCommands: {},
+  action: async () => {},
+};

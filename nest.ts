@@ -1,3 +1,4 @@
-import { globalCommand } from "./src/commands/global.ts";
+import { mainCommand } from "./src/main.ts";
+import "./src/commands/main.ts";
 
-await globalCommand.action();
+await mainCommand.action();

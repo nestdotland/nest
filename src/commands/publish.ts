@@ -1,14 +1,14 @@
 import { parse } from "../../deps.ts";
 import { log } from "../utilities/log.ts";
-import { publish } from "../publish.ts";
+import { publish } from "../actions/publish.ts";
 import {
   aliasesFromOptions,
   limitArgs,
   limitOptions,
 } from "../utilities/cli.ts";
-import { globalOptions } from "./global/options.ts";
+import { mainCommand, mainOptions } from "../main.ts";
 import type { Command, Option } from "../utilities/types.ts";
-import { CLIError } from "../error.ts";
+import { NestCLIError } from "../error.ts";
 
 interface rawFlags {
   version?: string | number;
@@ -19,7 +19,7 @@ interface Flags {
 }
 
 const options: Option[] = [
-  ...globalOptions,
+  ...mainOptions,
   {
     flag: "-Y, --yes",
     description: "Disable confirmation prompts",
@@ -45,13 +45,17 @@ export const publishCommand: Command = {
   action,
 };
 
+mainCommand.subCommands[publishCommand.name] = publishCommand;
+
 async function action() {
   const { _: [_, version, ...remainingArgs], pre, ...remainingOptions } = parse(
     Deno.args,
-    { alias: aliasesFromOptions(publishCommand.options) },
+    {
+      alias: aliasesFromOptions(publishCommand.options),
+    },
   );
 
-  limitOptions(remainingOptions, globalOptions);
+  limitOptions(remainingOptions, mainOptions);
   limitArgs(remainingArgs);
 
   const flags = assertFlags({ version });
@@ -62,7 +66,7 @@ async function action() {
 function assertFlags({ version }: rawFlags): Flags {
   if (version !== undefined && typeof version !== "string") {
     log.error(`Version should be of type string. Received ${version}`);
-    throw new CLIError("Invalid type (version)");
+    throw new NestCLIError("Invalid type (version)");
   }
   return { version };
 }

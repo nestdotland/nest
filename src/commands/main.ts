@@ -1,16 +1,16 @@
 import { parse } from "../../deps.ts";
 import { handleError, log, setupLogLevel } from "../utilities/log.ts";
 import { aliasesFromOptions } from "../utilities/cli.ts";
-import { CLIError } from "../error.ts";
+import { NestCLIError } from "../error.ts";
+import { mainCommand, mainOptions } from "../main.ts";
 
-import { Command } from "../utilities/types.ts";
+import "./upgrade.ts";
+import "./publish.ts";
+import "./help.ts";
 
-import { globalOptions } from "./global/options.ts";
-import { globalCommands } from "./global/commands.ts";
+import { main } from "../actions/main.ts";
 
-import { global } from "../global.ts";
-
-interface rawFlags {
+export interface rawFlags {
   command?: string | number;
   logLevel?: unknown;
   version?: unknown;
@@ -18,7 +18,7 @@ interface rawFlags {
   gui?: unknown;
 }
 
-interface Flags {
+export interface Flags {
   command?: string;
   logLevel?: string;
   version?: boolean;
@@ -26,20 +26,12 @@ interface Flags {
   gui?: boolean;
 }
 
-export const globalCommand: Command = {
-  name: "",
-  description:
-    "nest.land - A module registry and CDN for Deno, on the permaweb",
-  options: globalOptions,
-  arguments: ["[command]"],
-  subCommands: globalCommands,
-  action,
-};
+mainCommand.action = action;
 
 async function action() {
   const { _: [command], "log-level": logLevel, version, help, gui } = parse(
     Deno.args,
-    { alias: aliasesFromOptions(globalCommand.options) },
+    { alias: aliasesFromOptions(mainCommand.options) },
   );
 
   setupLogLevel();
@@ -47,7 +39,7 @@ async function action() {
   try {
     const flags = assertFlags({ command, logLevel, version, help, gui });
 
-    await global(
+    await main(
       flags.command,
       flags.logLevel,
       flags.version,
@@ -57,7 +49,7 @@ async function action() {
 
     Deno.exit(0);
   } catch (err) {
-    if (err instanceof CLIError) {
+    if (err instanceof NestCLIError) {
       log.debug(err.stack);
       Deno.exit(1);
     }
@@ -72,23 +64,23 @@ function assertFlags(
 ): Flags {
   if (command !== undefined && typeof command !== "string") {
     log.error(`Command should be of type string. Received ${command}`);
-    throw new CLIError("Invalid type (command)");
+    throw new NestCLIError("Invalid type (command)");
   }
   if (logLevel !== undefined && typeof logLevel !== "string") {
     log.error(`Log level should be of type string. Received ${logLevel}`);
-    throw new CLIError("Invalid type (logLevel)");
+    throw new NestCLIError("Invalid type (logLevel)");
   }
   if (version !== undefined && typeof version !== "boolean") {
     log.error(`Version should be of type boolean. Received ${version}`);
-    throw new CLIError("Invalid type (version)");
+    throw new NestCLIError("Invalid type (version)");
   }
   if (help !== undefined && typeof help !== "boolean") {
     log.error(`Help should be of type boolean. Received ${help}`);
-    throw new CLIError("Invalid type (help)");
+    throw new NestCLIError("Invalid type (help)");
   }
   if (gui !== undefined && typeof gui !== "boolean") {
     log.error(`GUI should be of type boolean. Received ${gui}`);
-    throw new CLIError("Invalid type (gui)");
+    throw new NestCLIError("Invalid type (gui)");
   }
   return { command, logLevel, version, help, gui };
 }

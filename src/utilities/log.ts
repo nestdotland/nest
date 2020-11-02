@@ -1,5 +1,5 @@
 import { blue, bold, gray, path, red, stripColor, yellow } from "../../deps.ts";
-import { CLIError } from "../error.ts";
+import { NestCLIError } from "../error.ts";
 import { version } from "../version.ts";
 import { highlight } from "./fmt.ts";
 
@@ -88,7 +88,7 @@ export function setupLogLevel(logLevel?: string) {
         Number.isNaN(Number.parseInt(level))
       ),
     );
-    throw new CLIError("Invalid value (log level)");
+    throw new NestCLIError("Invalid value (log level)");
   }
 }
 
