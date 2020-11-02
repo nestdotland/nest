@@ -1,18 +1,12 @@
 import { parse } from "../../deps.ts";
 import { log } from "../utilities/log.ts";
-import { upgrade } from "../actions/upgrade.ts";
-import { limitArgs, limitOptions } from "../utilities/cli.ts";
-import { mainCommand, mainOptions } from "../main.ts";
-import type { Command } from "../utilities/types.ts";
 import { NestCLIError } from "../error.ts";
+import { limitArgs, limitOptions } from "../utilities/cli.ts";
+import type { Command } from "../utilities/types.ts";
 
-interface rawFlags {
-  version?: string | number;
-}
+import { mainOptions } from "./main/options.ts";
 
-interface Flags {
-  version?: string;
-}
+import { upgrade } from "../functions/upgrade.ts";
 
 export const upgradeCommand: Command = {
   name: "upgrade",
@@ -23,9 +17,7 @@ export const upgradeCommand: Command = {
   action,
 };
 
-mainCommand.subCommands[upgradeCommand.name] = upgradeCommand;
-
-async function action() {
+export async function action() {
   const { _: [_, version, ...remainingArgs], ...remainingOptions } = parse(
     Deno.args,
   );
@@ -36,6 +28,14 @@ async function action() {
   const flags = assertFlags({ version });
 
   await upgrade(flags.version);
+}
+
+interface rawFlags {
+  version?: string | number;
+}
+
+interface Flags {
+  version?: string;
 }
 
 function assertFlags({ version }: rawFlags): Flags {

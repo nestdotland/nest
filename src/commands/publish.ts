@@ -1,22 +1,12 @@
 import { parse } from "../../deps.ts";
 import { log } from "../utilities/log.ts";
-import { publish } from "../actions/publish.ts";
-import {
-  aliasesFromOptions,
-  limitArgs,
-  limitOptions,
-} from "../utilities/cli.ts";
-import { mainCommand, mainOptions } from "../main.ts";
-import type { Command, Option } from "../utilities/types.ts";
 import { NestCLIError } from "../error.ts";
+import { limitArgs, limitOptions } from "../utilities/cli.ts";
+import type { Command, Option } from "../utilities/types.ts";
 
-interface rawFlags {
-  version?: string | number;
-}
+import { mainOptions } from "./main/options.ts";
 
-interface Flags {
-  version?: string;
-}
+import { publish } from "../functions/publish.ts";
 
 const options: Option[] = [
   ...mainOptions,
@@ -40,19 +30,14 @@ export const publishCommand: Command = {
   name: "publish",
   description: "Publishes your module to the nest.land registry",
   arguments: ["[version]"],
-  options,
+  options: mainOptions,
   subCommands: {},
   action,
 };
 
-mainCommand.subCommands[publishCommand.name] = publishCommand;
-
-async function action() {
-  const { _: [_, version, ...remainingArgs], pre, ...remainingOptions } = parse(
+export async function action() {
+  const { _: [_, version, ...remainingArgs], ...remainingOptions } = parse(
     Deno.args,
-    {
-      alias: aliasesFromOptions(publishCommand.options),
-    },
   );
 
   limitOptions(remainingOptions, mainOptions);
@@ -61,6 +46,14 @@ async function action() {
   const flags = assertFlags({ version });
 
   await publish();
+}
+
+interface rawFlags {
+  version?: string | number;
+}
+
+interface Flags {
+  version?: string;
 }
 
 function assertFlags({ version }: rawFlags): Flags {

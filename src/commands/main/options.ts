@@ -1,4 +1,4 @@
-import { Command, Option } from "./utilities/types.ts";
+import type { Option } from "../../utilities/types.ts";
 
 export const mainOptions: Option[] = [
   {
@@ -24,13 +24,3 @@ export const mainOptions: Option[] = [
     description: "Perform the task in the gui",
   },
 ];
-
-export const mainCommand: Command = {
-  name: "",
-  description:
-    "nest.land - A module registry and CDN for Deno, on the permaweb",
-  options: mainOptions,
-  arguments: ["[command]"],
-  subCommands: {},
-  action: async () => {},
-};

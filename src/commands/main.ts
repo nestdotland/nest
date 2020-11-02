@@ -1,37 +1,28 @@
 import { parse } from "../../deps.ts";
 import { handleError, log, setupLogLevel } from "../utilities/log.ts";
-import { aliasesFromOptions } from "../utilities/cli.ts";
 import { NestCLIError } from "../error.ts";
-import { mainCommand, mainOptions } from "../main.ts";
+import { aliasesFromOptions } from "../utilities/cli.ts";
+import type { Command } from "../utilities/types.ts";
 
-import "./upgrade.ts";
-import "./publish.ts";
-import "./help.ts";
+import { mainOptions } from "./main/options.ts";
+import { mainCommands } from "./main/commands.ts";
 
-import { main } from "../actions/main.ts";
+import { main } from "../functions/main.ts";
 
-export interface rawFlags {
-  command?: string | number;
-  logLevel?: unknown;
-  version?: unknown;
-  help?: unknown;
-  gui?: unknown;
-}
+export const mainCommand: Command = {
+  name: "",
+  description:
+    "nest.land - A module registry and CDN for Deno, on the permaweb",
+  options: mainOptions,
+  arguments: ["[command]"],
+  subCommands: mainCommands,
+  action,
+};
 
-export interface Flags {
-  command?: string;
-  logLevel?: string;
-  version?: boolean;
-  help?: boolean;
-  gui?: boolean;
-}
-
-mainCommand.action = action;
-
-async function action() {
+export async function action() {
   const { _: [command], "log-level": logLevel, version, help, gui } = parse(
     Deno.args,
-    { alias: aliasesFromOptions(mainCommand.options) },
+    { alias: aliasesFromOptions(mainOptions) },
   );
 
   setupLogLevel();
@@ -57,6 +48,22 @@ async function action() {
     await handleError(err);
     Deno.exit(2);
   }
+}
+
+interface rawFlags {
+  command?: string | number;
+  logLevel?: unknown;
+  version?: unknown;
+  help?: unknown;
+  gui?: unknown;
+}
+
+interface Flags {
+  command?: string;
+  logLevel?: string;
+  version?: boolean;
+  help?: boolean;
+  gui?: boolean;
 }
 
 function assertFlags(

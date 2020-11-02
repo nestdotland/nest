@@ -1,19 +1,13 @@
 import { parse } from "../../deps.ts";
 import { log } from "../utilities/log.ts";
-import { limitArgs, limitOptions } from "../utilities/cli.ts";
-import { mainCommand, mainOptions } from "../main.ts";
-import type { Command } from "../utilities/types.ts";
 import { NestCLIError } from "../error.ts";
+import { limitOptions } from "../utilities/cli.ts";
+import type { Command } from "../utilities/types.ts";
 
-import { help } from "../actions/help.ts";
+import { mainOptions } from "./main/options.ts";
+import { mainCommand } from "../commands/main.ts";
 
-interface rawFlags {
-  command?: string | number;
-}
-
-interface Flags {
-  command?: string;
-}
+import { help } from "../functions/help.ts";
 
 export const helpCommand: Command = {
   name: "help",
@@ -24,19 +18,24 @@ export const helpCommand: Command = {
   action,
 };
 
-mainCommand.subCommands[helpCommand.name] = helpCommand;
-
-async function action() {
-  const { _: [_, command, ...remainingArgs], ...remainingOptions } = parse(
+export async function action() {
+  const { _: [_, command], ...remainingOptions } = parse(
     Deno.args,
   );
 
   limitOptions(remainingOptions, mainOptions);
-  limitArgs(remainingArgs);
 
   const flags = assertFlags({ command });
 
   help(mainCommand, flags.command);
+}
+
+interface rawFlags {
+  command?: string | number;
+}
+
+interface Flags {
+  command?: string;
 }
 
 function assertFlags({ command }: rawFlags): Flags {
