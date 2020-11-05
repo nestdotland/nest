@@ -14,7 +14,7 @@ export const helpCommand: Command = {
   description: "Show this help or the help of a sub-command",
   arguments: [{
     name: "[command]",
-    description: ""
+    description: "A command",
   }],
   options: mainOptions,
   subCommands: {},
@@ -34,11 +34,11 @@ export async function action() {
 }
 
 interface rawFlags {
-  command?: string | number;
+  command: string | number | undefined;
 }
 
 interface Flags {
-  command?: string;
+  command: string | undefined;
 }
 
 function assertFlags({ command }: rawFlags): Flags {

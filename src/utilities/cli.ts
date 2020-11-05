@@ -2,7 +2,8 @@ import type { Option } from "./types.ts";
 import { log } from "../utilities/log.ts";
 import { NestCLIError } from "../error.ts";
 
-export function aliasesFromOptions(options: Option[]) {
+/** Generates aliases from options for the `parse` function. */
+export function aliasesFromOptions(options: Option[]): Record<string, string> {
   const aliases: Record<string, string> = {};
 
   for (let i = 0; i < options.length; i++) {
@@ -35,6 +36,7 @@ function extractFlags(options: Option[]) {
   return flags;
 }
 
+/** Will throw if `options` is not empty. */
 export function limitOptions(
   options: Record<string, unknown>,
   baseOptions: Option[],
@@ -53,6 +55,7 @@ export function limitOptions(
   throw new NestCLIError("Unknown options");
 }
 
+/** Will throw if `args` is not empty. */
 export function limitArgs(args: unknown[]) {
   if (args.length === 0) return;
   log.error("Too many arguments:", args.join(", "));

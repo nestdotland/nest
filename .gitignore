@@ -2,9 +2,10 @@
 .idea/
 .vscode/
 
-# Nest.land - eggs
+# Nest.land
 nestkey.json
 eggs-debug.log
+nest-debug.log
 
 # Benchmarks
 benchmarks/**

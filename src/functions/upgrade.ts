@@ -1,11 +1,12 @@
-import { NestLand, semver } from "../../deps.ts";
+import { bold, NestLand, semver } from "../../deps.ts";
 import { log } from "../utilities/log.ts";
 import { version as CLIVersion } from "../version.ts";
 
 export async function upgrade(givenVersion?: string) {
+  // TODO: change `eggs` to `nest`
   const versions = await NestLand.sortedVersions("eggs", "nestdotland");
 
-  const latest = versions[0];
+  const latest = versions[versions.length - 1];
 
   const version = semver.valid(givenVersion || latest);
   if (version === null) {
@@ -20,7 +21,7 @@ export async function upgrade(givenVersion?: string) {
 
   if (!versions.includes(version)) {
     log.error(`Version ${version} has not been found.`);
-    log.info("Published versions:", versions);
+    log.info("Published versions:", versions.reverse());
     return;
   }
 
@@ -43,12 +44,12 @@ export async function upgrade(givenVersion?: string) {
     await upgradeProcess.stderrOutput(),
   );
 
-  log.debug("stdout: ", stdout);
-  log.debug("stderr: ", stderr);
+  log.debug("stdout:", stdout);
+  log.debug("stderr:", stderr);
 
   if (!status.success) {
+    log.plain(stderr);
     log.error(`Failed to upgrade nest CLI to v${version} !`);
-    log.error(stderr);
   } else {
     log.info(`Successfully upgraded nest CLI to v${version}!`);
   }

@@ -9,7 +9,6 @@ export async function main(
   logLevel?: string,
   version?: boolean,
   help?: boolean,
-  gui?: boolean,
 ) {
   if (version) {
     console.info(currentVersion);

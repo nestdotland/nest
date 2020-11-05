@@ -13,7 +13,7 @@ export const upgradeCommand: Command = {
   description: "Upgrade nest cli to the given version",
   arguments: [{
     name: "[version]",
-    description: "A given version, the latest by default"
+    description: "A given version, the latest by default",
   }],
   options: mainOptions,
   subCommands: {},
@@ -34,11 +34,11 @@ export async function action() {
 }
 
 interface rawFlags {
-  version?: string | number;
+  version: string | number | undefined;
 }
 
 interface Flags {
-  version?: string;
+  version: string | undefined;
 }
 
 function assertFlags({ version }: rawFlags): Flags {

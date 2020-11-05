@@ -86,6 +86,6 @@ task("setup-github-actions", [], async function () {
 }); */
 
 desc("Development tools. Should ideally be run before each commit.");
-task("dev", ["format", "lint", "test" /* "dry-publish" */]);
+task("dev", ["format", "lint" /*, "test", "dry-publish" */]);
 
 run();

@@ -18,7 +18,9 @@ export const mainOptions: Option[] = [
   {
     flag: "-l, --log",
     argument: "<path>",
-    description: `Specify filepath to output logs, ${underline("nest-debug.log")} by default`,
+    description: `Specify filepath to output logs, ${
+      underline("nest-debug.log")
+    } by default`,
   },
   {
     flag: "-G, --gui",
