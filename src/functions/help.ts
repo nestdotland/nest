@@ -1,13 +1,12 @@
 import { bold, green, magenta, sprintf, underline } from "../../deps.ts";
-import { version } from "../version.ts";
-import { Command } from "../utilities/types.ts";
+import type { Command } from "../utilities/types.ts";
 import { log } from "../utilities/log.ts";
 import { NestCLIError } from "../error.ts";
 
 export function help(main: Command, name?: string) {
   if (name) {
     if (name in main.subCommands) {
-      getHelp(main.subCommands[name]);
+      printHelp(main.subCommands[name]);
     } else {
       log.error(`${underline(name)} is not valid command name.`);
       log.info(
@@ -18,13 +17,13 @@ export function help(main: Command, name?: string) {
       throw new NestCLIError("Invalid command name (help)");
     }
   } else {
-    getHelp(main);
+    printHelp(main);
   }
   return;
 }
 
-export function getHelp(command: Command) {
-  const header = `\nnest CLI v${version}\n\n`;
+export function printHelp(command: Command) {
+  // TODO(@oganexon): refactor this function
 
   const description = `  ${command.description.replaceAll("\n", "\n  ")}\n\n`;
 

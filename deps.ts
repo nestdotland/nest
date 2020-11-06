@@ -2,7 +2,7 @@
 export * from "https://deno.land/std@0.74.0/fmt/colors.ts";
 export * from "https://deno.land/std@0.74.0/fmt/printf.ts";
 
-export { parse } from "https://deno.land/std@0.74.0/flags/mod.ts";
+export { Args, parse } from "https://deno.land/std@0.74.0/flags/mod.ts";
 
 export * as path from "https://x.nest.land/std@0.74.0/path/mod.ts";
 

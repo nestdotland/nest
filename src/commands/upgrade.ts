@@ -1,4 +1,5 @@
 import { parse } from "../../deps.ts";
+import type { Args } from "../../deps.ts";
 import { log } from "../utilities/log.ts";
 import { NestCLIError } from "../error.ts";
 import { limitArgs, limitOptions } from "../utilities/cli.ts";
@@ -21,27 +22,21 @@ export const upgradeCommand: Command = {
 };
 
 export async function action() {
-  const { _: [_, version, ...remainingArgs], ...remainingOptions } = parse(
-    Deno.args,
-  );
+  const { version } = assertFlags(parse(Deno.args));
 
-  limitOptions(remainingOptions, mainOptions);
-  limitArgs(remainingArgs);
-
-  const flags = assertFlags({ version });
-
-  await upgrade(flags.version);
-}
-
-interface rawFlags {
-  version: string | number | undefined;
+  await upgrade(version);
 }
 
 interface Flags {
   version: string | undefined;
 }
 
-function assertFlags({ version }: rawFlags): Flags {
+function assertFlags(
+  { _: [_, version, ...remainingArgs], ...remainingOptions }: Args,
+): Flags {
+  limitOptions(remainingOptions, mainOptions);
+  limitArgs(remainingArgs);
+
   if (version !== undefined && typeof version !== "string") {
     log.error(`Version should be of type string. Received ${version}`);
     throw new NestCLIError("Invalid type (version)");

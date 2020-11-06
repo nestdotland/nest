@@ -1,4 +1,5 @@
 import { parse } from "../../deps.ts";
+import type { Args } from "../../deps.ts";
 import {
   handleError,
   log,
@@ -28,26 +29,15 @@ export const mainCommand: Command = {
 };
 
 export async function action() {
-  const {
-    _: [command],
-    "log-level": logLevel,
-    version,
-    help,
-    gui,
-    log: logFile,
-  } = parse(
-    Deno.args,
-    { alias: aliasesFromOptions(mainOptions) },
-  );
-
   setupLogLevel();
 
   let logToFile: string | undefined;
 
   try {
-    const flags = assertFlags(
-      { command, logLevel, version, help, gui, logFile },
-    );
+    const flags = assertFlags(parse(
+      Deno.args,
+      { alias: aliasesFromOptions(mainOptions) },
+    ));
 
     logToFile = typeof flags.logFile === "string" ? flags.logFile : undefined;
 
@@ -74,15 +64,6 @@ export async function action() {
   }
 }
 
-interface rawFlags {
-  command: string | number | undefined;
-  logLevel: unknown;
-  logFile: unknown;
-  version: unknown;
-  help: unknown;
-  gui: unknown;
-}
-
 interface Flags {
   command: string | undefined;
   logLevel: string | undefined;
@@ -93,7 +74,14 @@ interface Flags {
 }
 
 function assertFlags(
-  { command, logLevel, version, help, gui, logFile }: rawFlags,
+  {
+    _: [command],
+    "log-level": logLevel,
+    version,
+    help,
+    gui,
+    log: logFile,
+  }: Args,
 ): Flags {
   if (command !== undefined && typeof command !== "string") {
     log.error(`Command should be of type string. Received ${command}`);

@@ -1,4 +1,5 @@
 import { parse } from "../../deps.ts";
+import type { Args } from "../../deps.ts";
 import { log } from "../utilities/log.ts";
 import { NestCLIError } from "../error.ts";
 import { limitOptions } from "../utilities/cli.ts";
@@ -22,26 +23,18 @@ export const helpCommand: Command = {
 };
 
 export async function action() {
-  const { _: [_, command], ...remainingOptions } = parse(
-    Deno.args,
-  );
-
-  limitOptions(remainingOptions, mainOptions);
-
-  const flags = assertFlags({ command });
+  const flags = assertFlags(parse(Deno.args));
 
   help(mainCommand, flags.command);
-}
-
-interface rawFlags {
-  command: string | number | undefined;
 }
 
 interface Flags {
   command: string | undefined;
 }
 
-function assertFlags({ command }: rawFlags): Flags {
+function assertFlags({ _: [_, command], ...remainingOptions }: Args): Flags {
+  limitOptions(remainingOptions, mainOptions);
+
   if (command !== undefined && typeof command !== "string") {
     log.error(`Command should be of type string. Received ${command}`);
     throw new NestCLIError("Invalid type (version)");

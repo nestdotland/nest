@@ -1,4 +1,5 @@
 import { parse, underline } from "../../deps.ts";
+import type { Args } from "../../deps.ts";
 import { log } from "../utilities/log.ts";
 import { NestCLIError } from "../error.ts";
 import {
@@ -49,32 +50,12 @@ export const publishCommand: Command = {
 };
 
 export async function action() {
-  const {
-    _: [_, version, ...remainingArgs],
-    yes,
-    "dry-run": dryRun,
-    "git-tag": gitTag,
-    pre,
-    ...remainingOptions
-  } = parse(
+  const flags = assertFlags(parse(
     Deno.args,
     { alias: aliasesFromOptions(options) },
-  );
-
-  limitOptions(remainingOptions, mainOptions);
-  limitArgs(remainingArgs);
-
-  const flags = assertFlags({ version, yes, dryRun, gitTag, pre });
+  ));
 
   await publish();
-}
-
-interface rawFlags {
-  yes: unknown;
-  dryRun: unknown;
-  gitTag: unknown;
-  pre: unknown;
-  version: string | number | undefined;
 }
 
 interface Flags {
@@ -85,7 +66,17 @@ interface Flags {
   version: string | undefined;
 }
 
-function assertFlags({ version, yes, dryRun, gitTag, pre }: rawFlags): Flags {
+function assertFlags({
+  _: [_, version, ...remainingArgs],
+  yes,
+  "dry-run": dryRun,
+  "git-tag": gitTag,
+  pre,
+  ...remainingOptions
+}: Args): Flags {
+  limitOptions(remainingOptions, mainOptions);
+  limitArgs(remainingArgs);
+
   if (yes !== undefined && typeof yes !== "boolean") {
     log.error(`Version should be of type boolean. Received ${yes}`);
     throw new NestCLIError("Invalid type (yes)");

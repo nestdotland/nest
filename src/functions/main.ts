@@ -30,6 +30,7 @@ export async function main(
       throw new NestCLIError("Unknown command");
     }
   } else {
+    // default action
     displayHelp(mainCommand);
   }
 }

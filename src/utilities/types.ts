@@ -21,18 +21,18 @@ export interface Command {
 }
 
 export interface Hooks {
-  presync: string;
-  postsync: string;
-  prepack: string;
-  postpack: string;
-  prepublish: string;
-  postpublish: string;
-  preaudit: string;
-  postaudit: string;
+  presync?: string;
+  postsync?: string;
+  prepack?: string;
+  postpack?: string;
+  prepublish?: string;
+  postpublish?: string;
+  preaudit?: string;
+  postaudit?: string;
 }
 
 export interface Module {
-  $schema: string;
+  $schema?: string;
 
   name: string;
   fullName?: string;
@@ -40,7 +40,7 @@ export interface Module {
   homepage?: string;
   license?: string;
 
-  hooks: Hooks;
+  hooks?: Hooks;
 
   unlisted?: boolean;
   private?: boolean;
