@@ -74,7 +74,7 @@ function assertFlags({
   pre,
   ...remainingOptions
 }: Args): Flags {
-  limitOptions(remainingOptions, mainOptions);
+  limitOptions(remainingOptions, options);
   limitArgs(remainingArgs);
 
   if (yes !== undefined && typeof yes !== "boolean") {
