@@ -1,11 +1,11 @@
 import { parse, underline } from "../../deps.ts";
 import type { Args } from "../../deps.ts";
-import { log } from "../utilities/log.ts";
 import { NestCLIError } from "../error.ts";
 import {
   aliasesFromOptions,
   limitArgs,
   limitOptions,
+  setupCheckType,
 } from "../utilities/cli.ts";
 import type { Command, Option } from "../utilities/types.ts";
 
@@ -77,27 +77,15 @@ function assertFlags({
   limitOptions(remainingOptions, options);
   limitArgs(remainingArgs);
 
-  if (yes !== undefined && typeof yes !== "boolean") {
-    log.error(`Version should be of type boolean. Received ${yes}`);
-    throw new NestCLIError("Invalid type (yes)");
-  }
-  if (dryRun !== undefined && typeof dryRun !== "boolean") {
-    log.error(`Version should be of type boolean. Received ${dryRun}`);
-    throw new NestCLIError("Invalid type (dryRun)");
-  }
-  if (gitTag !== undefined && typeof gitTag !== "boolean") {
-    log.error(`Version should be of type string. Received ${gitTag}`);
-    throw new NestCLIError("Invalid type (gitTag)");
-  }
-  if (
-    pre !== undefined && typeof pre !== "string" && typeof pre !== "boolean"
-  ) {
-    log.error(`Version should be of type string or boolean. Received ${pre}`);
-    throw new NestCLIError("Invalid type (pre)");
-  }
-  if (version !== undefined && typeof version !== "string") {
-    log.error(`Version should be of type string. Received ${version}`);
-    throw new NestCLIError("Invalid type (version)");
-  }
-  return { version, yes, dryRun, gitTag, pre };
+  const { checkType, typeError } = setupCheckType("flags");
+
+  checkType("--yes", yes, ["boolean"]);
+  checkType("--dry-run", dryRun, ["boolean"]);
+  checkType("--git-tag", gitTag, ["boolean"]);
+  checkType("--pre", pre, ["string", "boolean"]);
+  checkType("[version]", version, ["string"]);
+
+  if (typeError()) throw new NestCLIError("Flags: Invalid type");
+
+  return { version, yes, dryRun, gitTag, pre } as Flags;
 }

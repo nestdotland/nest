@@ -2,6 +2,7 @@ import type { Option } from "./types.ts";
 import { log } from "../utilities/log.ts";
 import { NestCLIError } from "../error.ts";
 import { likelyString } from "./levenshtein.ts";
+import { blue, bold, underline } from "../../deps.ts";
 
 /** Generates aliases from options for the `parse` function. */
 export function aliasesFromOptions(options: Option[]): Record<string, string> {
@@ -49,35 +50,35 @@ export function limitOptions(
   options: Record<string, unknown>,
   baseOptions: Option[],
 ) {
-  const baseFlags = extractFlags(baseOptions);
-  const delta = Object.keys(options).filter((flag) =>
-    !baseFlags.includes(flag)
+  const reference = extractFlags(baseOptions);
+  const misspelled = Object.keys(options).filter((flag) =>
+    !reference.includes(flag)
   );
-  if (delta.length === 0) return;
-  if (delta.length === 1) {
-    const option = delta[0];
-    log.error("Unknown option:", keyToOption(option));
-    const likely = likelyString(option, baseFlags);
-    if (likely) {
-      log.plain(`Did you mean ${keyToOption(likely)} ?`);
-    }
-  } else {
-    log.error(
-      "Unknown options:",
-      delta.map((key) => keyToOption(key)).join(", "),
-    );
-    const likelyKeys = delta
-      .map((option) => likelyString(option, baseFlags))
-      .filter((option): option is string => option !== undefined);
-    if (likelyKeys.length > 0) {
-      log.plain(
-        `Did you mean ${
-          likelyKeys.map((key) => keyToOption(key)).join(", ")
-        } ?`,
-      );
-    }
-  }
+  if (misspelled.length === 0) return;
+  log.error(
+    `Unknown option${misspelled.length === 1 ? "" : "s"} in config:`,
+    misspelled.map((key) => underline(key)).join(", "),
+  );
+  didYouMean(reference, misspelled, keyToOption);
   throw new NestCLIError("Unknown options");
+}
+
+/** Will throw if `fields` is not empty. */
+export function limitFields(
+  file: string,
+  fields: Record<string, unknown>,
+  baseFields: Record<string, unknown>,
+) {
+  const misspelled = Object.keys(fields);
+  const reference = Object.keys(baseFields);
+  if (misspelled.length === 0) return;
+  log.error(
+    bold(file),
+    `Unknown field${misspelled.length === 1 ? "" : "s"} in config:`,
+    misspelled.map((key) => underline(key)).join(", "),
+  );
+  didYouMean(reference, misspelled);
+  throw new NestCLIError("Unknown fields");
 }
 
 /** Will throw if `args` is not empty. */
@@ -85,4 +86,56 @@ export function limitArgs(args: unknown[]) {
   if (args.length === 0) return;
   log.error("Too many arguments:", args.join(", "));
   throw new NestCLIError("Too many arguments");
+}
+
+export function didYouMean(
+  reference: string[],
+  misspelled: string[],
+  format = (likely: string) => likely,
+): void {
+  if (misspelled.length === 0) return;
+  const likelyKeys = misspelled
+    .map((value) => likelyString(value, reference))
+    .filter((likely): likely is string => likely !== undefined);
+  if (likelyKeys.length > 0) {
+    log.plain(
+      `\nDid you mean ${
+        likelyKeys.map((likely) => bold(format(likely))).join(", ")
+      } ?`,
+    );
+  }
+}
+
+type TypeOf = "boolean" | "string" | "number" | "object";
+
+export function setupCheckType(file = "") {
+  file = file ? bold(file) : "";
+  let wrongType = false;
+  return {
+    checkType(
+      name: string,
+      value: unknown,
+      type: TypeOf[],
+      required = false,
+    ) {
+      if (
+        type.reduce(
+          (previous: boolean, current: TypeOf) =>
+            previous && typeof value !== current,
+          true,
+        ) && (required ? value === undefined : value !== undefined)
+      ) {
+        log.error(
+          file ? `${file}:` : "",
+          underline(name),
+          `should be of type ${blue(type.join(" or "))}. Received`,
+          value,
+        );
+        wrongType = true;
+      }
+    },
+    typeError() {
+      return wrongType;
+    },
+  };
 }

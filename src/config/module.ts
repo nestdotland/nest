@@ -1,40 +1,44 @@
 import { path } from "../../deps.ts";
 import { readJson } from "../utilities/json.ts";
 import { NEST_DIRECTORY } from "./nest.ts";
+import { log, setupLogLevel } from "../utilities/log.ts";
 import type { Module } from "../utilities/types.ts";
+import { limitFields, setupCheckType } from "../utilities/cli.ts";
+import { NestCLIError } from "../error.ts";
 
 export const MODULE_FILE = "module.json";
 export const MODULE_PATH = path.join(NEST_DIRECTORY, MODULE_FILE);
 
-interface RawHooks {
-  presync: unknown;
-  postsync: unknown;
-  prepack: unknown;
-  postpack: unknown;
-  prepublish: unknown;
-  postpublish: unknown;
-  preaudit: unknown;
-  postaudit: unknown;
-}
+const emptyHooks = {
+  presync: "",
+  postsync: "",
+  prepack: "",
+  postpack: "",
+  prepublish: "",
+  postpublish: "",
+  preaudit: "",
+  postaudit: "",
+};
 
-interface RawModule {
-  $schema: unknown;
+const emptyModule = {
+  $schema: "",
 
-  name: unknown;
-  fullName: unknown;
-  description: unknown;
-  homepage: unknown;
-  license: unknown;
+  name: "",
+  fullName: "",
+  description: "",
+  homepage: "",
+  license: "",
 
-  hooks: unknown;
+  hooks: emptyHooks,
 
-  unlisted: unknown;
-  private: unknown;
-  [key: string]: unknown;
-}
+  unlisted: false,
+  private: false,
+};
+
+type RawJson = Record<string, unknown>;
 
 export async function readModule() {
-  const json = await readJson(MODULE_PATH) as RawModule;
+  const json = await readJson(MODULE_PATH) as RawJson;
 
   const {
     $schema,
@@ -45,7 +49,7 @@ export async function readModule() {
     license,
     hooks,
     unlisted,
-    isPrivate,
+    private: isPrivate,
   } = assertModule(json);
 }
 
@@ -59,8 +63,25 @@ function assertModule({
   hooks,
   unlisted,
   private: isPrivate,
-  ...rest
-}: RawModule) {
+  ...remainingFields
+}: RawJson): Module {
+  limitFields(MODULE_FILE, remainingFields, emptyModule);
+
+  const { checkType, typeError } = setupCheckType(MODULE_FILE);
+
+  checkType("$schema", $schema, ["string"]);
+  checkType("name", name, ["string"], true);
+  checkType("$schema", $schema, ["string"]);
+  checkType("fullName", fullName, ["string"]);
+  checkType("description", description, ["string"]);
+  checkType("homepage", homepage, ["string"]);
+  checkType("license", license, ["string"]);
+  checkType("hooks", hooks, ["object"]);
+  checkType("unlisted", unlisted, ["boolean"]);
+  checkType("private", isPrivate, ["boolean"]);
+
+  if (typeError()) throw new NestCLIError("Config: Invalid type");
+
   return {
     $schema,
     name,
@@ -70,6 +91,10 @@ function assertModule({
     license,
     hooks,
     unlisted,
-    isPrivate,
-  };
+    private: isPrivate,
+  } as Module;
 }
+
+setupLogLevel("info");
+
+await readModule();

@@ -1,3 +1,10 @@
+/** Returns the most likely string in the array if the distance is >= 0.6 */
+export function likelyString(str: string, array: string[]): string | undefined {
+  const sorted = levenshteinSort(str, array);
+  const likely = sorted[sorted.length - 1];
+  return levenshtein(str, likely) >= 0.6 ? likely : undefined;
+}
+
 /** Computes the Levenshtein distance between two strings */
 export function levenshtein(s1: string, s2: string): number {
   let longer = s1;
@@ -13,14 +20,12 @@ export function levenshtein(s1: string, s2: string): number {
   return (longerLength - distance(longer, shorter)) / longerLength;
 }
 
+/** Efficient levenshtein sort */
 export function levenshteinSort(s: string, array: string[]) {
-  return array.sort((a, b) => levenshtein(s, a) - levenshtein(s, b));
-}
-
-export function likelyString(str: string, array: string[]): string | undefined {
-  const sorted = levenshteinSort(str, array);
-  const likely = sorted[sorted.length - 1];
-  return levenshtein(str, likely) >= 0.6 ? likely : undefined;
+  return array
+    .map((value) => [levenshtein(s, value), value] as [number, string])
+    .sort(([a], [b]) => a - b)
+    .map(([_, str]) => str);
 }
 
 function distance(s1: string, s2: string): number {

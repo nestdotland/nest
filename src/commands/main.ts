@@ -7,7 +7,7 @@ import {
   writeLogFile,
 } from "../utilities/log.ts";
 import { NestCLIError } from "../error.ts";
-import { aliasesFromOptions } from "../utilities/cli.ts";
+import { aliasesFromOptions, setupCheckType } from "../utilities/cli.ts";
 import type { Command } from "../utilities/types.ts";
 
 import { mainOptions } from "./main/options.ts";
@@ -69,7 +69,7 @@ interface Flags {
   logLevel: string | undefined;
   logFile: string | boolean | undefined;
   version: boolean | undefined;
-  help: boolean | undefined;
+  help: unknown;
   gui: boolean | undefined;
 }
 
@@ -83,32 +83,15 @@ function assertFlags(
     log: logFile,
   }: Args,
 ): Flags {
-  if (command !== undefined && typeof command !== "string") {
-    log.error(`Command should be of type string. Received ${command}`);
-    throw new NestCLIError("Invalid type (command)");
-  }
-  if (logLevel !== undefined && typeof logLevel !== "string") {
-    log.error(`Log level should be of type string. Received ${logLevel}`);
-    throw new NestCLIError("Invalid type (logLevel)");
-  }
-  if (
-    logFile !== undefined && typeof logFile !== "string" &&
-    typeof logFile !== "boolean"
-  ) {
-    log.error(`Log should be of type string or boolean. Received ${logFile}`);
-    throw new NestCLIError("Invalid type (logToFile)");
-  }
-  if (version !== undefined && typeof version !== "boolean") {
-    log.error(`Version should be of type boolean. Received ${version}`);
-    throw new NestCLIError("Invalid type (version)");
-  }
-  if (help !== undefined && typeof help !== "boolean") {
-    log.error(`Help should be of type boolean. Received ${help}`);
-    throw new NestCLIError("Invalid type (help)");
-  }
-  if (gui !== undefined && typeof gui !== "boolean") {
-    log.error(`GUI should be of type boolean. Received ${gui}`);
-    throw new NestCLIError("Invalid type (gui)");
-  }
-  return { command, logLevel, version, help, gui, logFile };
+  const { checkType, typeError } = setupCheckType("flags");
+
+  checkType("[command]", command, ["string"]);
+  checkType("--log-level", logLevel, ["string"]);
+  checkType("--log", logFile, ["string", "boolean"]);
+  checkType("--version", version, ["boolean"]);
+  checkType("--gui", gui, ["boolean"]);
+
+  if (typeError()) throw new NestCLIError("Flags: Invalid type");
+
+  return { command, logLevel, version, help, gui, logFile } as Flags;
 }

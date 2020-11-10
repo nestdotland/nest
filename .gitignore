@@ -3,6 +3,7 @@
 .vscode/
 
 # Nest.land
+.nest/
 nestkey.json
 eggs-debug.log
 nest-debug.log

@@ -1,8 +1,7 @@
 import { parse } from "../../deps.ts";
 import type { Args } from "../../deps.ts";
-import { log } from "../utilities/log.ts";
 import { NestCLIError } from "../error.ts";
-import { limitArgs, limitOptions } from "../utilities/cli.ts";
+import { limitArgs, limitOptions, setupCheckType } from "../utilities/cli.ts";
 import type { Command } from "../utilities/types.ts";
 
 import { mainOptions } from "./main/options.ts";
@@ -37,9 +36,11 @@ function assertFlags(
   limitOptions(remainingOptions, mainOptions);
   limitArgs(remainingArgs);
 
-  if (version !== undefined && typeof version !== "string") {
-    log.error(`Version should be of type string. Received ${version}`);
-    throw new NestCLIError("Invalid type (version)");
-  }
-  return { version };
+  const { checkType, typeError } = setupCheckType("flags");
+
+  checkType("[version]", version, ["string"]);
+
+  if (typeError()) throw new NestCLIError("Flags: Invalid type");
+
+  return { version } as Flags;
 }

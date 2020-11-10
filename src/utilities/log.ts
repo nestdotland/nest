@@ -49,6 +49,7 @@ function logToMainRecord(prefix: string) {
   return <T>(message: T, ...args: unknown[]) => {
     let msg = `${new Date().toISOString()} ${prefix}`;
     for (const arg of [message, ...args]) {
+      if (arg === "") continue;
       msg += `${
         typeof arg === "string"
           ? stripColor(arg)
@@ -65,6 +66,7 @@ function logToConsole(prefix: string, logLevel: LogLevel) {
   return <T>(message: T, ...args: unknown[]) => {
     let msg = prefix;
     for (const arg of [message, ...args]) {
+      if (arg === "") continue;
       msg += `${
         typeof arg === "string"
           ? arg
