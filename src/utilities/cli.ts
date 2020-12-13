@@ -106,7 +106,7 @@ export function didYouMean(
   }
 }
 
-type TypeOf = "boolean" | "string" | "number" | "object";
+type TypeOf = "boolean" | "string" | "number" | "object" | "array";
 
 export function setupCheckType(file = "") {
   file = file ? bold(file) : "";
@@ -121,7 +121,9 @@ export function setupCheckType(file = "") {
       if (
         type.reduce(
           (previous: boolean, current: TypeOf) =>
-            previous && typeof value !== current,
+            previous && current === "array"
+              ? !Array.isArray(value)
+              : typeof value !== current,
           true,
         ) && (required ? value === undefined : value !== undefined)
       ) {

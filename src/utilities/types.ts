@@ -17,7 +17,7 @@ export interface Command {
   arguments: Argument[];
   options: Option[];
   subCommands: Record<string, Command>;
-  action: (args?: string[]) => Promise<void>;
+  action: (args?: string[]) => Promise<void> | void;
 }
 
 export interface Hooks {
@@ -31,7 +31,7 @@ export interface Hooks {
   postaudit?: string;
 }
 
-export interface Module {
+export interface Meta {
   $schema?: string;
 
   name: string;
@@ -46,15 +46,16 @@ export interface Module {
   private?: boolean;
 }
 
-export interface ModuleData {
-  meta: Module;
+export interface Api {
+  versions: string[];
+  latestVersion: string;
+  lastPublished: number;
+  license: string;
+};
+export interface Module {
+  meta: Meta;
 
-  api: {
-    versions: string[];
-    latestVersion: string;
-    lastPublished: number;
-    license: string;
-  };
+  api: Api;
 
   version: string;
   lastSync: number;

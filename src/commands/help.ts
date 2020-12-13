@@ -21,7 +21,7 @@ export const helpCommand: Command = {
   action,
 };
 
-export async function action() {
+export function action() {
   const flags = assertFlags(parse(Deno.args));
 
   help(mainCommand, flags.command);
