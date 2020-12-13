@@ -31,7 +31,9 @@ interface Flags {
   command: string | undefined;
 }
 
-function assertFlags({ _: [_, command], ...remainingOptions }: Args): Flags {
+function assertFlags(args: Args): Flags {
+  const { _: [_, command], ...remainingOptions } = args;
+
   limitOptions(remainingOptions, mainOptions);
 
   const { checkType, typeError } = setupCheckType("flags");

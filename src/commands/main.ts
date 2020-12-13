@@ -28,18 +28,18 @@ export const mainCommand: Command = {
   action,
 };
 
-export async function action() {
+export async function action(args = Deno.args) {
   setupLogLevel();
 
   let logToFile: string | undefined;
 
   try {
     const flags = assertFlags(parse(
-      Deno.args,
+      args,
       { alias: aliasesFromOptions(mainOptions) },
     ));
 
-    logToFile = typeof flags.logFile === "string" ? flags.logFile : undefined;
+    logToFile = flags.logFile;
 
     await main(
       flags.command,
@@ -67,7 +67,7 @@ export async function action() {
 interface Flags {
   command: string | undefined;
   logLevel: string | undefined;
-  logFile: string | boolean | undefined;
+  logFile: string | undefined;
   version: boolean | undefined;
   help: unknown;
   gui: boolean | undefined;
@@ -87,7 +87,7 @@ function assertFlags(
 
   checkType("[command]", command, ["string"]);
   checkType("--log-level", logLevel, ["string"]);
-  checkType("--log", logFile, ["string", "boolean"]);
+  checkType("--log", logFile, ["string"]);
   checkType("--version", version, ["boolean"]);
   checkType("--gui", gui, ["boolean"]);
 

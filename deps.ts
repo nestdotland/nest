@@ -1,11 +1,11 @@
 /**************** std ****************/
-export * from "https://deno.land/std@0.74.0/fmt/colors.ts";
-export * from "https://deno.land/std@0.74.0/fmt/printf.ts";
+export * from "https://x.nest.land/std@0.80.0/fmt/colors.ts";
+export * from "https://x.nest.land/std@0.80.0/fmt/printf.ts";
 
-export { parse } from "https://deno.land/std@0.74.0/flags/mod.ts";
-export type { Args } from "https://deno.land/std@0.74.0/flags/mod.ts";
+export { parse } from "https://x.nest.land/std@0.80.0/flags/mod.ts";
+export type { Args } from "https://x.nest.land/std@0.80.0/flags/mod.ts";
 
-export * as path from "https://x.nest.land/std@0.74.0/path/mod.ts";
+export * as path from "https://x.nest.land/std@0.80.0/path/mod.ts";
 
 /**************** hatcher ****************/
 

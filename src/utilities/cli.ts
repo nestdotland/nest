@@ -1,8 +1,8 @@
-import type { Option } from "./types.ts";
-import { log } from "../utilities/log.ts";
-import { NestCLIError } from "../error.ts";
-import { likelyString } from "./levenshtein.ts";
 import { blue, bold, underline } from "../../deps.ts";
+import { NestCLIError } from "../error.ts";
+import { log } from "../utilities/log.ts";
+import { likelyString } from "./levenshtein.ts";
+import type { Option } from "./types.ts";
 
 /** Generates aliases from options for the `parse` function. */
 export function aliasesFromOptions(options: Option[]): Record<string, string> {

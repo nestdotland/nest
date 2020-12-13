@@ -49,9 +49,9 @@ export const publishCommand: Command = {
   action,
 };
 
-export async function action() {
+export async function action(args = Deno.args) {
   const flags = assertFlags(parse(
-    Deno.args,
+    args,
     { alias: aliasesFromOptions(options) },
   ));
 
@@ -66,14 +66,16 @@ interface Flags {
   version: string | undefined;
 }
 
-function assertFlags({
-  _: [_, version, ...remainingArgs],
-  yes,
-  "dry-run": dryRun,
-  "git-tag": gitTag,
-  pre,
-  ...remainingOptions
-}: Args): Flags {
+function assertFlags(args: Args): Flags {
+  const {
+    _: [_, version, ...remainingArgs],
+    yes,
+    "dry-run": dryRun,
+    "git-tag": gitTag,
+    pre,
+    ...remainingOptions
+  } = args;
+
   limitOptions(remainingOptions, options);
   limitArgs(remainingArgs);
 

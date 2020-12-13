@@ -17,7 +17,7 @@ export interface Command {
   arguments: Argument[];
   options: Option[];
   subCommands: Record<string, Command>;
-  action: () => Promise<void>;
+  action: (args?: string[]) => Promise<void>;
 }
 
 export interface Hooks {

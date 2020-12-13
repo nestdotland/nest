@@ -20,8 +20,8 @@ export const upgradeCommand: Command = {
   action,
 };
 
-export async function action() {
-  const { version } = assertFlags(parse(Deno.args));
+export async function action(args = Deno.args) {
+  const { version } = assertFlags(parse(args));
 
   await upgrade(version);
 }
@@ -30,9 +30,9 @@ interface Flags {
   version: string | undefined;
 }
 
-function assertFlags(
-  { _: [_, version, ...remainingArgs], ...remainingOptions }: Args,
-): Flags {
+function assertFlags(args: Args): Flags {
+  const { _: [_, version, ...remainingArgs], ...remainingOptions } = args;
+
   limitOptions(remainingOptions, mainOptions);
   limitArgs(remainingArgs);
 

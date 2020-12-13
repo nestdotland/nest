@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "nestdotland/module.json",
+  "properties": {
+    "name": {
+      "description": "The name of your module. Must not contain spaces.",
+      "type": ["string"],
+      "examples": ["my_module"]
+    },
+    "fullName": {
+      "description": "The full name of your module.",
+      "type": ["string"],
+      "examples": ["My Awesome Module"]
+    },
+    "description": {
+      "description": "Your module description.",
+      "type": "string",
+      "examples": ["I swear my module is the best out there"]
+    },
+    "homepage": {
+      "type": "string",
+      "description": "A link to your homepage. Usually a repository",
+      "examples": ["https://nest.land/x/user/module","https://github.com/user/module"],
+      "default": "https://nest.land/x/user/module"
+    },
+    "license": {
+      "type": "string",
+      "description": "Your module license.",
+      "examples": ["MIT"],
+      "default": "UNKNOWN"
+    },
+    "unlisted": {
+      "type": "boolean",
+      "description": "Hide or not this module on the gallery.",
+      "default": false
+    },
+    "private": {
+      "type": "boolean",
+      "description": "Set this module private user-scoped or private organization-scoped.",
+      "default": false
+    },
+    "hooks": {
+      "type": "object",
+      "description": "Add pre and post middleware hooks",
+      "properties": {
+        "presync": {
+          "description": "",
+          "type": "string",
+          "examples": []
+        },
+        "postsync": {
+          "description": "",
+          "type": "string",
+          "examples": []
+        },
+        "prepack": {
+          "description": "",
+          "type": "string",
+          "examples": []
+        },
+        "postpack": {
+          "description": "",
+          "type": "string",
+          "examples": []
+        },
+        "prepublish": {
+          "description": "",
+          "type": "string",
+          "examples": []
+        },
+        "postpublish": {
+          "description": "",
+          "type": "string",
+          "examples": []
+        },
+        "preaudit": {
+          "description": "",
+          "type": "string",
+          "examples": []
+        },
+        "postaudit": {
+          "description": "",
+          "type": "string",
+          "examples": []
+        }
+      }
+    }
+  },
+  "required": [ "name" ]
+}
