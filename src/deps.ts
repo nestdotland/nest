@@ -12,9 +12,15 @@ export {
   relative,
 } from "https://x.nest.land/std@0.80.0/path/mod.ts";
 
-export { expandGlob, walk } from "https://x.nest.land/std@0.80.0/fs/mod.ts";
+export { walk } from "https://x.nest.land/std@0.80.0/fs/walk.ts";
+export { exists } from "https://x.nest.land/std@0.80.0/fs/exists.ts";
+export { expandGlob } from "https://x.nest.land/std@0.80.0/fs/expand_glob.ts";
 
 export { readLines } from "https://x.nest.land/std@0.80.0/io/mod.ts";
+
+export { generate as generateUUID } from "https://x.nest.land/std@0.80.0/uuid/v4.ts";
+
+export { Tar } from "https://x.nest.land/std@0.80.0/archive/tar.ts";
 
 /**************** hatcher ****************/
 

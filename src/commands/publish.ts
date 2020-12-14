@@ -1,5 +1,5 @@
-import { parse, underline } from "../../deps.ts";
-import type { Args } from "../../deps.ts";
+import { parse, underline } from "../deps.ts";
+import type { Args } from "../deps.ts";
 import { NestCLIError } from "../error.ts";
 import {
   aliasesFromOptions,

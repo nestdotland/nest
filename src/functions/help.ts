@@ -1,4 +1,4 @@
-import { bold, green, magenta, sprintf, underline } from "../../deps.ts";
+import { bold, green, magenta, sprintf, underline } from "../deps.ts";
 import type { Command } from "../utilities/types.ts";
 import { log } from "../utilities/log.ts";
 import { NestCLIError } from "../error.ts";

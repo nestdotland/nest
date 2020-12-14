@@ -1,4 +1,4 @@
-import { underline } from "../../../deps.ts";
+import { underline } from "../../deps.ts";
 import type { Option } from "../../utilities/types.ts";
 
 export const mainOptions: Option[] = [

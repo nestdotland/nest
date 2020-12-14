@@ -1,6 +1,6 @@
-import { limitFields, setupCheckType } from "../../utilities/cli.ts";
-import { NestCLIError } from "../../error.ts";
-import type { Meta } from "../../utilities/types.ts";
+import { limitFields, setupCheckType } from "../utilities/cli.ts";
+import { NestCLIError } from "../error.ts";
+import type { Meta } from "../utilities/types.ts";
 import { assertHooks } from "./hooks.ts";
 
 const emptyMeta = {

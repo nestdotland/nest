@@ -1,12 +1,12 @@
-import { parse } from "../../deps.ts";
-import type { Args } from "../../deps.ts";
+import { parse } from "../deps.ts";
+import type { Args } from "../deps.ts";
 import {
   handleError,
   log,
   setupLogLevel,
   writeLogFile,
 } from "../utilities/log.ts";
-import { NestCLIError } from "../error.ts";
+import { NestCLIError, NestError } from "../error.ts";
 import { aliasesFromOptions, setupCheckType } from "../utilities/cli.ts";
 import type { Command } from "../utilities/types.ts";
 
@@ -54,7 +54,7 @@ export async function action(args = Deno.args) {
 
     Deno.exit(0);
   } catch (err) {
-    if (err instanceof NestCLIError) {
+    if (err instanceof NestCLIError || err instanceof NestError) {
       log.debug(err.stack);
       Deno.exit(1);
     }

@@ -1,6 +1,6 @@
-import { limitFields, setupCheckType } from "../../utilities/cli.ts";
-import { NestCLIError } from "../../error.ts";
-import type { Hooks } from "../../utilities/types.ts";
+import { limitFields, setupCheckType } from "../utilities/cli.ts";
+import { NestCLIError } from "../error.ts";
+import type { Hooks } from "../utilities/types.ts";
 
 const emptyHooks = {
   presync: "",

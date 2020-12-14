@@ -1,5 +1,5 @@
-import { parse } from "../../deps.ts";
-import type { Args } from "../../deps.ts";
+import { parse } from "../deps.ts";
+import type { Args } from "../deps.ts";
 import { NestCLIError } from "../error.ts";
 import { limitArgs, limitOptions, setupCheckType } from "../utilities/cli.ts";
 import type { Command } from "../utilities/types.ts";

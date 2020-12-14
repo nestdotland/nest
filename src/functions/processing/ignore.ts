@@ -6,8 +6,8 @@ import {
   relative,
   walk,
 } from "../../deps.ts";
-import { log } from "../utilities/log.ts";
-import { readIgnore } from "../config/ignore.ts";
+import { log } from "../../utilities/log.ts";
+import { IGNORE_PATH, readIgnore } from "../config/ignore.ts";
 
 export interface Ignore {
   accepts: RegExp[];
@@ -15,8 +15,8 @@ export interface Ignore {
 }
 
 export async function parseIgnore(
-  path: string,
-  read: typeof readIgnore,
+  read: (path: string) => Promise<string[]> | string[] = readIgnore,
+  path = IGNORE_PATH,
   wd = Deno.cwd(),
 ): Promise<Ignore> {
   const ignore: Ignore = {
@@ -31,7 +31,7 @@ export async function parseIgnore(
   for (let i = 0; i < lines.length; i++) {
     let line = lines[i];
     // A blank line matches no files, so it can serve as a separator for readability.
-    if (!line) continue;
+    if (line === "") continue;
     // A line starting with # serves as a comment. Put a backslash ("\") in front of
     // the first hash for patterns that begin with a hash.
     if (line.startsWith("#")) continue;
@@ -48,7 +48,7 @@ export async function parseIgnore(
 
       for await (const file of files) {
         const path = join(wd, file.path);
-        const { accepts, denies } = await parseIgnore(path, read, wd);
+        const { accepts, denies } = await parseIgnore(read, path, wd);
         ignore.accepts.push(...accepts);
         ignore.denies.push(...denies);
       }
@@ -85,7 +85,7 @@ export async function matchFiles(
   for await (const entry of walk(wd)) {
     if (!entry.isFile) continue;
 
-    const path = "/" + relative(wd, entry.path.replace(/\\/g, "/"));
+    const path = "/" + relative(wd, entry.path).replace(/\\/g, "/");
     matched.push(path);
   }
 

@@ -1,4 +1,4 @@
-import { blue, bold, gray, path, red, stripColor, yellow } from "../../deps.ts";
+import { blue, bold, gray, join, red, stripColor, yellow } from "../deps.ts";
 import { NestCLIError } from "../error.ts";
 import { version } from "../version.ts";
 import { highlight } from "./fmt.ts";
@@ -191,7 +191,7 @@ export async function writeLogFile(logFile = "./nest-debug.log") {
   );
 
   log.info(
-    `Debug file created. (${highlight(path.join(Deno.cwd(), logFile))})`,
+    `Debug file created. (${highlight(join(Deno.cwd(), logFile))})`,
   );
 }
 

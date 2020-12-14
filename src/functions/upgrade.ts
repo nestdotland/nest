@@ -1,4 +1,4 @@
-import { NestLand, semver } from "../../deps.ts";
+import { NestLand, semver } from "../deps.ts";
 import { log } from "../utilities/log.ts";
 import { version as CLIVersion } from "../version.ts";
 
