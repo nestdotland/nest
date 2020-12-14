@@ -34,7 +34,7 @@ export function assertModule(
 
   const { checkType, typeError } = setupCheckType(file);
 
-  checkType(`${prefix}meta`, meta, ["object"],true);
+  checkType(`${prefix}meta`, meta, ["object"], true);
   checkType(`${prefix}api`, api, ["object"], true);
   checkType(`${prefix}version`, version, ["string"], true);
   checkType(`${prefix}lastSync`, lastSync, ["number"], true);

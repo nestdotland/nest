@@ -30,7 +30,7 @@ export function assertApi(api: RawObject, file: string, prefix = ""): Api {
   checkType(`${prefix}license`, license, ["string"], true);
 
   if (Array.isArray(versions)) {
-    for(let i = 0; i < versions.length; i++) {
+    for (let i = 0; i < versions.length; i++) {
       checkType(`${prefix}versions[${i}]`, versions[i], ["string"], true);
     }
   }

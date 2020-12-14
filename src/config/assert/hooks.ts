@@ -15,7 +15,11 @@ const emptyHooks = {
 
 type RawObject = Record<string, unknown>;
 
-export function assertHooks(hooks: RawObject, file: string, prefix = ""): Hooks {
+export function assertHooks(
+  hooks: RawObject,
+  file: string,
+  prefix = "",
+): Hooks {
   const { checkType, typeError } = setupCheckType(file);
 
   const {

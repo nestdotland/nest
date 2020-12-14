@@ -5,7 +5,16 @@ export * from "https://x.nest.land/std@0.80.0/fmt/printf.ts";
 export { parse } from "https://x.nest.land/std@0.80.0/flags/mod.ts";
 export type { Args } from "https://x.nest.land/std@0.80.0/flags/mod.ts";
 
-export * as path from "https://x.nest.land/std@0.80.0/path/mod.ts";
+export {
+  basename,
+  globToRegExp,
+  join,
+  relative,
+} from "https://x.nest.land/std@0.80.0/path/mod.ts";
+
+export { expandGlob, walk } from "https://x.nest.land/std@0.80.0/fs/mod.ts";
+
+export { readLines } from "https://x.nest.land/std@0.80.0/io/mod.ts";
 
 /**************** hatcher ****************/
 

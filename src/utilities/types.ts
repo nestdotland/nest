@@ -51,7 +51,7 @@ export interface Api {
   latestVersion: string;
   lastPublished: number;
   license: string;
-};
+}
 export interface Module {
   meta: Meta;
 
