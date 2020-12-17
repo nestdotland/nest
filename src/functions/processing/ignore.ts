@@ -15,7 +15,7 @@ export interface Ignore {
 }
 
 export async function parseIgnore(
-  read: (path: string) => Promise<string[]> | string[] = readIgnore,
+  read: (path: string) => Promise<string> | string = readIgnore,
   path = IGNORE_PATH,
   wd = Deno.cwd(),
 ): Promise<Ignore> {
@@ -24,9 +24,11 @@ export async function parseIgnore(
     denies: [],
   };
 
-  let lines = await read(path);
-  // ignore spaces at the beginning of the line
-  lines = lines.map((line) => line.replace(/^\s*/, ""));
+  const text = await read(path);
+  // split text & ignore spaces at the beginning of each line
+  const lines = text.split(/\r\n|\r|\n/).map((line) =>
+    line.replace(/^\s*/, "")
+  );
 
   for (let i = 0; i < lines.length; i++) {
     let line = lines[i];
@@ -38,11 +40,11 @@ export async function parseIgnore(
     // An optional prefix "!" which negates the pattern.
     const accepts = line.startsWith("!");
     // An optional prefix "@extends " which imports other ignore files (.gitignore).
-    const extends_ = line.startsWith("@extends ");
+    const extended = line.startsWith("@extends ");
     // Trailing spaces are ignored unless they are quoted with backslash ("\").
     line = line.replace(/(?<!\\)\s/g, "").replace(/(?:\\(.))/g, "$1");
     if (accepts) line = line.substr(1);
-    if (extends_) {
+    if (extended) {
       const pattern = line.substr(8);
       const files = expandGlob(pattern, { root: wd });
 

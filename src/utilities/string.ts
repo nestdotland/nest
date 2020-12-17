@@ -1,3 +1,10 @@
+import { bold, underline } from "../deps.ts";
+
+/** Underline & bold */
+export function underlineBold(msg: string) {
+  return underline(bold(msg));
+}
+
 /** Returns the most likely string in the array if the distance is >= 0.6 */
 export function likelyString(str: string, array: string[]): string | undefined {
   const sorted = levenshteinSort(str, array);

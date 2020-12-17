@@ -24,6 +24,6 @@ export const mainOptions: Option[] = [
   },
   {
     flag: "-G, --gui",
-    description: "Perform the task in the gui",
+    description: "Perform the task in the gui (not implemented yet)",
   },
 ];

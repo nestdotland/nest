@@ -1,6 +1,6 @@
-import { generateUUID, Tar } from "../deps.ts";
+import { generateUUID, globToRegExp, Tar } from "../deps.ts";
 import { log } from "../utilities/log.ts";
-import { highlight } from "../utilities/fmt.ts";
+import { underlineBold } from "../utilities/string.ts";
 import { NestError } from "../error.ts";
 import { stageModule } from "../api/todo_.ts";
 import type { Meta } from "../utilities/types.ts";
@@ -17,9 +17,8 @@ export async function publish() {
   if (ignoreFileExists) {
     ignoredFiles = await parseIgnore();
   } else {
-    // Exclude all dotfiles by default while publishing
-    ignoredFiles = await parseIgnore(() => [".*"]);
-    log.info(`${highlight("ignore")} file not found.`);
+    log.info(`${underlineBold("ignore")} file not found.`);
+    ignoredFiles = await parseIgnore(() => "");
   }
 
   const files = await matchFiles(ignoredFiles);
@@ -40,7 +39,7 @@ export async function directPublish(
     if (!file.startsWith("/")) {
       log.error(
         `Incorrect file path: ${
-          highlight(file)
+          underlineBold(file)
         } It should start with a slash ("/").`,
       );
       throw new NestError("Incorrect file path (publish)");
@@ -50,7 +49,9 @@ export async function directPublish(
         filePath: `.${file}`,
       });
     } catch (err) {
-      log.error(`Unable to append ${highlight(file.substr(1))} to the tarball`);
+      log.error(
+        `Unable to append ${underlineBold(file.substr(1))} to the tarball`,
+      );
       log.debug(err.stack);
       throw new NestError("Unable to append file to the tarball (publish)");
     }

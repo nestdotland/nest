@@ -7,6 +7,7 @@ export type { Args } from "https://x.nest.land/std@0.80.0/flags/mod.ts";
 
 export {
   basename,
+  dirname,
   globToRegExp,
   join,
   relative,
@@ -15,6 +16,8 @@ export {
 export { walk } from "https://x.nest.land/std@0.80.0/fs/walk.ts";
 export { exists } from "https://x.nest.land/std@0.80.0/fs/exists.ts";
 export { expandGlob } from "https://x.nest.land/std@0.80.0/fs/expand_glob.ts";
+export { ensureFile } from "https://deno.land/std@0.81.0/fs/ensure_file.ts";
+export { ensureDir } from "https://deno.land/std@0.81.0/fs/ensure_dir.ts";
 
 export { readLines } from "https://x.nest.land/std@0.80.0/io/mod.ts";
 

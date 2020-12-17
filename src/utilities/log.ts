@@ -1,7 +1,7 @@
-import { blue, bold, gray, join, red, stripColor, yellow } from "../deps.ts";
+import { bold, gray, green, join, red, stripColor, yellow } from "../deps.ts";
 import { NestCLIError } from "../error.ts";
 import { version } from "../version.ts";
-import { highlight } from "./fmt.ts";
+import { underlineBold } from "./string.ts";
 
 type logFunction = <T>(message: T, ...args: unknown[]) => T;
 interface Logger {
@@ -15,11 +15,11 @@ interface Logger {
 
 const prefix = {
   debug: bold(`${gray("debug ")}`),
-  info: bold(`${blue("info ")}`),
+  info: bold(`${green("i ")}`),
   plain: "",
-  warning: bold(`${yellow("warn ")}`),
-  error: bold(`${red("error ")}`),
-  critical: bold(`${red("CRITICAL ")}`),
+  warning: bold(`${yellow("! ")}`),
+  error: bold(`${red("! ")}`),
+  critical: bold(`${red("critical ")}`),
 };
 
 export let mainRecord = "";
@@ -191,7 +191,7 @@ export async function writeLogFile(logFile = "./nest-debug.log") {
   );
 
   log.info(
-    `Debug file created. (${highlight(join(Deno.cwd(), logFile))})`,
+    `Debug file created. (${underlineBold(join(Deno.cwd(), logFile))})`,
   );
 }
 
@@ -205,12 +205,12 @@ export async function handleError(err: Error, logFile?: string) {
   await writeLogFile(logFile);
   log.info(
     `If you think this is a bug, please open a bug report at ${
-      highlight("https://github.com/nestdotland/nest/issues/new/choose")
+      underlineBold("https://github.com/nestdotland/nest/issues/new/choose")
     }.`,
   );
   log.info(
     `Visit ${
-      highlight("https://docs.nest.land/nest/")
+      underlineBold("https://docs.nest.land/nest/")
     } for documentation about this command.`,
   );
 }
