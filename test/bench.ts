@@ -1,6 +1,6 @@
 // Copyright 2018-2020 the Deno authors. All rights reserved. MIT license.
 // https://deno.land/std/testing/bench.ts
-import { bench, BenchmarkTimer, runBenchmarks } from "./deps_test.ts";
+import { bench, BenchmarkTimer, runBenchmarks } from "./deps.ts";
 
 // Basic
 bench(function forIncrementX1e9(b: BenchmarkTimer): void {

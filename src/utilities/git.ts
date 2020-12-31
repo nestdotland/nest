@@ -1,5 +1,10 @@
+import { ensureFile } from "../deps.ts";
+import { Ignore } from "../processing/ignore.ts";
+import { readIgnore } from "../config/files/ignore.ts";
 import { log } from "./log.ts";
 import { NestCLIError } from "../error.ts";
+
+const encoder = new TextEncoder();
 
 export async function isGitRepository(): Promise<string | false> {
   const process = Deno.run({
@@ -13,6 +18,26 @@ export async function isGitRepository(): Promise<string | false> {
     return false;
   }
   return stdout;
+}
+
+export async function addToGitIgnore(lines: string[]) {
+  if (await isGitRepository()) {
+    await ensureFile(".gitignore");
+
+    const ignore = new Ignore(".gitignore");
+    await ignore.parsingProcess;
+
+    for (const line of lines) {
+      const patternInFile = ignore.denied.some((rgx) => rgx.test(line));
+      if (!patternInFile) {
+        await Deno.writeFile(
+          ".gitignore",
+          encoder.encode(line),
+          { append: true },
+        );
+      }
+    }
+  }
 }
 
 export async function getLatestTag(): Promise<string> {
@@ -32,8 +57,6 @@ export async function getLatestTag(): Promise<string> {
 
   return stdout.split("\n")[0];
 }
-
-await getLatestTag();
 
 export async function describeTag(tag: string): Promise<string> {
   const process = Deno.run({

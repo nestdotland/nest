@@ -1,27 +1,15 @@
-import { generateUUID, globToRegExp, Tar } from "../deps.ts";
+import { generateUUID, Tar } from "../deps.ts";
 import { log } from "../utilities/log.ts";
 import { underlineBold } from "../utilities/string.ts";
 import { NestError } from "../error.ts";
-import { stageModule } from "../api/todo_.ts";
+import { publishModule, stageModule } from "../api/todo_.ts";
 import type { Meta } from "../utilities/types.ts";
-import { ignoreExists, readIgnore } from "./config/ignore.ts";
-import type { Ignore } from "./processing/ignore.ts";
-import { matchFiles, parseIgnore } from "./processing/ignore.ts";
+import { readIgnore } from "../config/files/ignore.ts";
 
 export const releaseType = ["patch", "minor", "major"];
 
 export async function publish() {
-  const ignoreFileExists = await ignoreExists();
-  let ignoredFiles: Ignore;
-
-  if (ignoreFileExists) {
-    ignoredFiles = await parseIgnore();
-  } else {
-    log.info(`${underlineBold("ignore")} file not found.`);
-    ignoredFiles = await parseIgnore(() => "");
-  }
-
-  const files = await matchFiles(ignoredFiles);
+  const files = await readIgnore();
 }
 
 export async function directPublish(
@@ -65,9 +53,7 @@ export async function directPublish(
   /** Step 3 - upload the tarball to arweave */
   // TODO
 
-  const writer = await Deno.open("./out.tar", { write: true, create: true });
-  await Deno.copy(tar.getReader(), writer);
-  writer.close();
+  const response_ = await publishModule(tar.getReader());
 
   /** Step 4 - do the twig magic locally */
   // TODO

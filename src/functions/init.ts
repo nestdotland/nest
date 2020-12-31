@@ -1,10 +1,10 @@
-import { basename, cyan, ensureDir, ensureFile, green } from "../deps.ts";
-import { log, setupLog } from "../utilities/log.ts";
-import { NEST_DIRECTORY } from "./config/nest.ts";
-import { dataJsonExists } from "./config/data.json.ts";
-import { writeModuleJson } from "./config/module.json.ts";
-import { ignoreExists, writeIgnore } from "./config/ignore.ts";
-import { isGitRepository } from "../utilities/git.ts";
+import { basename, cyan, ensureDir, green } from "../deps.ts";
+import { log } from "../utilities/log.ts";
+import { NEST_DIRECTORY } from "../config/files/nest.ts";
+import { dataJsonExists } from "../config/files/data.json.ts";
+import { writeModuleJson } from "../config/files/module.json.ts";
+import { writeIgnore } from "../config/files/ignore.ts";
+import { addToGitIgnore } from "../utilities/git.ts";
 import { sync } from "./sync.ts";
 import { confirm, prompt, promptAndValidate } from "../utilities/interact.ts";
 
@@ -75,14 +75,12 @@ export async function init() {
     "# List here the files and directories to be ignored, one by line as a glob expression.\n\n# Dotfiles are ignored by default.\n.*\n",
   );
 
-  if (await isGitRepository()) {
-    // TODO
-  }
+  await addToGitIgnore([NEST_DIRECTORY]);
 
   const user = "user"; // TODO
   log.info(
     `Linked to ${cyan(`${user}/${name}`)} (created ${
-      green(".nest")
+      green(NEST_DIRECTORY)
     } and added it to ${green(".gitignore")})`,
   );
 }
