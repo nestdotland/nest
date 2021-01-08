@@ -1,6 +1,6 @@
 import { limitFields, setupCheckType } from "../utilities/cli.ts";
 import { NestCLIError } from "../error.ts";
-import type { Hooks } from "../utilities/types.ts";
+import type { Hooks, RawObject } from "../utilities/types.ts";
 
 const emptyHooks = {
   presync: "",
@@ -12,8 +12,6 @@ const emptyHooks = {
   preaudit: "",
   postaudit: "",
 };
-
-type RawObject = Record<string, unknown>;
 
 export function assertHooks(
   hooks: RawObject,

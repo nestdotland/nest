@@ -20,6 +20,8 @@ export interface Command {
   action: (args?: string[]) => Promise<void> | void;
 }
 
+export type RawObject = Record<string, unknown>;
+
 export interface Hooks {
   presync?: string;
   postsync?: string;

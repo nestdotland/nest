@@ -1,6 +1,6 @@
 import { limitFields, setupCheckType } from "../utilities/cli.ts";
 import { NestCLIError } from "../error.ts";
-import type { Module } from "../utilities/types.ts";
+import type { Module, RawObject } from "../utilities/types.ts";
 import { assertMeta } from "./meta.ts";
 import { assertApi } from "./api.ts";
 
@@ -13,8 +13,6 @@ const emptyModule = {
   lastSync: 0,
   nextAutoSync: 0,
 };
-
-type RawObject = Record<string, unknown>;
 
 export function assertModule(
   module: RawObject,

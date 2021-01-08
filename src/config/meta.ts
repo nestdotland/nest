@@ -1,6 +1,6 @@
 import { limitFields, setupCheckType } from "../utilities/cli.ts";
 import { NestCLIError } from "../error.ts";
-import type { Meta } from "../utilities/types.ts";
+import type { Meta, RawObject } from "../utilities/types.ts";
 import { assertHooks } from "./hooks.ts";
 
 const emptyMeta = {
@@ -17,8 +17,6 @@ const emptyMeta = {
   unlisted: false,
   private: false,
 };
-
-type RawObject = Record<string, unknown>;
 
 export function assertMeta(meta: RawObject, file: string, prefix = ""): Meta {
   const {
