@@ -1,22 +1,7 @@
 import { limitFields, setupCheckType } from "../utilities/cli.ts";
 import { NestCLIError } from "../error.ts";
-import type { Meta, RawObject } from "../utilities/types.ts";
 import { assertHooks } from "./hooks.ts";
-
-const emptyMeta = {
-  $schema: "",
-
-  name: "",
-  fullName: "",
-  description: "",
-  homepage: "",
-  license: "",
-
-  hooks: {},
-
-  unlisted: false,
-  private: false,
-};
+import type { Meta, RawObject } from "../utilities/types.ts";
 
 export function assertMeta(meta: RawObject, file: string, prefix = ""): Meta {
   const {
@@ -32,7 +17,7 @@ export function assertMeta(meta: RawObject, file: string, prefix = ""): Meta {
     ...remainingFields
   } = meta;
 
-  limitFields(file, remainingFields, emptyMeta);
+  limitFields(file, remainingFields);
 
   const { checkType, typeError } = setupCheckType(file);
 

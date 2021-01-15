@@ -1,7 +1,7 @@
 import { bold, green, magenta, sprintf, underline } from "../deps.ts";
-import type { Command } from "../utilities/types.ts";
 import { log } from "../utilities/log.ts";
 import { NestCLIError } from "../error.ts";
+import type { Command } from "../utilities/types.ts";
 
 export function help(main: Command, name?: string) {
   if (name) {
@@ -23,7 +23,7 @@ export function help(main: Command, name?: string) {
 }
 
 export function printHelp(command: Command) {
-  // TODO(@oganexon): refactor this function
+  // TODO(oganexon): refactor this function
 
   const description = `  ${command.description.replaceAll("\n", "\n  ")}\n\n`;
 

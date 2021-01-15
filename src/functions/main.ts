@@ -12,7 +12,7 @@ export async function main(
   help?: unknown,
 ) {
   if (version) {
-    console.info(currentVersion);
+    log.plain(currentVersion);
     return;
   }
 

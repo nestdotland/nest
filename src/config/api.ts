@@ -2,13 +2,6 @@ import { limitFields, setupCheckType } from "../utilities/cli.ts";
 import { NestCLIError } from "../error.ts";
 import type { Api, RawObject } from "../utilities/types.ts";
 
-const emptyApi = {
-  versions: [""],
-  latestVersion: "",
-  lastPublished: "",
-  license: "",
-};
-
 export function assertApi(api: RawObject, file: string, prefix = ""): Api {
   const { checkType, typeError } = setupCheckType(file);
 
@@ -20,7 +13,7 @@ export function assertApi(api: RawObject, file: string, prefix = ""): Api {
     ...remainingFields
   } = api;
 
-  limitFields(file, remainingFields, emptyApi);
+  limitFields(file, remainingFields);
 
   checkType(`${prefix}versions`, versions, ["array"], true);
   checkType(`${prefix}latestVersion`, latestVersion, ["string"], true);

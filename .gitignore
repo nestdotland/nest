@@ -13,3 +13,4 @@ benchmarks/**
 !benchmarks/README.md
 
 foo.ts
+.nest

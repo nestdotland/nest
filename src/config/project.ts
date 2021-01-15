@@ -1,24 +1,14 @@
 import { limitFields, setupCheckType } from "../utilities/cli.ts";
 import { NestCLIError } from "../error.ts";
-import type { Module, RawObject } from "../utilities/types.ts";
 import { assertMeta } from "./meta.ts";
 import { assertApi } from "./api.ts";
+import type { Project, RawObject } from "../utilities/types.ts";
 
-const emptyModule = {
-  meta: {},
-
-  api: {},
-
-  version: "",
-  lastSync: 0,
-  nextAutoSync: 0,
-};
-
-export function assertModule(
+export function assertProject(
   module: RawObject,
   file: string,
   prefix = "",
-): Module {
+): Project {
   const {
     meta,
     api,
@@ -28,7 +18,7 @@ export function assertModule(
     ...remainingFields
   } = module;
 
-  limitFields(file, remainingFields, emptyModule);
+  limitFields(file, remainingFields);
 
   const { checkType, typeError } = setupCheckType(file);
 
@@ -48,5 +38,5 @@ export function assertModule(
 
   if (typeError()) throw new NestCLIError("Config: Invalid type");
 
-  return meta as unknown as Module;
+  return meta as unknown as Project;
 }

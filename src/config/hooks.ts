@@ -2,17 +2,6 @@ import { limitFields, setupCheckType } from "../utilities/cli.ts";
 import { NestCLIError } from "../error.ts";
 import type { Hooks, RawObject } from "../utilities/types.ts";
 
-const emptyHooks = {
-  presync: "",
-  postsync: "",
-  prepack: "",
-  postpack: "",
-  prepublish: "",
-  postpublish: "",
-  preaudit: "",
-  postaudit: "",
-};
-
 export function assertHooks(
   hooks: RawObject,
   file: string,
@@ -32,7 +21,7 @@ export function assertHooks(
     ...remainingFields
   } = hooks;
 
-  limitFields(file, remainingFields, emptyHooks);
+  limitFields(file, remainingFields);
 
   checkType(`${prefix}presync`, presync, ["string"]);
   checkType(`${prefix}postsync`, postsync, ["string"]);

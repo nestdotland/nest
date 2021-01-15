@@ -2,7 +2,7 @@ import { blue, bold, underline } from "../deps.ts";
 import { NestCLIError } from "../error.ts";
 import { log } from "../utilities/log.ts";
 import { likelyString } from "./string.ts";
-import type { Option } from "./types.ts";
+import type { Option, RawObject } from "./types.ts";
 
 /** Generates aliases from options for the `parse` function. */
 export function aliasesFromOptions(options: Option[]): Record<string, string> {
@@ -38,7 +38,7 @@ function extractFlags(options: Option[]) {
       flags.push(flag.substr(1));
     } else {
       log.error("Malformed flag:", flag);
-      throw new Error("Malformed flag");
+      throw new NestCLIError("Malformed flag (extractFlags)");
     }
   }
 
@@ -47,7 +47,7 @@ function extractFlags(options: Option[]) {
 
 /** Will throw if `options` is not empty. */
 export function limitOptions(
-  options: Record<string, unknown>,
+  options: RawObject,
   baseOptions: Option[],
 ) {
   const reference = extractFlags(baseOptions);
@@ -60,14 +60,14 @@ export function limitOptions(
     misspelled.map((key) => underline(key)).join(", "),
   );
   didYouMean(reference, misspelled, keyToOption);
-  throw new NestCLIError("Unknown options");
+  throw new NestCLIError("Unknown options (limitOptions)");
 }
 
 /** Will throw if `fields` is not empty. */
 export function limitFields(
   file: string,
-  fields: Record<string, unknown>,
-  baseFields: Record<string, unknown>,
+  fields: RawObject,
+  baseFields: RawObject = {},
 ) {
   const misspelled = Object.keys(fields);
   const reference = Object.keys(baseFields);
@@ -78,14 +78,14 @@ export function limitFields(
     misspelled.map((key) => underline(key)).join(", "),
   );
   didYouMean(reference, misspelled);
-  throw new NestCLIError("Unknown fields");
+  throw new NestCLIError("Unknown fields (limitFields)");
 }
 
 /** Will throw if `args` is not empty. */
 export function limitArgs(args: unknown[]) {
   if (args.length === 0) return;
   log.error("Too many arguments:", args.join(", "));
-  throw new NestCLIError("Too many arguments");
+  throw new NestCLIError("Too many arguments (limitArgs)");
 }
 
 export function didYouMean(

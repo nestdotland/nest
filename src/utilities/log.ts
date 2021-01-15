@@ -43,6 +43,10 @@ export const log: Logger = {
   critical: <T>(message: T) => message,
 };
 
+export function lineBreak() {
+  console.log();
+}
+
 /** Main record handler */
 function logToMainRecord(prefix: string) {
   prefix = stripColor(prefix);
@@ -111,6 +115,8 @@ export function setupLog(logLevel = LogLevel.info) {
   log.warning = logToMainRecord(prefix.warning);
   log.error = logToMainRecord(prefix.error);
   log.critical = logToMainRecord(prefix.critical);
+
+  // TODO(oganexon): refactor this part
 
   if (logLevel <= LogLevel.debug) {
     const logMainRecord = log.debug;

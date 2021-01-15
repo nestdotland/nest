@@ -52,9 +52,9 @@ export interface Api {
   versions: string[];
   latestVersion: string;
   lastPublished: number;
-  license: string;
 }
-export interface Module {
+
+export interface Project {
   meta: Meta;
 
   api: Api;

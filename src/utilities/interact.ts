@@ -8,6 +8,8 @@ const decoder = new TextDecoder();
 
 const separator = gray(">");
 
+/** Shows the given message and waits for the enter key pressed.
+ * If the stdin is not interactive, it does nothing. */
 export async function alert(message = "Alert", hint = "[Enter]") {
   if (!isatty(stdin.rid)) {
     return;
@@ -20,6 +22,10 @@ export async function alert(message = "Alert", hint = "[Enter]") {
   await readLineFromStdin();
 }
 
+/** Shows the given message and waits for the answer. Returns the user's answer as boolean.
+ * Answers that start with y or Y are considered as true.
+ * Answers that start with n or N are considered as false.
+ * If the stdin is not interactive, it returns false. */
 export async function confirm(
   message = "Confirm",
   defaultValue = false,
@@ -56,6 +62,10 @@ export async function confirm(
   }
 }
 
+/** Shows the given message and waits for the user's input. Returns the user's input as string.
+ * If the default value is given and the user inputs the empty string, then it returns the given default value.
+ * If the default value is not given and the user inputs the empty string, it returns null. 
+ * If the stdin is not interactive, it returns null. */
 export async function prompt(message = "Prompt", defaultValue?: string) {
   if (!isatty(stdin.rid)) {
     return "";
@@ -74,6 +84,9 @@ export async function prompt(message = "Prompt", defaultValue?: string) {
   return answer.replace(/\r$/, "") || defaultValue;
 }
 
+/** Shows the given message and waits for the user's input. Returns the user's input as string.
+ * If the given value passed to the `validate` function returns false, repeat the process.
+ * Same behavior as the `prompt` function. */
 export async function promptAndValidate({
   validate,
   invalidMessage,

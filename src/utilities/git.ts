@@ -1,6 +1,5 @@
 import { ensureFile } from "../deps.ts";
 import { Ignore } from "../processing/ignore.ts";
-import { readIgnore } from "../config/files/ignore.ts";
 import { log } from "./log.ts";
 import { NestCLIError } from "../error.ts";
 

@@ -8,6 +8,7 @@ import {
   setupCheckType,
 } from "../utilities/cli.ts";
 import type { Command, Option } from "../utilities/types.ts";
+import type { PublishOptions as Flags } from "../functions/publish.ts";
 
 import { mainOptions } from "./main/options.ts";
 
@@ -55,15 +56,7 @@ export async function action(args = Deno.args) {
     { alias: aliasesFromOptions(options) },
   ));
 
-  await publish();
-}
-
-interface Flags {
-  yes: boolean | undefined;
-  dryRun: boolean | undefined;
-  gitTag: boolean | undefined;
-  pre: boolean | string | undefined;
-  version: string | undefined;
+  await publish(flags);
 }
 
 function assertFlags(args: Args): Flags {

@@ -1,24 +1,32 @@
 import { basename, cyan, ensureDir, green } from "../deps.ts";
-import { log } from "../utilities/log.ts";
+import { lineBreak, log } from "../utilities/log.ts";
 import { NEST_DIRECTORY } from "../config/files/nest.ts";
-import { dataJsonExists } from "../config/files/data.json.ts";
+import { dataJsonExists, writeDataJson } from "../config/files/data.json.ts";
 import { writeModuleJson } from "../config/files/module.json.ts";
 import { writeIgnore } from "../config/files/ignore.ts";
 import { addToGitIgnore } from "../utilities/git.ts";
 import { sync } from "./sync.ts";
 import { confirm, prompt, promptAndValidate } from "../utilities/interact.ts";
 
-export async function init() {
+export async function init(wd = Deno.cwd()) {
+  // FIXME: find a better way to determine if a module is already initialized and linked
   if (await dataJsonExists()) {
     await sync();
     return;
   }
 
-  console.log();
+  lineBreak();
 
-  const project = basename(Deno.cwd());
+  const project = basename(wd);
 
-  if (!await confirm(`Setup ${green(`${project}/`)} ?`, true)) return;
+  if (
+    !await confirm(`Initialize directory ${green(`${project}/`)} ?`, true)
+  ) {
+    return;
+  }
+
+  // TODO: get username if logged in
+  const user = "user";
 
   if (await confirm("Link to an existing module?")) {
     const name = await promptAndValidate({
@@ -26,11 +34,10 @@ export async function init() {
       invalidMessage:
         "The length of a module name must be between 2 and 40 characters.",
       defaultValue: project,
-      validate: (name) => !!name && name.length > 1 && name.length < 41,
+      validate: (name) => name.length > 1 && name.length < 41,
     });
 
     await sync(name);
-    const user = "user"; // TODO
     log.info(
       `Linked to ${cyan(`${user}/${name}`)} (created ${
         green(".nest")
@@ -71,13 +78,23 @@ export async function init() {
 
   await ensureDir(NEST_DIRECTORY);
   await writeModuleJson(meta);
+  await writeDataJson({
+    meta,
+    api: {
+      versions: [],
+      lastPublished: 0,
+      latestVersion: "",
+    },
+    version: "0.0.0",
+    lastSync: 0,
+    nextAutoSync: 0,
+  });
   await writeIgnore(
     "# List here the files and directories to be ignored, one by line as a glob expression.\n\n# Dotfiles are ignored by default.\n.*\n",
   );
 
   await addToGitIgnore([NEST_DIRECTORY]);
 
-  const user = "user"; // TODO
   log.info(
     `Linked to ${cyan(`${user}/${name}`)} (created ${
       green(NEST_DIRECTORY)
