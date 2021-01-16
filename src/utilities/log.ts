@@ -1,7 +1,17 @@
-import { bold, gray, green, join, red, stripColor, yellow } from "../deps.ts";
+import {
+  bold,
+  cyan,
+  ensureDir,
+  gray,
+  join,
+  red,
+  stripColor,
+  yellow,
+} from "../deps.ts";
 import { NestCLIError } from "../error.ts";
 import { version } from "../version.ts";
 import { underlineBold } from "./string.ts";
+import { envHOMEDIR } from "./env.ts";
 
 type logFunction = <T>(message: T, ...args: unknown[]) => T;
 interface Logger {
@@ -13,9 +23,9 @@ interface Logger {
   critical: logFunction;
 }
 
-const prefix = {
+export const prefix = {
   debug: bold(`${gray("debug ")}`),
-  info: bold(`${green("i ")}`),
+  info: bold(`${cyan("i ")}`),
   plain: "",
   warning: bold(`${yellow("! ")}`),
   error: bold(`${red("! ")}`),
@@ -104,79 +114,27 @@ export function setupLogLevel(logLevel?: string) {
   }
 }
 
-/**
- * Setup the log handlers: console & main record.
- * Default log level is `info`.
- */
+/** Setup the log handlers: console & main record.
+ * Default log level is `info`. */
 export function setupLog(logLevel = LogLevel.info) {
-  log.debug = logToMainRecord(prefix.debug);
-  log.info = logToMainRecord(prefix.info);
-  log.plain = logToMainRecord(prefix.plain);
-  log.warning = logToMainRecord(prefix.warning);
-  log.error = logToMainRecord(prefix.error);
-  log.critical = logToMainRecord(prefix.critical);
-
-  // TODO(oganexon): refactor this part
-
-  if (logLevel <= LogLevel.debug) {
-    const logMainRecord = log.debug;
-    const logConsole = logToConsole(prefix.debug, logLevel);
-    log.debug = <T>(message: T, ...args: unknown[]) => {
-      logMainRecord(message, ...args);
-      logConsole(message, ...args);
-      return message;
-    };
-  }
-  if (logLevel <= LogLevel.info) {
-    const logMainRecordInfo = log.info;
-    const logConsoleInfo = logToConsole(prefix.info, logLevel);
-    log.info = <T>(message: T, ...args: unknown[]) => {
-      logMainRecordInfo(message, ...args);
-      logConsoleInfo(message, ...args);
-      return message;
-    };
-    const logMainRecordPlain = log.plain;
-    const logConsolePlain = logToConsole(prefix.plain, logLevel);
-    log.plain = <T>(message: T, ...args: unknown[]) => {
-      logMainRecordPlain(message, ...args);
-      logConsolePlain(message, ...args);
-      return message;
-    };
-  }
-  if (logLevel <= LogLevel.warning) {
-    const logMainRecord = log.warning;
-    const logConsole = logToConsole(prefix.warning, logLevel);
-    log.warning = <T>(message: T, ...args: unknown[]) => {
-      logMainRecord(message, ...args);
-      logConsole(message, ...args);
-      return message;
-    };
-  }
-  if (logLevel <= LogLevel.error) {
-    const logMainRecord = log.error;
-    const logConsole = logToConsole(prefix.error, logLevel);
-    log.error = <T>(message: T, ...args: unknown[]) => {
-      logMainRecord(message, ...args);
-      logConsole(message, ...args);
-      return message;
-    };
-  }
-  if (logLevel <= LogLevel.critical) {
-    const logMainRecord = log.critical;
-    const logConsole = logToConsole(prefix.critical, logLevel);
-    log.critical = <T>(message: T, ...args: unknown[]) => {
-      logMainRecord(message, ...args);
-      logConsole(message, ...args);
-      return message;
-    };
+  for (const l in log) {
+    const level = l as keyof typeof log;
+    log[level] = logToMainRecord(level);
+    if (logLevel <= LogLevel[level]) {
+      const logMainRecord = log[level];
+      const logConsole = logToConsole(prefix[level], logLevel);
+      log[level] = <T>(message: T, ...args: unknown[]) => {
+        logMainRecord(message, ...args);
+        logConsole(message, ...args);
+        return message;
+      };
+    }
   }
 }
 
-/**
- * Writes the contents of the main record to `logFile`.
- * Defaults to `./nest-debug.log` .
- */
-export async function writeLogFile(logFile = "./nest-debug.log") {
+/** Writes the contents of the main record to `logFile`.
+ * Defaults to `./nest-debug.log`. */
+export async function writeLogFile(logFile?: string, wd = Deno.cwd()) {
   const encoder = new TextEncoder();
 
   const args = `Arguments:\n  ${Deno.args}\n\n`;
@@ -184,6 +142,17 @@ export async function writeLogFile(logFile = "./nest-debug.log") {
     `Deno version:\n  deno: ${Deno.version.deno}\n  v8: ${Deno.version.v8}\n  typescript: ${Deno.version.typescript}\n\n`;
   const eggsVersion = `Nest CLI version:\n  ${version}\n\n`;
   const platform = `Platform:\n  ${Deno.build.target}\n\n`;
+
+  if (logFile) {
+    logFile = join(wd, logFile);
+  } else {
+    const logDir = join(envHOMEDIR(), ".nest/logs");
+    await ensureDir(logDir);
+    logFile = join(
+      logDir,
+      `${new Date().toISOString().replace(/[.:]/g, "_")}-debug.log`,
+    );
+  }
 
   await Deno.writeFile(
     logFile,
@@ -197,21 +166,19 @@ export async function writeLogFile(logFile = "./nest-debug.log") {
   );
 
   log.info(
-    `Debug file created. (${underlineBold(join(Deno.cwd(), logFile))})`,
+    `Debug file created. (${underlineBold(logFile)})`,
   );
 }
 
-/**
- * Called when an unexpected error is thrown anywhere in the code.
- * A debug file is created.
- */
+/** Called when an unexpected error is thrown anywhere in the code.
+ * A debug file is created. */
 export async function handleError(err: Error, logFile?: string) {
   log.critical(`An unexpected error occurred: "${err.message}"`);
   log.debug(err.stack);
   await writeLogFile(logFile);
   log.info(
     `If you think this is a bug, please open a bug report at ${
-      underlineBold("https://github.com/nestdotland/nest/issues/new/choose")
+      underlineBold("https://github.com/nestdotland/cli/issues/new/choose")
     }.`,
   );
   log.info(

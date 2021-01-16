@@ -1,4 +1,4 @@
-import { NestLand, semver, bold } from "../deps.ts";
+import { bold, NestLand, semver } from "../deps.ts";
 import { log } from "../utilities/log.ts";
 import { version as CLIVersion } from "../version.ts";
 
@@ -54,5 +54,3 @@ export async function upgrade(givenVersion?: string) {
     log.info(`Successfully upgraded nest CLI to ${bold(version)}!`);
   }
 }
-
-prompt()

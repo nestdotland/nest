@@ -1,5 +1,5 @@
-import { bold, cyan, gray } from "../deps.ts";
-import { log } from "../utilities/log.ts";
+import { bold, cyan, gray, green } from "../deps.ts";
+import { log, prefix } from "../utilities/log.ts";
 
 const { stdin, stdout, isatty } = Deno;
 const LF = "\n".charCodeAt(0);
@@ -7,6 +7,7 @@ const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
 const separator = gray(">");
+const question = green("?");
 
 /** Shows the given message and waits for the enter key pressed.
  * If the stdin is not interactive, it does nothing. */
@@ -16,7 +17,9 @@ export async function alert(message = "Alert", hint = "[Enter]") {
   }
 
   await stdout.write(
-    encoder.encode(`${bold(`${cyan("i")} ${message}`)} ${hint} ${separator} `),
+    encoder.encode(
+      `${bold(`${prefix.info} ${message}`)} ${hint} ${separator} `,
+    ),
   );
 
   await readLineFromStdin();
@@ -40,7 +43,7 @@ export async function confirm(
 
   await stdout.write(
     encoder.encode(
-      `${bold(`${cyan("?")} ${message}`)} ${
+      `${bold(`${question} ${message}`)} ${
         defaultValue ? yesHint : noHint
       } ${separator} `,
     ),
@@ -73,7 +76,7 @@ export async function prompt(message = "Prompt", defaultValue?: string) {
 
   await stdout.write(
     encoder.encode(
-      `${bold(`${cyan("?")} ${message}`)}${
+      `${bold(`${question} ${message}`)}${
         defaultValue ? ` (${defaultValue})` : ""
       } ${separator} `,
     ),
