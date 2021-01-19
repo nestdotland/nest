@@ -27,7 +27,7 @@ export async function action(args = Deno.args) {
 }
 
 interface Flags {
-  version: string | undefined;
+  version?: string;
 }
 
 function assertFlags(args: Args): Flags {

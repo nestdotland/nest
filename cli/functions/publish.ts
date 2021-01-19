@@ -1,21 +1,23 @@
-import { bold, dim, generateUUID, gray, red, semver, Tar } from "../deps.ts";
-import { log } from "../utilities/log.ts";
-import { underlineBold } from "../utilities/string.ts";
+import { bold, dim, gray, red, semver } from "../deps.ts";
+import { log, underlineBold } from "../utilities/log.ts";
 import { getLatestTag, isGitRepository } from "../utilities/git.ts";
-import { NestCLIError, NestError } from "../error.ts";
-import { publishModule, stageModule } from "../api/todo_.ts";
+import { NestCLIError } from "../error.ts";
 import { readIgnore } from "../config/files/ignore.ts";
 import { DATA_FILE, readDataJson } from "../config/files/data.json.ts";
 import { confirm } from "../utilities/interact.ts";
-import type { Meta } from "../utilities/types.ts";
+import { publish as directPublish } from "../../lib/publish.ts";
+import { sync } from "./sync.ts";
 
 export interface PublishOptions {
-  yes: boolean | undefined;
-  dryRun: boolean | undefined;
-  gitTag: boolean | undefined;
-  pre: boolean | string | undefined;
-  version: string | undefined;
+  yes?: boolean;
+  dryRun?: boolean;
+  gitTag?: boolean;
+  pre?: boolean | string;
+  version?: string;
+  wallet?: string;
 }
+
+const MAX_BUNDLE_SIZE = 200;
 
 export async function publish(
   {
@@ -24,9 +26,15 @@ export async function publish(
     gitTag = false,
     pre = false,
     version: rawVersion = "patch",
+    wallet,
   }: PublishOptions,
 ): Promise<void> {
+  await sync();
+
   const files = await readIgnore();
+
+  // TODO
+  const token = "";
 
   const project = await readDataJson();
 
@@ -37,11 +45,12 @@ export async function publish(
     throw new NestCLIError("Invalid version (publish)");
   }
 
+  // shouldn't happen after a sync
   if (!semver.valid(project.version)) {
     log.error(
       `The project version was altered in the file ${
         underlineBold(DATA_FILE)
-      }. Please sync your module.`,
+      }. Report this issue.`,
     );
     throw new NestCLIError("Invalid project version (publish)");
   }
@@ -79,11 +88,13 @@ export async function publish(
     )
     : new semver.SemVer(rawVersion);
 
-  // TODO: get wallet
-  const wallet = "";
-
   const fileSize = files.map((file) => Deno.lstat(file));
   const settledFileSize = await Promise.allSettled(fileSize);
+  const totalSize = settledFileSize.reduce(
+    (previous, current) =>
+      current.status === "fulfilled" ? current.value.size : 0,
+    0,
+  );
 
   const filesToPublish = files.reduce(
     (previous, current, index) => {
@@ -98,6 +109,12 @@ export async function publish(
   log.info(filesToPublish);
 
   if (!yes) {
+    if (totalSize > MAX_BUNDLE_SIZE * 1e6 && !wallet) {
+      log.warning(
+        `Total estimated file size exceed ${MAX_BUNDLE_SIZE}Mb. Use your wallet if greater.`,
+      );
+    }
+
     const confirmation = await confirm(
       "Are you sure you want to publish this module?",
       false,
@@ -111,53 +128,5 @@ export async function publish(
 
   if (dryRun) return;
 
-  await directPublish(project.meta, version, files, wallet);
-}
-
-/** Lower level version of the publish function */
-export async function directPublish(
-  meta: Meta,
-  version: semver.SemVer,
-  files: string[],
-  wallet: string,
-) {
-  const uuid = generateUUID();
-  const tar = new Tar();
-
-  /** Step 1 - create a tarball */
-
-  for (const file of files) {
-    if (!file.startsWith("/")) {
-      log.error(
-        `Incorrect file path: ${
-          underlineBold(file)
-        } It should start with a slash ("/").`,
-      );
-      throw new NestError("Incorrect file path (publish)");
-    }
-    try {
-      await tar.append(file, {
-        filePath: `.${file}`,
-      });
-    } catch (err) {
-      log.error(
-        `Unable to append ${underlineBold(file.substr(1))} to the tarball`,
-      );
-      log.debug(err.stack);
-      throw new NestError("Unable to append file to the tarball (publish)");
-    }
-  }
-
-  /** Step 2 - send the config and uuid to the api */
-  // TODO
-
-  const response = await stageModule(meta, uuid);
-
-  /** Step 3 - upload the tarball to arweave */
-  // TODO
-
-  const response_ = await publishModule(tar.getReader());
-
-  /** Step 4 - do the twig magic locally */
-  // TODO
+  await directPublish(project.meta, version, files, token, wallet);
 }

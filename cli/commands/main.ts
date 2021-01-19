@@ -65,12 +65,12 @@ export async function action(args = Deno.args) {
 }
 
 interface Flags {
-  command: string | undefined;
-  logLevel: string | undefined;
-  logFile: string | undefined;
-  version: boolean | undefined;
+  command?: string;
+  logLevel?: string;
+  logFile?: string;
+  version?: boolean;
   help: unknown;
-  gui: boolean | undefined;
+  gui?: boolean;
 }
 
 function assertFlags(

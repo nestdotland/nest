@@ -1,3 +1,5 @@
+export * from "../lib/deps.ts"
+
 /**************** std ****************/
 export * from "https://x.nest.land/std@0.80.0/fmt/colors.ts";
 export * from "https://x.nest.land/std@0.80.0/fmt/printf.ts";
@@ -21,13 +23,6 @@ export { ensureDir } from "https://deno.land/std@0.81.0/fs/ensure_dir.ts";
 
 export { readLines } from "https://x.nest.land/std@0.80.0/io/mod.ts";
 
-export { generate as generateUUID } from "https://x.nest.land/std@0.80.0/uuid/v4.ts";
-
-export { Tar } from "https://x.nest.land/std@0.80.0/archive/tar.ts";
-
 /**************** hatcher ****************/
 
 export { NestLand } from "https://x.nest.land/hatcher@0.10.1/lib/registries/NestLand.ts";
-
-/**************** semver ****************/
-export * as semver from "https://deno.land/x/semver@v1.0.0/mod.ts";

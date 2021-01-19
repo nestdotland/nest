@@ -1,3 +1,5 @@
+import { Meta } from "../../lib/utilities/types.ts";
+
 /** Command option */
 export interface Option {
   flag: string;
@@ -33,19 +35,8 @@ export interface Hooks {
   postaudit?: string;
 }
 
-export interface Meta {
-  $schema?: string;
-
-  name: string;
-  fullName?: string;
-  description?: string;
-  homepage?: string;
-  license?: string;
-
+export interface MetaData extends Meta {
   hooks?: Hooks;
-
-  unlisted?: boolean;
-  private?: boolean;
 }
 
 export interface Api {

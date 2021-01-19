@@ -1,3 +1,3 @@
-import { mainCommand } from "./src/commands/main.ts";
+import { mainCommand } from "./cli/commands/main.ts";
 
 await mainCommand.action();

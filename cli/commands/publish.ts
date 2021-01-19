@@ -34,6 +34,11 @@ const options: Option[] = [
     argument: "[tag]",
     description: "Publish version as prerelease",
   },
+  {
+    flag: "-w, --wallet",
+    argument: "<path>",
+    description: "Publish with user wallet"
+  }
 ];
 
 export const publishCommand: Command = {
@@ -66,6 +71,7 @@ function assertFlags(args: Args): Flags {
     "dry-run": dryRun,
     "git-tag": gitTag,
     pre,
+    wallet,
     ...remainingOptions
   } = args;
 
@@ -78,9 +84,10 @@ function assertFlags(args: Args): Flags {
   checkType("--dry-run", dryRun, ["boolean"]);
   checkType("--git-tag", gitTag, ["boolean"]);
   checkType("--pre", pre, ["string", "boolean"]);
+  checkType("--wallet", pre, ["string"]);
   checkType("[version]", version, ["string"]);
 
   if (typeError()) throw new NestCLIError("Flags: Invalid type");
 
-  return { version, yes, dryRun, gitTag, pre } as Flags;
+  return { version, yes, dryRun, gitTag, pre, wallet } as Flags;
 }

@@ -6,11 +6,11 @@ import {
   join,
   red,
   stripColor,
+  underline,
   yellow,
 } from "../deps.ts";
 import { NestCLIError } from "../error.ts";
 import { version } from "../version.ts";
-import { underlineBold } from "./string.ts";
 import { envHOMEDIR } from "./env.ts";
 
 type logFunction = <T>(message: T, ...args: unknown[]) => T;
@@ -55,6 +55,11 @@ export const log: Logger = {
 
 export function lineBreak() {
   console.log();
+}
+
+/** Underline & bold */
+export function underlineBold(msg: string) {
+  return underline(bold(msg));
 }
 
 /** Main record handler */

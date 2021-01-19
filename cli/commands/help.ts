@@ -28,7 +28,7 @@ export function action() {
 }
 
 interface Flags {
-  command: string | undefined;
+  command?: string;
 }
 
 function assertFlags(args: Args): Flags {
