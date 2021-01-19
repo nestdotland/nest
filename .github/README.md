@@ -11,9 +11,19 @@
  </p>
 </p>
 
-## nest.land template
+> Note: This module is a work in progress until the stable release of nest.land.
 
-A template for nest.land repositories. Remove this sentence and change this header to describe the project this template is being used for.
+## cli
+
+Design goals:
+
+- Use the latest standard modules as much as possible
+- Use ASCII for stdout as much as possible (looking at you cliffy)
+- Avoid using `--unstable` APIs
+- Store all config in a temporary `.nest` directory
+- Exclude all dotfiles by default while publishing
+- Enforce semver
+- Companion server for gui (see #9)
 
 ## What is nest.land?
 
