@@ -13,7 +13,7 @@ export async function publish(
   const uuid = generateUUID();
   const tar = new Tar();
 
-  /** Step 1 - create a tarball */
+  /** 1 - create a tarball */
 
   for (const file of files) {
     if (!file.startsWith("/")) {
@@ -38,16 +38,16 @@ export async function publish(
   }
 
   if (wallet) {
-    /** Step 2.A.1 upload the tarball to arweave and get the file urls */
+    /** 2.1 upload the tarball to arweave and get the file urls */
     const response = await uploadArweave(wallet, tar.getReader());
 
     // TODO
     const urls: string[] = [];
-    /** Step 2.A.2 sends the arweave URLs and the config to the api */
+    /** 2.2.1 sends the arweave URLs and the config to the api */
     const response_ = await sendURLs(urls, token)
 
   } else {
-    /** Step 2.B.1 - upload the tarball and config to twig */
+    /** 2.2.1 - upload the tarball and config to twig */
     const response = await twigUpload(meta, uuid, token, tar.getReader());
   }
 }

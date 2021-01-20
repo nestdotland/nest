@@ -22,7 +22,7 @@ export interface Command {
   action: (args?: string[]) => Promise<void> | void;
 }
 
-export type RawObject = Record<string, unknown>;
+// export type RawObject = Record<string, unknown>;
 
 export interface Hooks {
   presync?: string;
@@ -54,3 +54,5 @@ export interface Project {
   lastSync: number;
   nextAutoSync: number;
 }
+
+export type { JSONArray, JSONObject, JSONValue, Json } from "./json.ts"

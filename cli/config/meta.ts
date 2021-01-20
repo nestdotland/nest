@@ -1,9 +1,15 @@
 import { limitFields, setupCheckType } from "../utilities/cli.ts";
 import { NestCLIError } from "../error.ts";
 import { assertHooks } from "./hooks.ts";
-import type { Meta, RawObject } from "../utilities/types.ts";
+import { log } from "../utilities/log.ts";
+import type { MetaData, Json } from "../utilities/types.ts";
 
-export function assertMeta(meta: RawObject, file: string, prefix = ""): Meta {
+export function assertMeta(meta: Json, file: string, prefix = ""): MetaData {
+  if (Array.isArray(meta)) {
+    log.error("Unable to parses api object: received an array.");
+    throw new NestCLIError("Config(meta): received an array");
+  }
+
   const {
     $schema,
     name,
@@ -32,10 +38,10 @@ export function assertMeta(meta: RawObject, file: string, prefix = ""): Meta {
   checkType(`${prefix}hooks`, hooks, ["object"]);
 
   if (typeof hooks === "object" && hooks !== null) {
-    assertHooks(hooks as RawObject, file, prefix + "hooks.");
+    assertHooks(hooks, file, prefix + "hooks.");
   }
 
   if (typeError()) throw new NestCLIError("Config(meta): Invalid type");
 
-  return meta as unknown as Meta;
+  return meta as unknown as MetaData;
 }

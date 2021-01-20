@@ -2,7 +2,7 @@ import { blue, bold, underline } from "../deps.ts";
 import { NestCLIError } from "../error.ts";
 import { log } from "../utilities/log.ts";
 import { likelyString } from "./string.ts";
-import type { Option, RawObject } from "./types.ts";
+import type { Option } from "./types.ts";
 
 /** Generates aliases from options for the `parse` function. */
 export function aliasesFromOptions(options: Option[]): Record<string, string> {
@@ -47,7 +47,7 @@ function extractFlags(options: Option[]) {
 
 /** Will throw if `options` is not empty. */
 export function limitOptions(
-  options: RawObject,
+  options: Record<string, unknown>,
   baseOptions: Option[],
 ) {
   const reference = extractFlags(baseOptions);
@@ -66,8 +66,8 @@ export function limitOptions(
 /** Will throw if `fields` is not empty. */
 export function limitFields(
   file: string,
-  fields: RawObject,
-  baseFields: RawObject = {},
+  fields: Record<string, unknown>,
+  baseFields: Record<string, unknown> = {},
 ) {
   const misspelled = Object.keys(fields);
   const reference = Object.keys(baseFields);

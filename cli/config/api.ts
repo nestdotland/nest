@@ -1,9 +1,15 @@
 import { limitFields, setupCheckType } from "../utilities/cli.ts";
 import { NestCLIError } from "../error.ts";
-import type { Api, RawObject } from "../utilities/types.ts";
+import { log } from "../utilities/log.ts";
+import type { Api, Json } from "../utilities/types.ts";
 
-export function assertApi(api: RawObject, file: string, prefix = ""): Api {
+export function assertApi(api: Json, file: string, prefix = ""): Api {
   const { checkType, typeError } = setupCheckType(file);
+
+  if (Array.isArray(api)) {
+    log.error("Unable to parses api object: received an array.");
+    throw new NestCLIError("Config(api): received an array");
+  }
 
   const {
     versions,

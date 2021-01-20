@@ -2,7 +2,7 @@ import { exists, join } from "../../deps.ts";
 import { readJson, writeJson } from "../../utilities/json.ts";
 import { NEST_DIRECTORY } from "./nest.ts";
 import { assertMeta } from "../../config/meta.ts";
-import type { Meta, RawObject } from "../../utilities/types.ts";
+import type { MetaData, Json } from "../../utilities/types.ts";
 
 export const MODULE_FILE = "module.json";
 export const MODULE_PATH = join(NEST_DIRECTORY, MODULE_FILE);
@@ -12,14 +12,14 @@ export function moduleJsonExists(): Promise<boolean> {
 }
 
 /** Reads and parses the `module.json` file. */
-export async function readModuleJson(path = MODULE_PATH): Promise<Meta> {
-  const json = await readJson(path) as RawObject;
+export async function readModuleJson(path = MODULE_PATH): Promise<MetaData> {
+  const json = await readJson(path) as Json;
 
   return assertMeta(json, MODULE_FILE);
 }
 
 export async function writeModuleJson(
-  object: Meta,
+  object: MetaData,
   path = MODULE_PATH,
 ): Promise<void> {
   await writeJson(path, object, { spaces: 2 });

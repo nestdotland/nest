@@ -1,4 +1,4 @@
-import { bold, dim, gray, red, semver } from "../deps.ts";
+import { bold, dim, gray, red, semver, underline } from "../deps.ts";
 import { log, underlineBold } from "../utilities/log.ts";
 import { getLatestTag, isGitRepository } from "../utilities/git.ts";
 import { NestCLIError } from "../error.ts";
@@ -92,7 +92,7 @@ export async function publish(
   const settledFileSize = await Promise.allSettled(fileSize);
   const totalSize = settledFileSize.reduce(
     (previous, current) =>
-      current.status === "fulfilled" ? current.value.size : 0,
+      previous + (current.status === "fulfilled" ? current.value.size : 0),
     0,
   );
 
@@ -111,7 +111,7 @@ export async function publish(
   if (!yes) {
     if (totalSize > MAX_BUNDLE_SIZE * 1e6 && !wallet) {
       log.warning(
-        `Total estimated file size exceed ${MAX_BUNDLE_SIZE}Mb. Use your wallet if greater.`,
+        `Total ${underline("estimated")} file size exceed ${MAX_BUNDLE_SIZE}Mb. Use your wallet if greater.`,
       );
     }
 

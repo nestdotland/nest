@@ -1,13 +1,19 @@
 import { limitFields, setupCheckType } from "../utilities/cli.ts";
 import { NestCLIError } from "../error.ts";
-import type { Hooks, RawObject } from "../utilities/types.ts";
+import { log } from "../utilities/log.ts";
+import type { Hooks, Json } from "../utilities/types.ts";
 
 export function assertHooks(
-  hooks: RawObject,
+  hooks: Json,
   file: string,
   prefix = "",
 ): Hooks {
   const { checkType, typeError } = setupCheckType(file);
+
+  if (Array.isArray(hooks)) {
+    log.error("Unable to parses hooks object: received an array.");
+    throw new NestCLIError("Config(hooks): received an array");
+  }
 
   const {
     presync,
