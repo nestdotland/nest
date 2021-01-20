@@ -1,5 +1,5 @@
 import { desc, run, sh, task } from "https://x.nest.land/drake@1.4.4/mod.ts";
-import { version } from "./src/version.ts";
+import { version } from "./cli/version.ts";
 
 desc("Run tests.");
 task("test", [], async function () {

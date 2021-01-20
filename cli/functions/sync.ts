@@ -1,33 +1,50 @@
-import { compare, unchanged } from "../utilities/diff.ts";
 import { readDataJson, writeDataJson } from "../config/files/data.json.ts";
 import {
   readModuleJson,
   writeModuleJson,
 } from "../config/files/module.json.ts";
-import type { MetaData } from "../utilities/types.ts";
+import {
+  applyJSONDiff,
+  compareJson,
+  isJSONUnchanged,
+} from "../utilities/json.ts";
+import { downloadMeta, uploadMeta } from "../../lib/api/_todo.ts";
+import type { Diff, Json, Meta, Project } from "../utilities/types.ts";
 
 export async function sync(name?: string) {
   const project = await readDataJson();
   const meta = await readModuleJson();
-  const remoteMeta = await downloadConfig();
+  const remoteMeta = await downloadMeta();
 
   /** 1 - compare the config in module.json (user editable) and data.json. */
-  const diff = compare(project.meta, meta);
+  const diff = compareMeta(meta, project.meta);
 
-  if (unchanged(diff)) {
+  if (isJSONUnchanged(diff)) {
     /** 2 - if they are same just download the remote config */
-    await writeModuleJson(remoteMeta);
-    project.meta = remoteMeta;
-    project.lastSync = new Date().getTime();
-    await writeDataJson(project);
+    await updateFiles(remoteMeta, project);
   } else {
-    /** 2.1 - if not same check what properties have changed */
-    /** 2.2 - update the new properties */
-    /** 2.3 - upload the final result to the api */
+    /** 2.1 - update the new properties */
+    const newMeta = applyMetaDiff(diff, remoteMeta);
+
+    await updateFiles(newMeta, project);
+
+    /** 2.2 - upload the final result to the api */
+    const token = ""; // TODO
+    await uploadMeta(newMeta, token);
   }
 }
 
-async function downloadConfig(): Promise<MetaData> {
-  // TODO
-  return { name: "" };
+async function updateFiles(meta: Meta, project: Project) {
+  await writeModuleJson(meta);
+  project.meta = meta;
+  project.lastSync = new Date().getTime();
+  await writeDataJson(project);
+}
+
+function compareMeta(actual: Meta, base: Meta): Diff {
+  return compareJson(actual as unknown as Json, base as unknown as Json);
+}
+
+function applyMetaDiff(diff: Diff, target: Meta): Meta {
+  return applyJSONDiff(diff, target as unknown as Json) as unknown as Meta;
 }

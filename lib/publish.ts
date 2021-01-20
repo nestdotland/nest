@@ -44,15 +44,19 @@ export async function publish(
     // TODO
     const urls: string[] = [];
     /** 2.2.1 sends the arweave URLs and the config to the api */
-    const response_ = await sendURLs(urls, token)
-
+    const response_ = await sendURLs(urls, token);
   } else {
     /** 2.2.1 - upload the tarball and config to twig */
     const response = await twigUpload(meta, uuid, token, tar.getReader());
   }
 }
 
-async function twigUpload(meta: Meta, uuid: string, token: string, reader: Deno.Reader) {
+async function twigUpload(
+  meta: Meta,
+  uuid: string,
+  token: string,
+  reader: Deno.Reader,
+) {
   // TODO
 }
 

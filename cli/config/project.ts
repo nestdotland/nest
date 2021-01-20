@@ -3,7 +3,7 @@ import { NestCLIError } from "../error.ts";
 import { assertMeta } from "./meta.ts";
 import { assertApi } from "./api.ts";
 import { log } from "../utilities/log.ts";
-import type { Project, Json } from "../utilities/types.ts";
+import type { Json, Project } from "../utilities/types.ts";
 
 export function assertProject(
   module: Json,

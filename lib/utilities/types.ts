@@ -1,3 +1,14 @@
+export interface Hooks {
+  presync?: string;
+  postsync?: string;
+  prepack?: string;
+  postpack?: string;
+  prepublish?: string;
+  postpublish?: string;
+  preaudit?: string;
+  postaudit?: string;
+}
+
 export interface Meta {
   $schema?: string;
 
@@ -9,4 +20,6 @@ export interface Meta {
 
   unlisted?: boolean;
   private?: boolean;
+
+  hooks?: Hooks;
 }

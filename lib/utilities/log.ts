@@ -1,1 +1,1 @@
-export * from "../../cli/utilities/log.ts"
+export * from "../../cli/utilities/log.ts";

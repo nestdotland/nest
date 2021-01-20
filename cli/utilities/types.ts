@@ -1,4 +1,4 @@
-import { Meta } from "../../lib/utilities/types.ts";
+import { Hooks, Meta } from "../../lib/utilities/types.ts";
 
 /** Command option */
 export interface Option {
@@ -22,23 +22,6 @@ export interface Command {
   action: (args?: string[]) => Promise<void> | void;
 }
 
-// export type RawObject = Record<string, unknown>;
-
-export interface Hooks {
-  presync?: string;
-  postsync?: string;
-  prepack?: string;
-  postpack?: string;
-  prepublish?: string;
-  postpublish?: string;
-  preaudit?: string;
-  postaudit?: string;
-}
-
-export interface MetaData extends Meta {
-  hooks?: Hooks;
-}
-
 export interface Api {
   versions: string[];
   latestVersion: string;
@@ -55,4 +38,5 @@ export interface Project {
   nextAutoSync: number;
 }
 
-export type { JSONArray, JSONObject, JSONValue, Json } from "./json.ts"
+export * from "../../lib/utilities/types.ts";
+export type { Diff, Json, JSONArray, JSONObject, JSONValue } from "./json.ts";

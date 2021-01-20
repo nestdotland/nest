@@ -1,4 +1,4 @@
-export * from "../lib/deps.ts"
+export * from "../lib/deps.ts";
 
 /**************** std ****************/
 export * from "https://x.nest.land/std@0.80.0/fmt/colors.ts";

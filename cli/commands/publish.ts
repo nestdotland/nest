@@ -37,8 +37,8 @@ const options: Option[] = [
   {
     flag: "-w, --wallet",
     argument: "<path>",
-    description: "Publish with user wallet"
-  }
+    description: "Publish with user wallet",
+  },
 ];
 
 export const publishCommand: Command = {

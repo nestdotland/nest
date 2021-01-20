@@ -111,7 +111,9 @@ export async function publish(
   if (!yes) {
     if (totalSize > MAX_BUNDLE_SIZE * 1e6 && !wallet) {
       log.warning(
-        `Total ${underline("estimated")} file size exceed ${MAX_BUNDLE_SIZE}Mb. Use your wallet if greater.`,
+        `Total ${
+          underline("estimated")
+        } file size exceed ${MAX_BUNDLE_SIZE}Mb. Use your wallet if greater.`,
       );
     }
 
