@@ -2,7 +2,7 @@ import { assertEquals, projectRoot, resolve } from "../../test/deps.ts";
 import { Ignore } from "./ignore.ts";
 
 Deno.test({
-  name: "internal | ignore | parseLine",
+  name: "CLI | ignore | parseLine",
   fn() {
     const src = [
       "@extends .gitignore",
@@ -67,7 +67,7 @@ Deno.test({
 });
 
 Deno.test({
-  name: "internal | ignore | parse",
+  name: "CLI | ignore | parse",
   async fn() {
     const wd = resolve(projectRoot, "./test/ignore/");
 
@@ -98,7 +98,7 @@ Deno.test({
 });
 
 Deno.test({
-  name: "internal | ignore | matchFiles",
+  name: "CLI | ignore | matchFiles",
   async fn() {
     const wd = resolve(projectRoot, "./test/ignore/");
 

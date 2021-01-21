@@ -29,6 +29,7 @@ export async function publish(
     wallet,
   }: PublishOptions,
 ): Promise<void> {
+  // ? Do we sync before publishing ?
   await sync();
 
   const files = await readIgnore();

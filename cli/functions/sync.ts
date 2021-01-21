@@ -4,12 +4,13 @@ import {
   writeModuleJson,
 } from "../config/files/module.json.ts";
 import {
-  applyJSONDiff,
+  applyJsonDiff,
   compareJson,
-  isJSONUnchanged,
-} from "../utilities/json.ts";
+  Diff,
+  isJsonUnchanged,
+} from "../processing/json.ts";
 import { downloadMeta, uploadMeta } from "../../lib/api/_todo.ts";
-import type { Diff, Json, Meta, Project } from "../utilities/types.ts";
+import type { Json, Meta, Project } from "../utilities/types.ts";
 
 export async function sync(name?: string) {
   const project = await readDataJson();
@@ -19,7 +20,7 @@ export async function sync(name?: string) {
   /** 1 - compare the config in module.json (user editable) and data.json. */
   const diff = compareMeta(meta, project.meta);
 
-  if (isJSONUnchanged(diff)) {
+  if (isJsonUnchanged(diff)) {
     /** 2 - if they are same just download the remote config */
     await updateFiles(remoteMeta, project);
   } else {
@@ -34,7 +35,7 @@ export async function sync(name?: string) {
   }
 }
 
-async function updateFiles(meta: Meta, project: Project) {
+async function updateFiles(meta: Meta, project: Project): Promise<void> {
   await writeModuleJson(meta);
   project.meta = meta;
   project.lastSync = new Date().getTime();
@@ -46,5 +47,5 @@ function compareMeta(actual: Meta, base: Meta): Diff {
 }
 
 function applyMetaDiff(diff: Diff, target: Meta): Meta {
-  return applyJSONDiff(diff, target as unknown as Json) as unknown as Meta;
+  return applyJsonDiff(diff, target as unknown as Json) as unknown as Meta;
 }

@@ -38,5 +38,15 @@ export interface Project {
   nextAutoSync: number;
 }
 
+export type JSONObject = { [key: string]: JSONValue };
+export type JSONArray = JSONValue[];
+export type JSONValue =
+  | string
+  | number
+  | JSONObject
+  | JSONArray
+  | boolean
+  | null;
+export type Json = JSONArray | JSONObject;
+
 export * from "../../lib/utilities/types.ts";
-export type { Diff, Json, JSONArray, JSONObject, JSONValue } from "./json.ts";

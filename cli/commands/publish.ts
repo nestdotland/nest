@@ -37,7 +37,7 @@ const options: Option[] = [
   {
     flag: "-w, --wallet",
     argument: "<path>",
-    description: "Publish with user wallet",
+    description: "Use arweave user wallet for large uploads",
   },
 ];
 
