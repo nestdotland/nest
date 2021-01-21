@@ -15,7 +15,6 @@ export function assertApi(api: Json, file: string, prefix = ""): Api {
     versions,
     latestVersion,
     lastPublished,
-    license,
     ...remainingFields
   } = api;
 
@@ -24,7 +23,6 @@ export function assertApi(api: Json, file: string, prefix = ""): Api {
   checkType(`${prefix}versions`, versions, ["array"], true);
   checkType(`${prefix}latestVersion`, latestVersion, ["string"], true);
   checkType(`${prefix}lastPublished`, lastPublished, ["number"], true);
-  checkType(`${prefix}license`, license, ["string"], true);
 
   if (Array.isArray(versions)) {
     for (let i = 0; i < versions.length; i++) {

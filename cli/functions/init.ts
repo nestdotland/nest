@@ -9,8 +9,9 @@ import { sync } from "./sync.ts";
 import { confirm, prompt, promptAndValidate } from "../utilities/interact.ts";
 
 export async function init(wd = Deno.cwd()) {
-  // FIXME: find a better way to determine if a module is already initialized and linked
+  // FIXME: find a better way to determine if a module is already **initialized** and **linked**
   if (await dataJsonExists()) {
+    log.info("Module is already initialized and linked, syncing...");
     await sync();
     return;
   }

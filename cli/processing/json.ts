@@ -1,3 +1,5 @@
+import { bold, gray, green, red, yellow } from "../deps.ts";
+import { lineBreak, log } from "../utilities/log.ts";
 import { NestCLIError } from "../error.ts";
 import type { Json, JSONValue } from "../utilities/types.ts";
 
@@ -133,4 +135,56 @@ function applyDiff(
     return diff.value;
   }
   if (diff.type === DiffType.removed) return undefined;
+}
+
+export function printJsonDiff(diff: Diff) {
+  log.plain(
+    `\n   ${bold(gray("[Diff]"))} ${bold(red("Deleted"))} / ${
+      bold(green("Added"))
+    } / ${bold(yellow("Modified"))}\n`,
+  );
+
+  printDiff(diff, "");
+
+  lineBreak();
+}
+
+function printDiff(diff: Diff, indent: string, key?: string) {
+  const newIndent = indent + "  ";
+  if (diff instanceof Map) {
+    log.plain(`${indent}   ${key ? `${key}: ` : ""}{`);
+    for (const [key, value] of diff) {
+      printDiff(value, newIndent, key);
+    }
+    log.plain(`${indent}   },`);
+  } else if (Array.isArray(diff)) {
+    log.plain(`${indent}   ${key ? `${key}: ` : ""}[`);
+    for (let i = 0; i < diff.length; i++) {
+      printDiff(diff[i], newIndent);
+    }
+    log.plain(`${indent}   ],`);
+  } else {
+    const value = `${indent}${key ? `${key}: ` : ""}${
+      Deno.inspect(diff.value, { depth: Infinity, compact: false }).replaceAll(
+        "\n",
+        `\n${indent}`,
+      )
+    },`;
+    let line: string;
+    switch (diff.type) {
+      case DiffType.added:
+        line = bold(green(` + ${value.replaceAll("\n", "\n + ")}`));
+        break;
+      case DiffType.removed:
+        line = bold(red(` - ${value.replaceAll("\n", "\n - ")}`));
+        break;
+      case DiffType.updated:
+        line = bold(yellow(` ~ ${value.replaceAll("\n", "\n ~ ")}`));
+        break;
+      default:
+        line = `   ${value.replaceAll("\n", "\n   ")}`;
+        break;
+    }
+    log.plain(line);
+  }
 }

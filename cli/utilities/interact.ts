@@ -1,5 +1,5 @@
 import { bold, cyan, gray, green } from "../deps.ts";
-import { log, prefix } from "../utilities/log.ts";
+import { lineBreak, log, prefix } from "../utilities/log.ts";
 
 const { stdin, stdout, isatty } = Deno;
 const LF = "\n".charCodeAt(0);
@@ -107,7 +107,7 @@ export async function promptAndValidate({
     if (validate(response)) return response;
 
     log.warning(invalidMessage);
-    console.log();
+    lineBreak();
   }
 }
 

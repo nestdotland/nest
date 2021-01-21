@@ -1,4 +1,4 @@
-import { bold, dim, gray, red, semver, underline } from "../deps.ts";
+import { bold, dim, gray, green, red, semver, underline } from "../deps.ts";
 import { log, underlineBold } from "../utilities/log.ts";
 import { getLatestTag, isGitRepository } from "../utilities/git.ts";
 import { NestCLIError } from "../error.ts";
@@ -6,7 +6,7 @@ import { readIgnore } from "../config/files/ignore.ts";
 import { DATA_FILE, readDataJson } from "../config/files/data.json.ts";
 import { confirm } from "../utilities/interact.ts";
 import { publish as directPublish } from "../../lib/publish.ts";
-import { sync } from "./sync.ts";
+import { isConfigUpToDate } from "./sync.ts";
 
 export interface PublishOptions {
   yes?: boolean;
@@ -29,9 +29,6 @@ export async function publish(
     wallet,
   }: PublishOptions,
 ): Promise<void> {
-  // ? Do we sync before publishing ?
-  await sync();
-
   const files = await readIgnore();
 
   // TODO
@@ -109,19 +106,23 @@ export async function publish(
   );
   log.info(filesToPublish);
 
-  if (!yes) {
-    if (totalSize > MAX_BUNDLE_SIZE * 1e6 && !wallet) {
-      log.warning(
-        `Total ${
-          underline("estimated")
-        } file size exceed ${MAX_BUNDLE_SIZE}Mb. Use your wallet if greater.`,
-      );
-    }
-
-    const confirmation = await confirm(
-      "Are you sure you want to publish this module?",
-      false,
+  if (totalSize > MAX_BUNDLE_SIZE * 1e6 && !wallet) {
+    log.warning(
+      `Total ${
+        underline("estimated")
+      } file size exceed ${MAX_BUNDLE_SIZE}Mb. Use your wallet if greater.`,
     );
+  }
+
+  if (!await isConfigUpToDate()) {
+    log.warning(
+      "Local config is not up to date. You should synchronize it with",
+      bold(green("nest sync")),
+    );
+  }
+
+  if (!yes) {
+    const confirmation = await confirm("Proceed with publication ?", false);
 
     if (!confirmation) {
       log.info("Publish cancelled.");

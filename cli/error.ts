@@ -5,9 +5,5 @@ export class NestCLIError extends Error {
     super(message);
   }
 }
-export class NestError extends Error {
-  name = "Nest Error";
-  constructor(public message: string) {
-    super(message);
-  }
-}
+
+export { NestError } from "../lib/error.ts";
