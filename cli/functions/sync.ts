@@ -1,7 +1,8 @@
-import { readDataJson, writeDataJson } from "../config/files/data.json.ts";
+import { parseDataJson, writeDataJson } from "../config/files/data.json.ts";
+import { ensureConfig } from "../config/files/all.ts";
 import { log } from "../utilities/log.ts";
 import {
-  readModuleJson,
+  parseModuleJson,
   writeModuleJson,
 } from "../config/files/module.json.ts";
 import {
@@ -16,8 +17,10 @@ import { downloadMeta, uploadMeta } from "../../lib/api/_todo.ts";
 import type { Json, Meta, Project } from "../utilities/types.ts";
 
 export async function sync(name?: string) {
-  const project = await readDataJson();
-  const meta = await readModuleJson();
+  await ensureConfig();
+  
+  const project = await parseDataJson();
+  const meta = await parseModuleJson();
   const pendingRemoteMeta = downloadMeta();
 
   /** 1 - compare the config in module.json (user editable) and data.json. */
@@ -62,7 +65,7 @@ export async function sync(name?: string) {
 }
 
 export async function isConfigUpToDate(): Promise<boolean> {
-  const meta = await readModuleJson();
+  const meta = await parseModuleJson();
   const remoteMeta = await downloadMeta();
 
   const diff = compareMeta(meta, remoteMeta);

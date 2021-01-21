@@ -66,7 +66,8 @@ export class Ignore {
       : `/${line}`;
     // If there is a separator at the end of the pattern then the pattern will only match directories,
     // otherwise the pattern can match both files and directories.
-    if (line.endsWith("/")) line = `${line}**`;
+    const matchDirsOnly = line.endsWith("/");
+    if (matchDirsOnly) line = `${line}**`;
 
     if (extended) {
       return {
@@ -76,7 +77,9 @@ export class Ignore {
     }
     return {
       status: accepted ? "accepts" : "denies",
-      value: globToRegExp(line),
+      value: matchDirsOnly ? globToRegExp(line) : new RegExp(
+        `${globToRegExp(line).source}|${globToRegExp(`${line}/**`).source}`,
+      ),
     };
   }
 

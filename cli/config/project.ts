@@ -16,6 +16,7 @@ export function assertProject(
   }
 
   const {
+    $comment,
     meta,
     api,
     version,
@@ -28,6 +29,7 @@ export function assertProject(
 
   const { checkType, typeError } = setupCheckType(file);
 
+  checkType(`${prefix}$comment`, $comment, ["string"]);
   checkType(`${prefix}meta`, meta, ["object"], true);
   checkType(`${prefix}api`, api, ["object"], true);
   checkType(`${prefix}version`, version, ["string"], true);
@@ -41,6 +43,8 @@ export function assertProject(
   if (typeof api === "object" && api !== null) {
     assertApi(api, file, `${prefix}api.`);
   }
+
+  if ($comment) delete module.$comment;
 
   if (typeError()) throw new NestCLIError("Config: Invalid type");
 

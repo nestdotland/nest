@@ -2,15 +2,22 @@ import { basename, cyan, ensureDir, green } from "../deps.ts";
 import { lineBreak, log } from "../utilities/log.ts";
 import { NEST_DIRECTORY } from "../config/files/nest.ts";
 import { dataJsonExists, writeDataJson } from "../config/files/data.json.ts";
-import { writeModuleJson } from "../config/files/module.json.ts";
-import { writeIgnore } from "../config/files/ignore.ts";
+import {
+  moduleJsonExists,
+  writeModuleJson,
+} from "../config/files/module.json.ts";
+import { ignoreExists, writeIgnore } from "../config/files/ignore.ts";
 import { addToGitIgnore } from "../utilities/git.ts";
 import { sync } from "./sync.ts";
 import { confirm, prompt, promptAndValidate } from "../utilities/interact.ts";
 
 export async function init(wd = Deno.cwd()) {
-  // FIXME: find a better way to determine if a module is already **initialized** and **linked**
-  if (await dataJsonExists()) {
+  const linked = true; // TODO
+
+  if (
+    await dataJsonExists() && await moduleJsonExists() &&
+    await ignoreExists() && linked
+  ) {
     log.info("Module is already initialized and linked, syncing...");
     await sync();
     return;

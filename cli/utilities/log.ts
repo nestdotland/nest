@@ -66,14 +66,15 @@ export function underlineBold(msg: string) {
 function logToMainRecord(prefix: string) {
   prefix = stripColor(prefix);
   return <T>(message: T, ...args: unknown[]) => {
+    // TODO(oganexon): align messages with fprintf
     let msg = `${new Date().toISOString()} ${prefix}`;
     for (const arg of [message, ...args]) {
       if (arg === "") continue;
-      msg += `${
+      msg += ` ${
         typeof arg === "string"
           ? stripColor(arg)
           : Deno.inspect(arg, { depth: Infinity, iterableLimit: Infinity })
-      } `;
+      }`;
     }
     mainRecord += msg + "\n";
     return message;

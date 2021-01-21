@@ -11,10 +11,13 @@ export function ignoreExists(): Promise<boolean> {
   return exists(IGNORE_PATH);
 }
 
-/** Reads and parses the `ignore` file.  */
-export async function readIgnore(path = IGNORE_PATH): Promise<string[]> {
-  await ensureFile(path);
+/** Reads the `ignore` file.  */
+export function readIgnore(): Promise<string> {
+  return Deno.readTextFile(IGNORE_PATH);
+}
 
+/** Reads and parses the `ignore` file.  */
+export function parseIgnore(path = IGNORE_PATH): Promise<string[]> {
   const ignore = new Ignore(path);
 
   return ignore.matchFiles();

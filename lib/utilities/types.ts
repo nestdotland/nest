@@ -10,8 +10,6 @@ export interface Hooks {
 }
 
 export interface Meta {
-  $schema?: string;
-
   name: string;
   fullName?: string;
   description?: string;

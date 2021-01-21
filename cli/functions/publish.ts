@@ -1,9 +1,19 @@
-import { bold, dim, gray, green, red, semver, underline } from "../deps.ts";
-import { log, underlineBold } from "../utilities/log.ts";
+import {
+  bold,
+  dim,
+  gray,
+  green,
+  join,
+  red,
+  semver,
+  underline,
+} from "../deps.ts";
+import { lineBreak, log, underlineBold } from "../utilities/log.ts";
 import { getLatestTag, isGitRepository } from "../utilities/git.ts";
 import { NestCLIError } from "../error.ts";
-import { readIgnore } from "../config/files/ignore.ts";
-import { DATA_FILE, readDataJson } from "../config/files/data.json.ts";
+import { parseIgnore } from "../config/files/ignore.ts";
+import { DATA_FILE, parseDataJson } from "../config/files/data.json.ts";
+import { ensureConfig } from "../config/files/all.ts";
 import { confirm } from "../utilities/interact.ts";
 import { publish as directPublish } from "../../lib/publish.ts";
 import { isConfigUpToDate } from "./sync.ts";
@@ -29,12 +39,16 @@ export async function publish(
     wallet,
   }: PublishOptions,
 ): Promise<void> {
-  const files = await readIgnore();
+  await ensureConfig()
+
+  const files = await parseIgnore();
+
+  log.info(`Found ${files.length} files.`);
 
   // TODO
   const token = "";
 
-  const project = await readDataJson();
+  const project = await parseDataJson();
 
   const isReleaseType = ["patch", "minor", "major"].includes(rawVersion);
 
@@ -86,7 +100,8 @@ export async function publish(
     )
     : new semver.SemVer(rawVersion);
 
-  const fileSize = files.map((file) => Deno.lstat(file));
+  const wd = Deno.cwd();
+  const fileSize = files.map((file) => Deno.lstat(join(wd, file)));
   const settledFileSize = await Promise.allSettled(fileSize);
   const totalSize = settledFileSize.reduce(
     (previous, current) =>
@@ -98,13 +113,14 @@ export async function publish(
     (previous, current, index) => {
       const fileInfo = settledFileSize[index];
       const size = fileInfo.status === "fulfilled"
-        ? gray(dim("(" + (fileInfo.value.size / 1000000).toString() + "MB)"))
+        ? gray(dim(`(${prettyBytes(fileInfo.value.size)})`))
         : red(`Error while computing file size: ${fileInfo.reason}`);
-      return `${previous}\n        - ${dim(current)}  ${size}`;
+      return `${previous}\n     - ${dim(current)}  ${size}`;
     },
     "Files to publish:",
   );
   log.info(filesToPublish);
+  lineBreak();
 
   if (totalSize > MAX_BUNDLE_SIZE * 1e6 && !wallet) {
     log.warning(
@@ -116,7 +132,7 @@ export async function publish(
 
   if (!await isConfigUpToDate()) {
     log.warning(
-      "Local config is not up to date. You should synchronize it with",
+      "Local config is not up to date. You should synchronize by running",
       bold(green("nest sync")),
     );
   }
@@ -133,4 +149,30 @@ export async function publish(
   if (dryRun) return;
 
   await directPublish(project.meta, version, files, token, wallet);
+}
+
+function prettyBytes(n: number): string {
+  const log = Math.floor(Math.log10(n) / 3);
+  let suffix: string;
+  switch (log) {
+    case 0:
+      suffix = "B";
+      break;
+    case 1:
+      suffix = "kB";
+      break;
+    case 2:
+      suffix = "MB";
+      break;
+    case 3:
+      suffix = "GB";
+      break;
+    case 4:
+      suffix = "PB";
+      break;
+    default:
+      suffix = "?";
+      break;
+  }
+  return (n / 10 ** (log * 3)).toPrecision(3) + suffix;
 }

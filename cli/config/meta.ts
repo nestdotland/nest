@@ -41,6 +41,8 @@ export function assertMeta(meta: Json, file: string, prefix = ""): Meta {
     assertHooks(hooks, file, prefix + "hooks.");
   }
 
+  if ($schema) delete meta.$schema;
+
   if (typeError()) throw new NestCLIError("Config(meta): Invalid type");
 
   return meta as unknown as Meta;
