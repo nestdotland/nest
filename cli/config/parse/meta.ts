@@ -1,8 +1,8 @@
-import { limitFields, setupCheckType } from "../utilities/cli.ts";
-import { NestCLIError } from "../error.ts";
+import { limitFields, setupCheckType } from "../../utilities/cli.ts";
+import { NestCLIError } from "../../error.ts";
 import { assertHooks } from "./hooks.ts";
-import { log } from "../utilities/log.ts";
-import type { Json, Meta } from "../utilities/types.ts";
+import { log } from "../../utilities/log.ts";
+import type { Json, Meta } from "../../utilities/types.ts";
 
 export function assertMeta(meta: Json, file: string, prefix = ""): Meta {
   if (Array.isArray(meta)) {
@@ -28,7 +28,6 @@ export function assertMeta(meta: Json, file: string, prefix = ""): Meta {
   const { checkType, typeError } = setupCheckType(file);
 
   checkType(`${prefix}$schema`, $schema, ["string"]);
-  checkType(`${prefix}name`, name, ["string"], true);
   checkType(`${prefix}fullName`, fullName, ["string"]);
   checkType(`${prefix}description`, description, ["string"]);
   checkType(`${prefix}homepage`, homepage, ["string"]);
@@ -38,7 +37,7 @@ export function assertMeta(meta: Json, file: string, prefix = ""): Meta {
   checkType(`${prefix}hooks`, hooks, ["object"]);
 
   if (typeof hooks === "object" && hooks !== null) {
-    assertHooks(hooks, file, prefix + "hooks.");
+    assertHooks(hooks, file, `${prefix}hooks.`);
   }
 
   if ($schema) delete meta.$schema;

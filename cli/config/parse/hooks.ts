@@ -1,7 +1,7 @@
-import { limitFields, setupCheckType } from "../utilities/cli.ts";
-import { NestCLIError } from "../error.ts";
-import { log } from "../utilities/log.ts";
-import type { Hooks, Json } from "../utilities/types.ts";
+import { limitFields, setupCheckType } from "../../utilities/cli.ts";
+import { NestCLIError } from "../../error.ts";
+import { log } from "../../utilities/log.ts";
+import type { Hooks, Json } from "../../utilities/types.ts";
 
 export function assertHooks(
   hooks: Json,

@@ -1,4 +1,4 @@
-import { log, setupLogLevel } from "../utilities/log.ts";
+import { lineBreak, log, setupLogLevel } from "../utilities/log.ts";
 import { version as currentVersion } from "../version.ts";
 import { help as displayHelp } from "./help.ts";
 import { NestCLIError } from "../error.ts";
@@ -15,6 +15,8 @@ export async function main(
     log.plain(currentVersion);
     return;
   }
+
+  lineBreak();
 
   if (help) {
     displayHelp(mainCommand, command);

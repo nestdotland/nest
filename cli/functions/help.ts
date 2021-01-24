@@ -68,5 +68,5 @@ export function printHelp(command: Command) {
     ).join("\n")
   }\n`;
 
-  console.log("\n" + description + usage + args + commands + options);
+  console.log(description + usage + args + commands + options);
 }

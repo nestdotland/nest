@@ -11,9 +11,10 @@ import {
 import { lineBreak, log, underlineBold } from "../utilities/log.ts";
 import { getLatestTag, isGitRepository } from "../utilities/git.ts";
 import { NestCLIError } from "../error.ts";
-import { parseIgnore } from "../config/files/ignore.ts";
-import { DATA_FILE, parseDataJson } from "../config/files/data.json.ts";
-import { ensureConfig } from "../config/files/all.ts";
+import { parseIgnore } from "../config/ignore.ts";
+import { DATA_FILE, parseDataJson } from "../config/data.json.ts";
+import { ensureConfig } from "../config/all.ts";
+import { getActiveUser } from "./login.ts";
 import { confirm } from "../utilities/interact.ts";
 import { publish as directPublish } from "../../lib/publish.ts";
 import { isConfigUpToDate } from "./sync.ts";
@@ -39,14 +40,12 @@ export async function publish(
     wallet,
   }: PublishOptions,
 ): Promise<void> {
-  await ensureConfig()
+  const user = await getActiveUser();
+  await ensureConfig();
 
   const files = await parseIgnore();
 
   log.info(`Found ${files.length} files.`);
-
-  // TODO
-  const token = "";
 
   const project = await parseDataJson();
 
@@ -148,7 +147,7 @@ export async function publish(
 
   if (dryRun) return;
 
-  await directPublish(project.meta, version, files, token, wallet);
+  await directPublish(project.meta, version, files, user.token, wallet);
 }
 
 function prettyBytes(n: number): string {

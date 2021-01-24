@@ -33,9 +33,22 @@ export interface Project {
 
   api: Api;
 
+  name: string;
+  author: string;
+
   version: string;
   lastSync: number;
   nextAutoSync: number;
+}
+
+export interface UserManager {
+  activeUser: string;
+  users: Record<string, User>;
+}
+
+export interface User {
+  name: string;
+  token: string;
 }
 
 export type JSONObject = { [key: string]: JSONValue };

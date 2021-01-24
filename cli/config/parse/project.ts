@@ -1,9 +1,9 @@
-import { limitFields, setupCheckType } from "../utilities/cli.ts";
-import { NestCLIError } from "../error.ts";
+import { limitFields, setupCheckType } from "../../utilities/cli.ts";
+import { NestCLIError } from "../../error.ts";
 import { assertMeta } from "./meta.ts";
 import { assertApi } from "./api.ts";
-import { log } from "../utilities/log.ts";
-import type { Json, Project } from "../utilities/types.ts";
+import { log } from "../../utilities/log.ts";
+import type { Json, Project } from "../../utilities/types.ts";
 
 export function assertProject(
   module: Json,
@@ -19,6 +19,8 @@ export function assertProject(
     $comment,
     meta,
     api,
+    name,
+    author,
     version,
     lastSync,
     nextAutoSync,
@@ -32,6 +34,8 @@ export function assertProject(
   checkType(`${prefix}$comment`, $comment, ["string"]);
   checkType(`${prefix}meta`, meta, ["object"], true);
   checkType(`${prefix}api`, api, ["object"], true);
+  checkType(`${prefix}name`, name, ["string"], true);
+  checkType(`${prefix}author`, author, ["string"], true);
   checkType(`${prefix}version`, version, ["string"], true);
   checkType(`${prefix}lastSync`, lastSync, ["number"], true);
   checkType(`${prefix}nextAutoSync`, nextAutoSync, ["number"], true);

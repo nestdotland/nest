@@ -4,6 +4,7 @@ import { publishCommand } from "../publish.ts";
 import { upgradeCommand } from "../upgrade.ts";
 import { initCommand } from "../init.ts";
 import { syncCommand } from "../sync.ts";
+import { loginCommand } from "../login.ts";
 
 export const mainCommands: Record<string, Command> = {
   [helpCommand.name]: helpCommand,
@@ -11,4 +12,5 @@ export const mainCommands: Record<string, Command> = {
   [syncCommand.name]: syncCommand,
   [publishCommand.name]: publishCommand,
   [upgradeCommand.name]: upgradeCommand,
+  [loginCommand.name]: loginCommand,
 };

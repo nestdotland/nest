@@ -1,8 +1,8 @@
-import { exists, join } from "../../deps.ts";
-import { readJson, writeJson } from "../../utilities/json.ts";
+import { exists, join } from "../deps.ts";
+import { readJson, writeJson } from "../utilities/json.ts";
 import { NEST_DIRECTORY } from "./nest.ts";
-import { assertMeta } from "../../config/meta.ts";
-import type { Json, Meta } from "../../utilities/types.ts";
+import { assertMeta } from "./parse/meta.ts";
+import type { Json, Meta } from "../utilities/types.ts";
 
 export const MODULE_FILE = "module.json";
 export const MODULE_PATH = join(NEST_DIRECTORY, MODULE_FILE);
@@ -24,7 +24,7 @@ export async function parseModuleJson(path = MODULE_PATH): Promise<Meta> {
 }
 
 export async function writeModuleJson(
-  content: Meta | Json,
+  content: Meta,
   path = MODULE_PATH,
 ): Promise<void> {
   await writeJson(path, {

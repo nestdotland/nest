@@ -1,6 +1,6 @@
-import { ensureFile, exists, join } from "../../deps.ts";
+import { ensureFile, exists, join } from "../deps.ts";
 import { NEST_DIRECTORY } from "./nest.ts";
-import { Ignore } from "../../processing/ignore.ts";
+import { Ignore } from "../processing/ignore.ts";
 
 export const IGNORE_FILE = "ignore";
 export const IGNORE_PATH = join(NEST_DIRECTORY, IGNORE_FILE);

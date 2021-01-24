@@ -1,6 +1,6 @@
-import { log, underlineBold } from "../../utilities/log.ts";
-import { NestCLIError } from "../../error.ts";
-import { green } from "../../deps.ts";
+import { log, underlineBold } from "../utilities/log.ts";
+import { NestCLIError } from "../error.ts";
+import { green } from "../deps.ts";
 import { DATA_FILE, dataJsonExists } from "./data.json.ts";
 import { IGNORE_FILE, ignoreExists } from "./ignore.ts";
 import { MODULE_FILE, moduleJsonExists } from "./module.json.ts";

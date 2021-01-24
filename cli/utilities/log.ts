@@ -10,6 +10,7 @@ import {
   yellow,
 } from "../deps.ts";
 import { NestCLIError } from "../error.ts";
+import { NEST_DIRECTORY } from "../config/nest.ts";
 import { version } from "../version.ts";
 import { envHOMEDIR } from "./env.ts";
 
@@ -152,7 +153,7 @@ export async function writeLogFile(logFile?: string, wd = Deno.cwd()) {
   if (logFile) {
     logFile = join(wd, logFile);
   } else {
-    const logDir = join(envHOMEDIR(), ".nest/logs");
+    const logDir = join(envHOMEDIR(), NEST_DIRECTORY, "logs");
     await ensureDir(logDir);
     logFile = join(
       logDir,

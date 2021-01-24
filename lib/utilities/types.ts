@@ -10,7 +10,6 @@ export interface Hooks {
 }
 
 export interface Meta {
-  name: string;
   fullName?: string;
   description?: string;
   homepage?: string;
@@ -20,4 +19,9 @@ export interface Meta {
   private?: boolean;
 
   hooks?: Hooks;
+}
+
+export interface Module {
+  author: string;
+  name: string;
 }

@@ -73,16 +73,16 @@ interface Flags {
   gui?: boolean;
 }
 
-function assertFlags(
-  {
+function assertFlags(args: Args): Flags {
+  const {
     _: [command],
     "log-level": logLevel,
     version,
     help,
     gui,
     log: logFile,
-  }: Args,
-): Flags {
+  } = args;
+
   const { checkType, typeError } = setupCheckType("flags");
 
   checkType("[command]", command, ["string"]);

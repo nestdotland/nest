@@ -1,10 +1,8 @@
-import { parseDataJson, writeDataJson } from "../config/files/data.json.ts";
-import { ensureConfig } from "../config/files/all.ts";
 import { log } from "../utilities/log.ts";
-import {
-  parseModuleJson,
-  writeModuleJson,
-} from "../config/files/module.json.ts";
+import { parseDataJson, writeDataJson } from "../config/data.json.ts";
+import { readIgnore, writeIgnore } from "../config/ignore.ts";
+import { ensureConfig } from "../config/all.ts";
+import { parseModuleJson, writeModuleJson } from "../config/module.json.ts";
 import {
   applyJsonDiff,
   compareJson,
@@ -13,15 +11,35 @@ import {
   printJsonDiff,
 } from "../processing/json.ts";
 import { confirm } from "../utilities/interact.ts";
-import { downloadMeta, uploadMeta } from "../../lib/api/_todo.ts";
-import type { Json, Meta, Project } from "../utilities/types.ts";
+import { downloadConfig, uploadConfig } from "../../lib/api/_todo.ts";
+import { getActiveUser } from "./login.ts";
+import type { Json, Meta, Module, Project } from "../utilities/types.ts";
 
-export async function sync(name?: string) {
+export async function sync(module?: Module) {
+  const user = await getActiveUser();
+
+  if (module !== undefined) {
+    const { meta, ignore } = await downloadConfig(module);
+    const project = {
+      meta,
+      api: {
+        versions: [],
+        lastPublished: 0,
+        latestVersion: "",
+      },
+      ...module,
+      version: "0.0.0",
+      lastSync: 0,
+      nextAutoSync: 0,
+    };
+    await updateFiles(meta, project, ignore);
+  }
+
   await ensureConfig();
-  
+
   const project = await parseDataJson();
   const meta = await parseModuleJson();
-  const pendingRemoteMeta = downloadMeta();
+  const pendingConfig = downloadConfig(project);
 
   /** 1 - compare the config in module.json (user editable) and data.json. */
   const diff = compareMeta(meta, project.meta);
@@ -29,23 +47,24 @@ export async function sync(name?: string) {
   if (isJsonUnchanged(diff)) {
     log.info("Local config has not changed, downloading remote config...");
     /** 2.A.1 - if they are same just download the remote config */
-    const remoteMeta = await pendingRemoteMeta;
+    const remote = await pendingConfig;
 
-    const remoteDiff = compareMeta(meta, remoteMeta);
+    const remoteDiff = compareMeta(meta, remote.meta);
     if (isJsonUnchanged(remoteDiff)) {
       log.info("Already synced !");
       return;
     }
 
     /** 2.A.2 - update the new properties */
-    await updateFiles(remoteMeta, project);
+    await updateFiles(remote.meta, project, remote.ignore);
   } else {
     log.info("Local config has changed, downloading remote config...");
     /** 2.B.1 - download the remote config */
-    const remoteMeta = await pendingRemoteMeta;
+    const remote = await pendingConfig;
 
-    const newMeta = applyMetaDiff(diff, remoteMeta);
+    const newMeta = applyMetaDiff(diff, remote.meta);
     const newDiff = compareMeta(newMeta, meta);
+    const newIgnore = ""; // TODO
 
     printJsonDiff(newDiff);
 
@@ -56,27 +75,32 @@ export async function sync(name?: string) {
       return;
     } /** 2.B.2 - update the new properties */
 
-    await updateFiles(newMeta, project);
+    await updateFiles(newMeta, project, newIgnore);
 
     /** 2.B.3 - upload the final result to the api */
-    const token = ""; // TODO
-    await uploadMeta(newMeta, token);
+    await uploadConfig(project, newMeta, newIgnore, user.token);
   }
 }
 
 export async function isConfigUpToDate(): Promise<boolean> {
   const meta = await parseModuleJson();
-  const remoteMeta = await downloadMeta();
+  const project = await parseDataJson();
+  const remote = await downloadConfig(project);
 
-  const diff = compareMeta(meta, remoteMeta);
+  const diff = compareMeta(meta, remote.meta);
   return isJsonUnchanged(diff);
 }
 
-async function updateFiles(meta: Meta, project: Project): Promise<void> {
+async function updateFiles(
+  meta: Meta,
+  project: Project,
+  ignore: string,
+): Promise<void> {
   await writeModuleJson(meta);
   project.meta = meta;
   project.lastSync = new Date().getTime();
   await writeDataJson(project);
+  await writeIgnore(ignore);
   log.info("Successfully updated config !");
 }
 

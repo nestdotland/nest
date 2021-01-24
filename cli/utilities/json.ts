@@ -1,3 +1,5 @@
+import { NestCLIError } from "../error.ts";
+
 type Replacer = (key: string, value: unknown) => unknown;
 
 export interface WriteJsonOptions extends Deno.WriteFileOptions {
@@ -47,6 +49,6 @@ export async function readJson(filePath: string): Promise<unknown> {
     return JSON.parse(content);
   } catch (err) {
     err.message = `${filePath}: ${err.message}`;
-    throw err;
+    throw err instanceof SyntaxError ? new NestCLIError(err.message) : err;
   }
 }

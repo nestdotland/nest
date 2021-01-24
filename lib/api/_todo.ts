@@ -1,11 +1,18 @@
-import type { Meta } from "../utilities/types.ts";
+import type { Meta, Module } from "../utilities/types.ts";
 
-export function downloadMeta(): Promise<Meta> {
+export function downloadConfig(
+  module: Module,
+): Promise<{ meta: Meta; ignore: string }> {
   // TODO
-  return Promise.resolve({ name: "" });
+  return Promise.resolve({ meta: {}, ignore: "" });
 }
 
-export function uploadMeta(meta: Meta, token: string): Promise<void> {
+export function uploadConfig(
+  module: Module,
+  meta: Meta,
+  ignore: string,
+  token: string,
+): Promise<void> {
   // TODO
   return Promise.resolve();
 }
