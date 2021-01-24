@@ -11,8 +11,8 @@ export function assertProject(
   prefix = "",
 ): Project {
   if (Array.isArray(module)) {
-    log.error("Unable to parses api object: received an array.");
-    throw new NestCLIError("Config: received an array");
+    log.error("Unable to parses project object: received an array.");
+    throw new NestCLIError("Config(project): received an array");
   }
 
   const {
@@ -50,7 +50,7 @@ export function assertProject(
 
   if ($comment) delete module.$comment;
 
-  if (typeError()) throw new NestCLIError("Config: Invalid type");
+  if (typeError()) throw new NestCLIError("Config(project): Invalid type");
 
   return module as unknown as Project;
 }

@@ -13,7 +13,7 @@ export const helpCommand: Command = {
   name: "help",
   description: "Show this help or the help of a sub-command",
   arguments: [{
-    name: "[command]",
+    name: "[...command]",
     description: "A command",
   }],
   options: mainOptions,
@@ -22,25 +22,27 @@ export const helpCommand: Command = {
 };
 
 export function action() {
-  const flags = assertFlags(parse(Deno.args));
+  const { commands } = assertFlags(parse(Deno.args));
 
-  help(mainCommand, flags.command);
+  help(mainCommand, commands);
 }
 
 interface Flags {
-  command?: string;
+  commands?: string[];
 }
 
 function assertFlags(args: Args): Flags {
-  const { _: [_, command], ...remainingOptions } = args;
+  const { _: [_, ...commands], ...remainingOptions } = args;
 
   limitOptions(remainingOptions, mainOptions);
 
   const { checkType, typeError } = setupCheckType("flags");
 
-  checkType("[command]", command, ["string"]);
+  for (let i = 0; i < commands.length; i++) {
+    checkType("[command]", commands[i], ["string"]);
+  }
 
   if (typeError()) throw new NestCLIError("Flags: Invalid type");
 
-  return { command } as Flags;
+  return { commands } as Flags;
 }

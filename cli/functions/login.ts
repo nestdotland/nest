@@ -52,7 +52,7 @@ export async function login(username?: string, token?: string) {
 
   await writeUsersJson(manager);
 
-  log.info(`Successfully logged in under ${green(username)} !`);
+  log.info("Successfully logged in under", green(username), "!");
 }
 
 export async function ensureUserLogged(): Promise<void> {

@@ -45,23 +45,23 @@ export async function publish(
 
   const files = await parseIgnore();
 
-  log.info(`Found ${files.length} files.`);
+  log.info("Found", files.length, "files.");
 
   const project = await parseDataJson();
 
   const isReleaseType = ["patch", "minor", "major"].includes(rawVersion);
 
   if (!isReleaseType && !semver.valid(rawVersion)) {
-    log.error(`${rawVersion} is not a valid semantic version.`);
+    log.error(rawVersion, "is not a valid semantic version.");
     throw new NestCLIError("Invalid version (publish)");
   }
 
   // shouldn't happen after a sync
   if (!semver.valid(project.version)) {
     log.error(
-      `The project version was altered in the file ${
-        underlineBold(DATA_FILE)
-      }. Report this issue.`,
+      "The project version was altered in the file",
+      underlineBold(DATA_FILE),
+      "Report this issue.",
     );
     throw new NestCLIError("Invalid project version (publish)");
   }
@@ -71,18 +71,16 @@ export async function publish(
   if (gitTag) {
     if (!await isGitRepository()) {
       log.error(
-        `${
-          bold("--git-tag")
-        } option was provided but the current directory is not a git repository.`,
+        bold("--git-tag"),
+        "option was provided but the current directory is not a git repository.",
       );
       throw new NestCLIError("Not a git repository (publish)");
     }
     latestTag = await getLatestTag();
     if (latestTag === "") {
       log.error(
-        `${
-          bold("--git-tag")
-        } option was provided but the current repository doesn't contain any tag.`,
+        bold("--git-tag"),
+        "option was provided but the current repository doesn't contain any tag",
       );
       throw new NestCLIError("No git tag (publish)");
     }

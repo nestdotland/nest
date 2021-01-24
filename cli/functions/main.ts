@@ -19,7 +19,7 @@ export async function main(
   lineBreak();
 
   if (help) {
-    displayHelp(mainCommand, command);
+    displayHelp(mainCommand, [command ?? ""]);
     return;
   }
 
@@ -29,7 +29,7 @@ export async function main(
     if (command in mainCommand.subCommands) {
       await mainCommand.subCommands[command].action();
     } else {
-      log.error(`Unknown command: ${command}`);
+      log.error("Unknown command:", command);
       didYouMean(Object.keys(mainCommand.subCommands), [command]);
       throw new NestCLIError("Unknown command");
     }

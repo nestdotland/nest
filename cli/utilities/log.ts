@@ -112,7 +112,7 @@ export function setupLogLevel(logLevel?: string) {
   } else {
     log.error(`Invalid log level: ${logLevel}`);
     log.info(
-      `Allowed log levels:`,
+      "Allowed log levels:",
       Object.keys(LogLevel).filter((level) =>
         Number.isNaN(Number.parseInt(level))
       ),
@@ -172,25 +172,23 @@ export async function writeLogFile(logFile?: string, wd = Deno.cwd()) {
     ),
   );
 
-  log.info(
-    `Debug file created. (${underlineBold(logFile)})`,
-  );
+  log.info("Debug file created. (", underlineBold(logFile), ")");
 }
 
 /** Called when an unexpected error is thrown anywhere in the code.
  * A debug file is created. */
 export async function handleError(err: Error, logFile?: string) {
-  log.critical(`An unexpected error occurred: "${err.message}"`);
+  log.critical('An unexpected error occurred: "', err.message, '"');
   log.debug(err.stack);
   await writeLogFile(logFile);
   log.info(
-    `If you think this is a bug, please open a bug report at ${
-      underlineBold("https://github.com/nestdotland/cli/issues/new/choose")
-    }.`,
+    "If you think this is a bug, please open a bug report at",
+    underlineBold("https://github.com/nestdotland/cli/issues/new/choose"),
+    ".",
   );
   log.info(
-    `Visit ${
-      underlineBold("https://docs.nest.land/nest/")
-    } for documentation about this command.`,
+    "Visit",
+    underlineBold("https://docs.nest.land/nest/"),
+    "for documentation about this command.",
   );
 }

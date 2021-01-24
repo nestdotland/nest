@@ -1,6 +1,5 @@
 import { limitFields, setupCheckType } from "../../utilities/cli.ts";
 import { NestCLIError } from "../../error.ts";
-import { log } from "../../utilities/log.ts";
 import type { JSONValue, UserManager } from "../../utilities/types.ts";
 
 export function assertUser(

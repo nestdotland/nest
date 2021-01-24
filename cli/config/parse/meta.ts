@@ -6,7 +6,7 @@ import type { Json, Meta } from "../../utilities/types.ts";
 
 export function assertMeta(meta: Json, file: string, prefix = ""): Meta {
   if (Array.isArray(meta)) {
-    log.error("Unable to parses api object: received an array.");
+    log.error("Unable to parses meta object: received an array.");
     throw new NestCLIError("Config(meta): received an array");
   }
 

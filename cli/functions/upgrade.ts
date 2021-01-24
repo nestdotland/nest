@@ -1,4 +1,4 @@
-import { bold, NestLand, semver } from "../deps.ts";
+import { bold, gray, NestLand, semver } from "../deps.ts";
 import { log } from "../utilities/log.ts";
 import { version as CLIVersion } from "../version.ts";
 
@@ -10,18 +10,21 @@ export async function upgrade(givenVersion?: string) {
 
   const version = semver.valid(givenVersion || latest);
   if (version === null) {
-    log.error(`Invalid version: ${givenVersion}`);
+    log.error("Invalid version:", givenVersion);
     return;
   }
 
   if (semver.eq(version, CLIVersion)) {
-    log.info(`You are already using version ${CLIVersion} !`);
+    log.info("You are already using version", CLIVersion, "!");
     return;
   }
 
   if (!versions.includes(version)) {
-    log.error(`Version ${version} has not been found.`);
-    log.info("Published versions:", versions.reverse());
+    log.error("Version", version, "has not been found.");
+    log.info("Published versions:");
+    for (let i = versions.length - 1; i > -1; i--) {
+      log.plain(gray("  -"), versions[i]);
+    }
     return;
   }
 
@@ -49,8 +52,8 @@ export async function upgrade(givenVersion?: string) {
 
   if (!status.success) {
     log.plain(stderr);
-    log.error(`Failed to upgrade nest CLI to ${bold(version)} !`);
+    log.error("Failed to upgrade nest CLI to", bold(version), "!");
   } else {
-    log.info(`Successfully upgraded nest CLI to ${bold(version)}!`);
+    log.info("Successfully upgraded nest CLI to", bold(version), "!");
   }
 }

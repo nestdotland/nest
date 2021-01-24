@@ -12,8 +12,8 @@ export function assertUserManager(
   const { checkType, typeError } = setupCheckType(file);
 
   if (Array.isArray(manager)) {
-    log.error("Unable to parses login object: received an array.");
-    throw new NestCLIError("Config(login): received an array");
+    log.error("Unable to parses user manager object: received an array.");
+    throw new NestCLIError("Config(user-manager): received an array");
   }
 
   const {

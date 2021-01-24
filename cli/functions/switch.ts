@@ -19,7 +19,7 @@ export async function switchUser(username?: string) {
       green("nest login"),
       "to add users.",
     );
-    throw new NestCLIError("Only one is logged in, cannot switch users.");
+    throw new NestCLIError("Only one user is logged in, cannot switch users.");
   }
 
   if (username === undefined) {
@@ -48,5 +48,5 @@ export async function switchUser(username?: string) {
 
   await writeUsersJson(manager);
 
-  log.info(`Successfully switched to ${green(username)} !`);
+  log.info("Successfully switched to", green(username), "!");
 }

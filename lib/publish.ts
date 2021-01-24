@@ -18,9 +18,9 @@ export async function publish(
   for (const file of files) {
     if (!file.startsWith("/")) {
       log.error(
-        `Incorrect file path: ${
-          underlineBold(file)
-        } It should start with a slash ("/").`,
+        "Incorrect file path:",
+        underlineBold(file),
+        'It should start with a slash ("/").',
       );
       throw new NestError("Incorrect file path (publish)");
     }
