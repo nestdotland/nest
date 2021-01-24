@@ -91,7 +91,7 @@ function logToConsole(prefix: string, logLevel: LogLevel) {
       msg += `${
         typeof arg === "string"
           ? arg
-          : Deno.inspect(arg, { depth: 10, colors: true })
+          : Deno.inspect(arg, { depth: 5, colors: true })
       } `;
     }
     if (logLevel <= LogLevel.warning) {

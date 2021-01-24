@@ -57,7 +57,7 @@ export async function login(username?: string, token?: string) {
 
 export async function ensureUserLogged(): Promise<void> {
   if (!await usersJsonExists()) {
-    log.error(`No user logged in, run ${green("nest login")}`);
+    log.error("No user logged in, use", green("nest login"), "to add users.");
     throw new NestCLIError("No user logged in (login)");
   }
 }
