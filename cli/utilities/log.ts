@@ -30,7 +30,7 @@ export const prefix = {
   plain: "",
   warning: bold(`${yellow("! ")}`),
   error: bold(`${red("! ")}`),
-  critical: bold(`${red("critical ")}`),
+  critical: bold(`${red("! [CRITICAL] ")}`),
 };
 
 export let mainRecord = "";
@@ -172,19 +172,18 @@ export async function writeLogFile(logFile?: string, wd = Deno.cwd()) {
     ),
   );
 
-  log.info("Debug file created. (", underlineBold(logFile), ")");
+  log.info(`Debug file created. (${underlineBold(logFile)})`);
 }
 
 /** Called when an unexpected error is thrown anywhere in the code.
  * A debug file is created. */
 export async function handleError(err: Error, logFile?: string) {
-  log.critical('An unexpected error occurred: "', err.message, '"');
+  log.critical(`An unexpected error occurred: "${red(err.message)}"`);
   log.debug(err.stack);
   await writeLogFile(logFile);
   log.info(
     "If you think this is a bug, please open a bug report at",
     underlineBold("https://github.com/nestdotland/cli/issues/new/choose"),
-    ".",
   );
   log.info(
     "Visit",

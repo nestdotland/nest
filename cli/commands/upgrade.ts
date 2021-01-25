@@ -38,9 +38,9 @@ function assertFlags(args: Args): Flags {
 
   const { checkType, typeError } = setupCheckType("flags");
 
-  checkType("[version]", version, ["string"]);
+  checkType("[version]", version, ["string", "number"]);
 
   if (typeError()) throw new NestCLIError("Flags: Invalid type");
 
-  return { version } as Flags;
+  return { version: `${version}` } as Flags;
 }

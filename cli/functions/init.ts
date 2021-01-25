@@ -78,6 +78,6 @@ export async function init() {
   log.info(
     `Linked to ${cyan(`${user.name}/${name}`)} (created ${
       green(NEST_DIRECTORY)
-    } and added it to ${green(".gitignore")})`,
+    })`,
   );
 }

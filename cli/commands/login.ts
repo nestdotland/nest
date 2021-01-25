@@ -42,9 +42,9 @@ function assertFlags(args: Args): Flags {
   const { checkType, typeError } = setupCheckType("flags");
 
   checkType("[username]", user, ["string"]);
-  checkType("[token]", token, ["string"]);
+  checkType("[token]", token, ["string", "number"]);
 
   if (typeError()) throw new NestCLIError("Flags: Invalid type");
 
-  return { user, token } as Flags;
+  return { user, token: `${token}` } as Flags;
 }

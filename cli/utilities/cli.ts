@@ -134,7 +134,9 @@ export function setupCheckType(file = "") {
           value,
         );
         wrongType = true;
+        return false;
       }
+      return true;
     },
     typeError() {
       return wrongType;

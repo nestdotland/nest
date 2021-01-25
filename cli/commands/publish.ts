@@ -84,10 +84,17 @@ function assertFlags(args: Args): Flags {
   checkType("--dry-run", dryRun, ["boolean"]);
   checkType("--git-tag", gitTag, ["boolean"]);
   checkType("--pre", pre, ["string", "boolean"]);
-  checkType("--wallet", pre, ["string"]);
-  checkType("[version]", version, ["string"]);
+  checkType("--wallet", pre, ["string", "number"]);
+  checkType("[version]", version, ["string", "number"]);
 
   if (typeError()) throw new NestCLIError("Flags: Invalid type");
 
-  return { version, yes, dryRun, gitTag, pre, wallet } as Flags;
+  return {
+    version: `${version}`,
+    yes,
+    dryRun,
+    gitTag,
+    pre,
+    wallet: `${wallet}`,
+  } as Flags;
 }

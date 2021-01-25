@@ -41,28 +41,36 @@ export async function confirm(
     return false;
   }
 
-  await stdout.write(
-    encoder.encode(
-      `${bold(`${question} ${message}`)} ${
-        defaultValue ? yesHint : noHint
-      } ${separator} `,
-    ),
-  );
+  do {
+    await stdout.write(
+      encoder.encode(
+        `${bold(`${question} ${message}`)} ${
+          defaultValue ? yesHint : noHint
+        } ${separator} `,
+      ),
+    );
 
-  const answer = await readLineFromStdin();
+    const answer = await readLineFromStdin();
 
-  switch (answer[0]) {
-    case "y":
-    case "Y":
-      return true;
+    switch (answer[0]) {
+      case "y":
+      case "Y":
+        return true;
 
-    case "n":
-    case "N":
-      return false;
+      case "n":
+      case "N":
+        return false;
 
-    default:
-      return defaultValue;
-  }
+      case "\r":
+      case undefined:
+        return defaultValue;
+
+      default:
+        log.warning(
+          "Your answer must begin with 'y','Y','n','N'. You may also press [enter].",
+        );
+    }
+  } while (true);
 }
 
 /** Shows the given message and waits for the user's input. Returns the user's input as string.
