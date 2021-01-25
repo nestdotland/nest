@@ -35,7 +35,7 @@ export async function logout(username?: string) {
 
   delete manager.users[username];
 
-  const isActiveUser = manager.activeUser === username
+  const isActiveUser = manager.activeUser === username;
 
   if (isActiveUser) {
     log.info("The currently active user was logged out.");

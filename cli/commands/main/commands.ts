@@ -7,10 +7,12 @@ import { syncCommand } from "../sync.ts";
 import { loginCommand } from "../login.ts";
 import { logoutCommand } from "../logout.ts";
 import { switchCommand } from "../switch.ts";
+import { setupCommand } from "../setup.ts";
 
 export const mainCommands: Record<string, Command> = {
   [helpCommand.name]: helpCommand,
   [initCommand.name]: initCommand,
+  [setupCommand.name]: setupCommand,
   [syncCommand.name]: syncCommand,
   [publishCommand.name]: publishCommand,
   [upgradeCommand.name]: upgradeCommand,

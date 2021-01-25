@@ -6,10 +6,11 @@ import { moduleJsonExists, writeModuleJson } from "../config/module.json.ts";
 import { ignoreExists, writeIgnore } from "../config/ignore.ts";
 import { addToGitIgnore } from "../utilities/git.ts";
 import { sync } from "./sync.ts";
+import { setup } from "./setup.ts";
 import { getActiveUser } from "./login.ts";
 import { confirm, prompt, promptAndValidate } from "../utilities/interact.ts";
 
-export async function init(wd = Deno.cwd()) {
+export async function init() {
   const user = await getActiveUser();
   const linked = true; // TODO
 
@@ -24,39 +25,16 @@ export async function init(wd = Deno.cwd()) {
 
   lineBreak();
 
-  const project = basename(wd);
+  const dirName = basename(Deno.cwd());
 
   if (
-    !await confirm(`Initialize directory ${green(`${project}/`)} ?`, true)
+    !await confirm(`Initialize directory ${green(`${dirName}/`)} ?`, true)
   ) {
     return;
   }
 
   if (await confirm("Link to an existing module?")) {
-    const module = {
-      name: await promptAndValidate({
-        message: "What's the name of your existing module?",
-        invalidMessage:
-          "The length of a module name must be between 2 and 40 characters.",
-        defaultValue: project,
-        validate: (name) => name.length > 1 && name.length < 41,
-      }),
-      author: await promptAndValidate({
-        message: "What's the author of this module?",
-        invalidMessage:
-          "The length of a username must be more than 0 characters.",
-        defaultValue: user.name,
-        validate: (name) => name.length > 0,
-      }),
-    };
-
-    await sync(module);
-
-    log.info(
-      `Linked to ${cyan(`${module.author}/${module.name}`)} (created ${
-        green(".nest")
-      } and added it to ${green(".gitignore")})`,
-    );
+    await setup();
     return;
   }
 
@@ -64,7 +42,7 @@ export async function init(wd = Deno.cwd()) {
     message: "Module name",
     invalidMessage:
       "The length of a module name must be between 2 and 40 characters.",
-    defaultValue: project,
+    defaultValue: dirName,
     validate: (name) => name.length > 1 && name.length < 41,
   });
 
