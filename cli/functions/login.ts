@@ -55,15 +55,19 @@ export async function login(username?: string, token?: string) {
   log.info("Successfully logged in under", green(username), "!");
 }
 
-export async function ensureUserLogged(): Promise<void> {
-  if (!await usersJsonExists()) {
+export async function ensureUserLogged(): Promise<UserManager> {
+  let manager: UserManager;
+  if (
+    !await usersJsonExists() ||
+    (manager = await parseUsersJson()).activeUser === ""
+  ) {
     log.error("No user logged in, use", green("nest login"), "to add users.");
     throw new NestCLIError("No user logged in (login)");
   }
+  return manager;
 }
 
 export async function getActiveUser(): Promise<User> {
-  await ensureUserLogged();
-  const { users, activeUser } = await parseUsersJson();
+  const { users, activeUser } = await ensureUserLogged();
   return users[activeUser];
 }
