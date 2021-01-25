@@ -1,29 +1,16 @@
 import { basename, cyan, ensureDir, green } from "../deps.ts";
-import { lineBreak, log } from "../utilities/log.ts";
+import { log } from "../utilities/log.ts";
 import { NEST_DIRECTORY } from "../config/nest.ts";
-import { dataJsonExists, writeDataJson } from "../config/data.json.ts";
-import { moduleJsonExists, writeModuleJson } from "../config/module.json.ts";
-import { ignoreExists, writeIgnore } from "../config/ignore.ts";
+import { writeDataJson } from "../config/data.json.ts";
+import { writeModuleJson } from "../config/module.json.ts";
+import { writeIgnore } from "../config/ignore.ts";
 import { addToGitIgnore } from "../utilities/git.ts";
-import { sync } from "./sync.ts";
 import { setup } from "./setup.ts";
 import { getActiveUser } from "./login.ts";
 import { confirm, prompt, promptAndValidate } from "../utilities/interact.ts";
 
 export async function init() {
   const user = await getActiveUser();
-  const linked = true; // TODO
-
-  if (
-    await dataJsonExists() && await moduleJsonExists() &&
-    await ignoreExists() && linked
-  ) {
-    log.info("Module is already initialized and linked, syncing...");
-    await sync();
-    return;
-  }
-
-  lineBreak();
 
   const dirName = basename(Deno.cwd());
 
