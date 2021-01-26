@@ -10,14 +10,23 @@ const obj1: Json = {
     b: "",
     d: "created",
   },
-  f: [{
-    a: "same",
-    b: [{
+  f: [
+    {
       a: "same",
-    }, {
-      c: "create",
-    }],
-  }, 1],
+      b: [{
+        a: "same",
+      }, {
+        c: "create",
+      }],
+    },
+    0,
+    1,
+    "a",
+    "b",
+    2,
+    3,
+    5,
+  ],
 };
 
 const obj2: Json = {
@@ -28,14 +37,23 @@ const obj2: Json = {
     b: "",
     d: "created",
   },
-  f: [{
-    a: "same",
-    b: [{
+  f: [
+    {
       a: "same",
-    }, {
-      c: "create",
-    }],
-  }, 1],
+      b: [{
+        a: "same",
+      }, {
+        c: "create",
+      }],
+    },
+    0,
+    1,
+    "a",
+    "b",
+    2,
+    3,
+    5,
+  ],
 };
 
 const obj3: Json = {
@@ -46,33 +64,48 @@ const obj3: Json = {
     b: false,
     c: null,
   },
-  f: [1, {
-    a: "same",
-    b: [{
+  f: [
+    1,
+    {
       a: "same",
-    }, {
-      d: "delete",
-    }],
-  }],
+      b: [{
+        a: "same",
+      }, {
+        d: "delete",
+      }],
+    },
+    "d",
+    "c",
+    2,
+    3,
+    4,
+  ],
 };
+
 const obj4: Json = {
-  a: "new",
-  b: "new",
-  c: "new",
-  d: "new",
+  a: "new_a",
+  b: "new_b",
+  c: "new_c",
+  d: "new_d",
   e: {
-    a: "new",
-    b: "new",
-    c: "new",
+    a: "new_a",
+    b: "new_b",
+    c: "new_c",
   },
-  f: ["new", {
-    a: "new",
-    b: [{
-      a: "new",
-    }, {
-      d: "new",
-    }],
-  }],
+  f: [
+    "new_1",
+    {
+      a: "new_a",
+      b: [{
+        a: "new_a",
+      }, {
+        d: "new_d",
+      }],
+    },
+    "new_2",
+    "new_3",
+    "new_4",
+  ],
 };
 
 Deno.test({
@@ -99,10 +132,12 @@ Deno.test({
             ["a", {
               type: "updated",
               value: "1",
+              oldValue: 1,
             }],
             ["b", {
               type: "updated",
               value: "",
+              oldValue: false,
             }],
             ["c", {
               type: "removed",
@@ -116,7 +151,7 @@ Deno.test({
         ],
         ["f", [
           {
-            type: "updated",
+            type: "added",
             value: {
               a: "same",
               b: [
@@ -130,8 +165,49 @@ Deno.test({
             },
           },
           {
-            type: "updated",
+            type: "added",
+            value: 0,
+          },
+          {
+            type: "common",
             value: 1,
+          },
+          {
+            type: "updated",
+            value: "a",
+            oldValue: {
+              a: "same",
+              b: [
+                {
+                  a: "same",
+                },
+                {
+                  d: "delete",
+                },
+              ],
+            },
+          },
+          {
+            type: "updated",
+            value: "b",
+            oldValue: "d",
+          },
+          {
+            type: "removed",
+            value: "c",
+          },
+          {
+            type: "common",
+            value: 2,
+          },
+          {
+            type: "common",
+            value: 3,
+          },
+          {
+            type: "updated",
+            value: 5,
+            oldValue: 4,
           },
         ]],
       ]),
@@ -146,9 +222,9 @@ Deno.test({
     const diff2 = compareJson(obj1, obj2);
     const diff3 = compareJson(obj2, obj3);
 
-    assert(isJsonUnchanged(diff1));
-    assert(isJsonUnchanged(diff2));
-    assert(!isJsonUnchanged(diff3));
+    assert(isJsonUnchanged(diff1), "obj1 vs obj1");
+    assert(isJsonUnchanged(diff2), "obj1 vs obj2");
+    assert(!isJsonUnchanged(diff3), "obj2 vs obj3");
   },
 });
 
@@ -160,22 +236,42 @@ Deno.test({
     const result = applyJsonDiff(diff, obj4);
 
     assertEquals(result, {
-      a: "new",
+      a: "new_a",
       c: "i am created",
-      d: "new",
+      d: "new_d",
       e: {
         a: "1",
         b: "",
         d: "created",
       },
-      f: [{
-        a: "same",
-        b: [{
+      f: [
+        {
           a: "same",
-        }, {
-          c: "create",
-        }],
-      }, 1],
+          b: [{
+            a: "same",
+          }, {
+            c: "create",
+          }],
+        },
+        0,
+        "new_1",
+        {
+          a: "new_a",
+          b: [
+            {
+              a: "new_a",
+            },
+            {
+              d: "new_d",
+            },
+          ],
+        },
+        "new_2",
+        "b",
+        "new_3",
+        "new_4",
+        5,
+      ],
     });
   },
 });

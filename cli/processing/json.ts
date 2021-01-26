@@ -1,7 +1,6 @@
 import { bold, gray, green, red, yellow } from "../deps.ts";
 import { lineBreak, log } from "../utilities/log.ts";
-import { NestCLIError } from "../error.ts";
-import type { Json, JSONValue } from "../utilities/types.ts";
+import type { Json, JSONArray, JSONValue } from "../utilities/types.ts";
 
 export enum DiffType {
   common = "common",
@@ -10,10 +9,14 @@ export enum DiffType {
   updated = "updated",
 }
 
-export interface DiffResult {
-  type: DiffType;
+export type DiffResult = {
+  type: DiffType.common | DiffType.added | DiffType.removed;
   value: JSONValue;
-}
+} | {
+  type: DiffType.updated;
+  value: JSONValue;
+  oldValue: JSONValue;
+};
 
 export type Diff = DiffResult | Diff[] | Map<string, Diff>;
 
@@ -61,13 +64,62 @@ function compare(actual?: JSONValue, base?: JSONValue): Diff {
       return {
         type: DiffType.updated,
         value: actual,
+        oldValue: base,
       };
     }
     const diff: Diff[] = [];
-    for (let i = 0; i < Math.max(actual.length, base.length); i++) {
-      const actualValue = actual[i];
-      const baseValue = base[i];
-      diff.push(compare(actualValue, baseValue));
+    const LCS = longestCommonSubsequence(actual, base);
+    let actualIndex = 0;
+    let baseIndex = 0;
+    for (let i = 0; i < LCS.length; i++) {
+      while (!equal(LCS[i], base[baseIndex]) && baseIndex < base.length) {
+        if (
+          !equal(LCS[i], actual[actualIndex]) && actualIndex < actual.length
+        ) {
+          diff.push(compare(actual[actualIndex], base[baseIndex]));
+          actualIndex++;
+        } else {
+          diff.push({
+            type: DiffType.removed,
+            value: base[baseIndex],
+          });
+        }
+        baseIndex++;
+      }
+      while (
+        !equal(LCS[i], actual[actualIndex]) && actualIndex < actual.length
+      ) {
+        diff.push({
+          type: DiffType.added,
+          value: actual[actualIndex],
+        });
+        actualIndex++;
+      }
+      diff.push({
+        type: DiffType.common,
+        value: LCS[i],
+      });
+      baseIndex++;
+      actualIndex++;
+    }
+    while (baseIndex < base.length) {
+      if (actualIndex < actual.length) {
+        diff.push(compare(actual[actualIndex], base[baseIndex]));
+        actualIndex++;
+      } else {
+        diff.push({
+          type: DiffType.removed,
+          value: base[baseIndex],
+        });
+      }
+      baseIndex++;
+    }
+    while (actualIndex < actual.length) {
+      diff.push({
+        type: DiffType.added,
+        value: actual[actualIndex],
+      });
+      actualIndex++;
     }
     return diff;
   } else if (typeof actual === "object" && actual !== null) {
@@ -75,6 +127,7 @@ function compare(actual?: JSONValue, base?: JSONValue): Diff {
       return {
         type: DiffType.updated,
         value: actual,
+        oldValue: base,
       };
     }
     const diff: Map<string, Diff> = new Map();
@@ -90,10 +143,16 @@ function compare(actual?: JSONValue, base?: JSONValue): Diff {
     }
     return diff;
   }
-  return {
-    type: actual === base ? DiffType.common : DiffType.updated,
-    value: actual,
-  };
+  return actual === base
+    ? {
+      type: DiffType.common,
+      value: actual,
+    }
+    : {
+      type: DiffType.updated,
+      value: actual,
+      oldValue: base,
+    };
 }
 
 function applyDiff(
@@ -102,19 +161,30 @@ function applyDiff(
 ): JSONValue | undefined {
   if (Array.isArray(diff)) {
     if (Array.isArray(target)) {
-      for (let i = 0; i < diff.length; i++) {
-        const result = applyDiff(diff[i], target[i]);
-        if (result !== undefined) target[i] = result;
-        else {
-          target.length = i;
-          break;
+      let j = 0;
+      const res: JSONArray = [];
+      for (let i = 0; i < diff.length; i++, j++) {
+        const current = diff[i];
+        if (Array.isArray(current) || (current instanceof Map)) {
+          res.push(applyDiff(current, target[j]) as JSONValue);
+        } else {
+          if (current.type === DiffType.common) {
+            target[j] && res.push(target[j]);
+          } else if (current.type === DiffType.updated) {
+            target[j] && res.push(target[j]);
+            if (!equal(current.oldValue, target[j])) res.push(current.value);
+          } else if (current.type === DiffType.added) {
+            res.push(current.value);
+            j--;
+          } else if (current.type === DiffType.removed) j--;
         }
       }
-      return target;
+      for (; j < target.length; j++) {
+        res.push(target[j]);
+      }
+      return res;
     }
-    throw new NestCLIError(
-      "Unable to apply JSON diff: target is not an array.",
-    );
+    return target;
   } else if (diff instanceof Map) {
     if (
       typeof target === "object" && target !== null && !Array.isArray(target)
@@ -124,11 +194,8 @@ function applyDiff(
         if (result !== undefined) target[key] = result;
         else delete target[key];
       }
-      return target;
     }
-    throw new NestCLIError(
-      "Unable to apply JSON diff: target is not an object.",
-    );
+    return target;
   }
   if (diff.type === DiffType.common) return target;
   if (diff.type === DiffType.updated || diff.type === DiffType.added) {
@@ -164,27 +231,106 @@ function printDiff(diff: Diff, indent: string, key?: string) {
     }
     log.plain(`${indent}   ],`);
   } else {
-    const value = `${indent}${key ? `${key}: ` : ""}${
-      Deno.inspect(diff.value, { depth: Infinity, compact: false }).replaceAll(
-        "\n",
-        `\n${indent}`,
-      )
-    },`;
-    let line: string;
-    switch (diff.type) {
-      case DiffType.added:
-        line = bold(green(` + ${value.replaceAll("\n", "\n + ")}`));
-        break;
-      case DiffType.removed:
-        line = bold(red(` - ${value.replaceAll("\n", "\n - ")}`));
-        break;
-      case DiffType.updated:
-        line = bold(yellow(` ~ ${value.replaceAll("\n", "\n ~ ")}`));
-        break;
-      default:
-        line = `   ${value.replaceAll("\n", "\n   ")}`;
-        break;
+    if (diff.type === DiffType.updated) {
+      print({ type: DiffType.removed, value: diff.oldValue }, indent, key);
+      print({ type: DiffType.added, value: diff.value }, indent, key);
+    } else {
+      print(diff, indent, key);
     }
-    log.plain(line);
   }
+}
+
+function print(diff: DiffResult, indent: string, key?: string) {
+  const value = `${indent}${key ? `${key}: ` : ""}${
+    Deno.inspect(diff.value, { depth: Infinity, compact: false }).replaceAll(
+      "\n",
+      `\n${indent}`,
+    )
+  },`;
+  let line: string;
+  switch (diff.type) {
+    case DiffType.added:
+      line = bold(green(` + ${value.replaceAll("\n", "\n + ")}`));
+      break;
+    case DiffType.removed:
+      line = bold(red(` - ${value.replaceAll("\n", "\n - ")}`));
+      break;
+    default:
+      line = `   ${value.replaceAll("\n", "\n   ")}`;
+      break;
+  }
+  log.plain(line);
+}
+
+function equal(a: JSONValue, b: JSONValue): boolean {
+  if (Object.is(a, b)) {
+    return true;
+  }
+  if (typeof a === "object" && typeof b === "object") {
+    if (Object.keys(a || {}).length !== Object.keys(b || {}).length) {
+      return false;
+    }
+    if (Array.isArray(a) && Array.isArray(b)) {
+      for (const key in [...a, ...b]) {
+        if (!compare(a && a[key], b && b[key])) {
+          return false;
+        }
+      }
+      return true;
+    } else if (!Array.isArray(a) && !Array.isArray(b)) {
+      for (const key in { ...a, ...b }) {
+        if (!compare(a && a[key], b && b[key])) {
+          return false;
+        }
+      }
+      return true;
+    }
+  }
+  return false;
+}
+
+function longestCommonSubsequence(c: JSONArray, d: JSONArray): JSONArray {
+  // common final sequence
+  c.push(0);
+  d.push(0);
+
+  const matrix = Array.from(
+    new Array(c.length + 1),
+    () => new Array(d.length + 1),
+  );
+
+  function backtrack(
+    c: JSONArray,
+    d: JSONArray,
+    x: number,
+    y: number,
+  ): JSONArray {
+    if (x === 0 || y === 0) return [];
+    return equal(c[x - 1], d[y - 1])
+      ? backtrack(c, d, x - 1, y - 1).concat(c[x - 1]) // x-1, y-1
+      : (matrix[x][y - 1] > matrix[x - 1][y]
+        ? backtrack(c, d, x, y - 1)
+        : backtrack(c, d, x - 1, y));
+  }
+
+  for (let i = 0; i < c.length; i++) {
+    matrix[i][0] = 0;
+  }
+  for (let j = 0; j < d.length; j++) {
+    matrix[0][j] = 0;
+  }
+  for (let i = 1; i <= c.length; i++) {
+    for (let j = 1; j <= d.length; j++) {
+      matrix[i][j] = c[i - 1] === d[j - 1]
+        ? matrix[i - 1][j - 1] + 1 // i-1, j-1
+        : Math.max(matrix[i][j - 1], matrix[i - 1][j]);
+    }
+  }
+
+  const result = backtrack(c, d, c.length, d.length);
+  // remove final sequence
+  c.pop();
+  d.pop();
+  result.pop();
+  return result;
 }

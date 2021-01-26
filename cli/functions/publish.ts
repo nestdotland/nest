@@ -145,7 +145,9 @@ export async function publish(
 
   if (dryRun) return;
 
-  await directPublish(project.meta, version, files, user.token, wallet);
+  await directPublish(
+    { module: project, version, files, token: user.token, wallet },
+  );
 }
 
 function prettyBytes(n: number): string {

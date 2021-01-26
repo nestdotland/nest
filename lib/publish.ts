@@ -1,14 +1,18 @@
 import { generateUUID, semver, Tar } from "./deps.ts";
 import { NestError } from "./error.ts";
 import { log, underlineBold } from "./utilities/log.ts";
-import type { Meta } from "./utilities/types.ts";
+import type { Module } from "./utilities/types.ts";
+
+interface PublishOptions {
+  module: Module;
+  version: semver.SemVer;
+  files: string[];
+  token: string;
+  wallet?: string;
+}
 
 export async function publish(
-  meta: Meta,
-  version: semver.SemVer,
-  files: string[],
-  token: string,
-  wallet?: string,
+  { module, version, files, token, wallet }: PublishOptions,
 ) {
   const uuid = generateUUID();
   const tar = new Tar();
@@ -47,12 +51,12 @@ export async function publish(
     const response_ = await sendURLs(urls, token);
   } else {
     /** 2.2.1 - upload the tarball and config to twig */
-    const response = await twigUpload(meta, uuid, token, tar.getReader());
+    const response = await twigUpload(module, uuid, token, tar.getReader());
   }
 }
 
 async function twigUpload(
-  meta: Meta,
+  module: Module,
   uuid: string,
   token: string,
   reader: Deno.Reader,
