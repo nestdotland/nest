@@ -31,6 +31,8 @@ export interface Api {
 export interface Project {
   meta: Meta;
 
+  ignore: string;
+
   api: Api;
 
   name: string;

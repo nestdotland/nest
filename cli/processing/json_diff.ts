@@ -1,37 +1,26 @@
 import { bold, gray, green, red, yellow } from "../deps.ts";
 import { lineBreak, log } from "../utilities/log.ts";
+import { DiffType, equal, longestCommonSubsequence } from "./diff.ts";
+import type { DiffResult } from "./diff.ts";
 import type { Json, JSONArray, JSONValue } from "../utilities/types.ts";
 
-export enum DiffType {
-  common = "common",
-  added = "added",
-  removed = "removed",
-  updated = "updated",
-}
-
-export type DiffResult = {
-  type: DiffType.common | DiffType.added | DiffType.removed;
-  value: JSONValue;
-} | {
-  type: DiffType.updated;
-  value: JSONValue;
-  oldValue: JSONValue;
-};
-
-export type Diff = DiffResult | Diff[] | Map<string, Diff>;
+export type JSONDiff =
+  | DiffResult<JSONValue>
+  | JSONDiff[]
+  | Map<string, JSONDiff>;
 
 /** Compares two objects and returns a diff */
-export function compareJson(actual: Json, base: Json): Diff {
+export function compareJson(actual: Json, base: Json): JSONDiff {
   return compare(actual, base);
 }
 
 /** Apply a diff to an object */
-export function applyJsonDiff(diff: Diff, target: Json): Json {
+export function applyJsonDiff(diff: JSONDiff, target: Json): Json {
   return applyDiff(diff, target) as Json;
 }
 
 /** Checks if diff contains added, removed, or updated fields */
-export function isJsonUnchanged(diff: Diff): boolean {
+export function isJsonUnchanged(diff: JSONDiff): boolean {
   if (Array.isArray(diff)) {
     for (let i = 0; i < diff.length; i++) {
       if (!isJsonUnchanged(diff[i])) return false;
@@ -46,7 +35,7 @@ export function isJsonUnchanged(diff: Diff): boolean {
   return diff.type === DiffType.common;
 }
 
-function compare(actual?: JSONValue, base?: JSONValue): Diff {
+function compare(actual?: JSONValue, base?: JSONValue): JSONDiff {
   if (actual === undefined) {
     return {
       type: DiffType.removed,
@@ -67,11 +56,11 @@ function compare(actual?: JSONValue, base?: JSONValue): Diff {
         oldValue: base,
       };
     }
-    const diff: Diff[] = [];
+    const diff: JSONDiff[] = [];
     const LCS = longestCommonSubsequence(actual, base);
     let actualIndex = 0;
     let baseIndex = 0;
-    for (let i = 0; i < LCS.length; i++) {
+    for (let i = 0; i <= LCS.length; i++) {
       while (!equal(LCS[i], base[baseIndex]) && baseIndex < base.length) {
         if (
           !equal(LCS[i], actual[actualIndex]) && actualIndex < actual.length
@@ -95,30 +84,13 @@ function compare(actual?: JSONValue, base?: JSONValue): Diff {
         });
         actualIndex++;
       }
-      diff.push({
-        type: DiffType.common,
-        value: LCS[i],
-      });
-      baseIndex++;
-      actualIndex++;
-    }
-    while (baseIndex < base.length) {
-      if (actualIndex < actual.length) {
-        diff.push(compare(actual[actualIndex], base[baseIndex]));
-        actualIndex++;
-      } else {
+      if (LCS[i] !== undefined) {
         diff.push({
-          type: DiffType.removed,
-          value: base[baseIndex],
+          type: DiffType.common,
+          value: LCS[i],
         });
       }
       baseIndex++;
-    }
-    while (actualIndex < actual.length) {
-      diff.push({
-        type: DiffType.added,
-        value: actual[actualIndex],
-      });
       actualIndex++;
     }
     return diff;
@@ -130,7 +102,7 @@ function compare(actual?: JSONValue, base?: JSONValue): Diff {
         oldValue: base,
       };
     }
-    const diff: Map<string, Diff> = new Map();
+    const diff: Map<string, JSONDiff> = new Map();
     for (const key in base) {
       const actualValue = actual[key];
       const baseValue = base[key];
@@ -156,7 +128,7 @@ function compare(actual?: JSONValue, base?: JSONValue): Diff {
 }
 
 function applyDiff(
-  diff: Diff,
+  diff: JSONDiff,
   target: JSONValue,
 ): JSONValue | undefined {
   if (Array.isArray(diff)) {
@@ -168,11 +140,17 @@ function applyDiff(
         if (Array.isArray(current) || (current instanceof Map)) {
           res.push(applyDiff(current, target[j]) as JSONValue);
         } else {
-          if (current.type === DiffType.common) {
-            target[j] && res.push(target[j]);
+          if (current.type === DiffType.common && target[j]) {
+            res.push(target[j]);
           } else if (current.type === DiffType.updated) {
-            target[j] && res.push(target[j]);
-            if (!equal(current.oldValue, target[j])) res.push(current.value);
+            if (target[j]) res.push(target[j]);
+            // in case of conflict
+            if (
+              !equal(current.oldValue, target[j]) &&
+              !equal(current.value, target[j])
+            ) {
+              res.push(current.value);
+            }
           } else if (current.type === DiffType.added) {
             res.push(current.value);
             j--;
@@ -204,11 +182,11 @@ function applyDiff(
   if (diff.type === DiffType.removed) return undefined;
 }
 
-export function printJsonDiff(diff: Diff) {
+export function printJsonDiff(title: string, diff: JSONDiff) {
   log.plain(
-    `\n   ${bold(gray("[Diff]"))} ${bold(red("Deleted"))} / ${
+    `\n   ${bold(gray(`[${title}]`))} ${bold(red("Deleted"))} / ${
       bold(green("Added"))
-    } / ${bold(yellow("Modified"))}\n`,
+    }\n`,
   );
 
   printDiff(diff, "");
@@ -216,7 +194,7 @@ export function printJsonDiff(diff: Diff) {
   lineBreak();
 }
 
-function printDiff(diff: Diff, indent: string, key?: string) {
+function printDiff(diff: JSONDiff, indent: string, key?: string) {
   const newIndent = indent + "  ";
   if (diff instanceof Map) {
     log.plain(`${indent}   ${key ? `${key}: ` : ""}{`);
@@ -240,7 +218,7 @@ function printDiff(diff: Diff, indent: string, key?: string) {
   }
 }
 
-function print(diff: DiffResult, indent: string, key?: string) {
+function print(diff: DiffResult<JSONValue>, indent: string, key?: string) {
   const value = `${indent}${key ? `${key}: ` : ""}${
     Deno.inspect(diff.value, { depth: Infinity, compact: false }).replaceAll(
       "\n",
@@ -260,77 +238,4 @@ function print(diff: DiffResult, indent: string, key?: string) {
       break;
   }
   log.plain(line);
-}
-
-function equal(a: JSONValue, b: JSONValue): boolean {
-  if (Object.is(a, b)) {
-    return true;
-  }
-  if (typeof a === "object" && typeof b === "object") {
-    if (Object.keys(a || {}).length !== Object.keys(b || {}).length) {
-      return false;
-    }
-    if (Array.isArray(a) && Array.isArray(b)) {
-      for (const key in [...a, ...b]) {
-        if (!compare(a && a[key], b && b[key])) {
-          return false;
-        }
-      }
-      return true;
-    } else if (!Array.isArray(a) && !Array.isArray(b)) {
-      for (const key in { ...a, ...b }) {
-        if (!compare(a && a[key], b && b[key])) {
-          return false;
-        }
-      }
-      return true;
-    }
-  }
-  return false;
-}
-
-function longestCommonSubsequence(c: JSONArray, d: JSONArray): JSONArray {
-  // common final sequence
-  c.push(0);
-  d.push(0);
-
-  const matrix = Array.from(
-    new Array(c.length + 1),
-    () => new Array(d.length + 1),
-  );
-
-  function backtrack(
-    c: JSONArray,
-    d: JSONArray,
-    x: number,
-    y: number,
-  ): JSONArray {
-    if (x === 0 || y === 0) return [];
-    return equal(c[x - 1], d[y - 1])
-      ? backtrack(c, d, x - 1, y - 1).concat(c[x - 1]) // x-1, y-1
-      : (matrix[x][y - 1] > matrix[x - 1][y]
-        ? backtrack(c, d, x, y - 1)
-        : backtrack(c, d, x - 1, y));
-  }
-
-  for (let i = 0; i < c.length; i++) {
-    matrix[i][0] = 0;
-  }
-  for (let j = 0; j < d.length; j++) {
-    matrix[0][j] = 0;
-  }
-  for (let i = 1; i <= c.length; i++) {
-    for (let j = 1; j <= d.length; j++) {
-      matrix[i][j] = c[i - 1] === d[j - 1]
-        ? matrix[i - 1][j - 1] + 1 // i-1, j-1
-        : Math.max(matrix[i][j - 1], matrix[i - 1][j]);
-    }
-  }
-
-  const result = backtrack(c, d, c.length, d.length);
-  // remove final sequence
-  c.pop();
-  d.pop();
-  result.pop();
-  return result;
 }

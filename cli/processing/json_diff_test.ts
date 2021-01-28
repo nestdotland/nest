@@ -1,6 +1,6 @@
 import { assert, assertEquals } from "../../test/deps.ts";
 import { Json } from "../utilities/types.ts";
-import { applyJsonDiff, compareJson, isJsonUnchanged } from "./json.ts";
+import { applyJsonDiff, compareJson, isJsonUnchanged } from "./json_diff.ts";
 
 const obj1: Json = {
   a: "i am unchanged",
@@ -109,7 +109,7 @@ const obj4: Json = {
 };
 
 Deno.test({
-  name: "CLI | json | compareJson",
+  name: "CLI | json_diff | compareJson",
   fn() {
     assertEquals(
       compareJson(obj1, obj3),
@@ -216,7 +216,7 @@ Deno.test({
 });
 
 Deno.test({
-  name: "CLI | json | isJsonUnchanged",
+  name: "CLI | json_diff | isJsonUnchanged",
   fn() {
     const diff1 = compareJson(obj1, obj1);
     const diff2 = compareJson(obj1, obj2);
@@ -229,7 +229,7 @@ Deno.test({
 });
 
 Deno.test({
-  name: "CLI | json | applyJsonDiff",
+  name: "CLI | json_diff | applyJsonDiff",
   fn() {
     const diff = compareJson(obj1, obj3);
 
