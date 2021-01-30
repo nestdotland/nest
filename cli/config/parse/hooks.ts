@@ -27,7 +27,16 @@ export function assertHooks(
     ...remainingFields
   } = hooks;
 
-  limitFields(file, remainingFields);
+  limitFields(file, remainingFields, [
+    "presync",
+    "postsync",
+    "prepack",
+    "postpack",
+    "prepublish",
+    "postpublish",
+    "preaudit",
+    "postaudit",
+  ]);
 
   checkType(`${prefix}presync`, presync, ["string"]);
   checkType(`${prefix}postsync`, postsync, ["string"]);

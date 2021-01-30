@@ -45,6 +45,7 @@ export async function sync(module?: Module) {
     };
     await ensureNestDir();
     await updateFiles(meta, project, ignore);
+    return;
   }
 
   await ensureConfig();

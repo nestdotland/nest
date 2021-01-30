@@ -23,7 +23,17 @@ export function assertMeta(meta: Json, file: string, prefix = ""): Meta {
     ...remainingFields
   } = meta;
 
-  limitFields(file, remainingFields);
+  limitFields(file, remainingFields, [
+    "$schema",
+    "name",
+    "fullName",
+    "description",
+    "homepage",
+    "license",
+    "unlisted",
+    "private",
+    "hooks",
+  ]);
 
   const { checkType, typeError } = setupCheckType(file);
 

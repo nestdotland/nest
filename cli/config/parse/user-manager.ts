@@ -23,7 +23,7 @@ export function assertUserManager(
     ...remainingFields
   } = manager;
 
-  limitFields(file, remainingFields);
+  limitFields(file, remainingFields, ["$comment", "activeUser", "users,"]);
 
   checkType(`${prefix}activeUser`, activeUser, ["string"], true);
   checkType(`${prefix}users`, users, ["array"], true);

@@ -18,7 +18,7 @@ export function assertUser(
       ...remainingFields
     } = user;
 
-    limitFields(file, remainingFields);
+    limitFields(file, remainingFields, ["name", "token"]);
 
     checkType(`${prefix}name`, name, ["string"], true);
     checkType(`${prefix}token`, token, ["string"], true);

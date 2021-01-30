@@ -31,7 +31,7 @@ export async function setup(author?: string, name?: string) {
   log.info(
     `Linked to ${cyan(`${module.author}/${module.name}`)} (created ${
       green(".nest")
-    } and added it to ${green(".gitignore")})`,
+    })`,
   );
   return;
 }
