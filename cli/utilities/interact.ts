@@ -1,4 +1,5 @@
 import { bold, cyan, gray, green } from "../deps.ts";
+import { NestCLIError } from "../error.ts";
 import { lineBreak, log, prefix } from "../utilities/log.ts";
 
 const { stdin, stdout, isatty } = Deno;
@@ -38,7 +39,7 @@ export async function confirm(
   },
 ) {
   if (!isatty(stdin.rid)) {
-    return false;
+    return defaultValue;
   }
 
   do {
@@ -79,7 +80,7 @@ export async function confirm(
  * If the stdin is not interactive, it returns null. */
 export async function prompt(message = "Prompt", defaultValue?: string) {
   if (!isatty(stdin.rid)) {
-    return "";
+    return defaultValue || "";
   }
 
   await stdout.write(
@@ -109,6 +110,12 @@ export async function promptAndValidate({
   message?: string;
   defaultValue?: string;
 }) {
+  if (!isatty(stdin.rid)) {
+    const response = defaultValue || ""
+    if (validate(response)) return response;
+    throw new NestCLIError("Could not validate default value.")
+  }
+
   while (true) {
     const response = (await prompt(message, defaultValue)) || "";
 
