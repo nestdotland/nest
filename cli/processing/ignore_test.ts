@@ -79,23 +79,23 @@ Deno.test({
     await ignore.parsingProcess;
 
     if (Deno.build.os === "windows") {
-      assertEquals(ignore.denied, [
+      assertEquals(new Set(ignore.denied), new Set([
         /^(?:[^\\/]*(?:\\|\/|$)+)*bar(?:\\|\/)*$|^(?:[^\\/]*(?:\\|\/|$)+)*bar(?:\\|\/)+(?:[^\\/]*(?:\\|\/|$)+)*$/,
-        /^(?:[^\\/]*(?:\\|\/|$)+)*bar2(?:\\|\/)*$|^(?:[^\\/]*(?:\\|\/|$)+)*bar2(?:\\|\/)+(?:[^\\/]*(?:\\|\/|$)+)*$/,
         /^(?:[^\\/]*(?:\\|\/|$)+)*bar1(?:\\|\/)*$|^(?:[^\\/]*(?:\\|\/|$)+)*bar1(?:\\|\/)+(?:[^\\/]*(?:\\|\/|$)+)*$/,
-      ]);
-      assertEquals(ignore.accepted, [
+        /^(?:[^\\/]*(?:\\|\/|$)+)*bar2(?:\\|\/)*$|^(?:[^\\/]*(?:\\|\/|$)+)*bar2(?:\\|\/)+(?:[^\\/]*(?:\\|\/|$)+)*$/,
+      ]));
+      assertEquals(new Set(ignore.accepted), new Set([
         /^(?:[^\\/]*(?:\\|\/|$)+)*bar3(?:\\|\/)*$|^(?:[^\\/]*(?:\\|\/|$)+)*bar3(?:\\|\/)+(?:[^\\/]*(?:\\|\/|$)+)*$/,
-      ]);
+      ]));
     } else {
-      assertEquals(ignore.denied, [
+      assertEquals(new Set(ignore.denied), new Set([
         /^(?:[^/]*(?:\/|$)+)*bar\/*$|^(?:[^/]*(?:\/|$)+)*bar\/+(?:[^/]*(?:\/|$)+)*$/,
         /^(?:[^/]*(?:\/|$)+)*bar1\/*$|^(?:[^/]*(?:\/|$)+)*bar1\/+(?:[^/]*(?:\/|$)+)*$/,
         /^(?:[^/]*(?:\/|$)+)*bar2\/*$|^(?:[^/]*(?:\/|$)+)*bar2\/+(?:[^/]*(?:\/|$)+)*$/,
-      ]);
-      assertEquals(ignore.accepted, [
+      ]));
+      assertEquals(new Set(ignore.accepted), new Set([
         /^(?:[^/]*(?:\/|$)+)*bar3\/*$|^(?:[^/]*(?:\/|$)+)*bar3\/+(?:[^/]*(?:\/|$)+)*$/,
-      ]);
+      ]));
     }
   },
 });
@@ -109,12 +109,12 @@ Deno.test({
 
     const files = await ignore.matchFiles();
 
-    assertEquals(files, [
+    assertEquals(new Set(files), new Set([
       "/dir/foo",
       "/files/2",
       "/files/4",
       "/files/5",
       "/matchFiles",
-    ]);
+    ]));
   },
 });
