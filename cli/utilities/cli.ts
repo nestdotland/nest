@@ -67,10 +67,9 @@ export function limitOptions(
 export function limitFields(
   file: string,
   fields: Record<string, unknown>,
-  baseFields: Record<string, unknown> = {},
+  reference: string[],
 ) {
   const misspelled = Object.keys(fields);
-  const reference = Object.keys(baseFields);
   if (misspelled.length === 0) return;
   log.error(
     bold(file),

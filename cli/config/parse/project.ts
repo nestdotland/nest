@@ -18,6 +18,7 @@ export function assertProject(
   const {
     $comment,
     meta,
+    ignore,
     api,
     name,
     author,
@@ -27,12 +28,23 @@ export function assertProject(
     ...remainingFields
   } = module;
 
-  limitFields(file, remainingFields);
+  limitFields(file, remainingFields, [
+    "$comment",
+    "meta",
+    "ignore",
+    "api",
+    "name",
+    "author",
+    "version",
+    "lastSync",
+    "nextAutoSync",
+  ]);
 
   const { checkType, typeError } = setupCheckType(file);
 
   checkType(`${prefix}$comment`, $comment, ["string"]);
   checkType(`${prefix}meta`, meta, ["object"], true);
+  checkType(`${prefix}ignore`, ignore, ["string"], true);
   checkType(`${prefix}api`, api, ["object"], true);
   checkType(`${prefix}name`, name, ["string"], true);
   checkType(`${prefix}author`, author, ["string"], true);

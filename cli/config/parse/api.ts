@@ -18,7 +18,11 @@ export function assertApi(api: Json, file: string, prefix = ""): Api {
     ...remainingFields
   } = api;
 
-  limitFields(file, remainingFields);
+  limitFields(file, remainingFields, [
+    "versions",
+    "latestVersion",
+    "lastPublished",
+  ]);
 
   checkType(`${prefix}versions`, versions, ["array"], true);
   checkType(`${prefix}latestVersion`, latestVersion, ["string"], true);
