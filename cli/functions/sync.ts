@@ -14,6 +14,7 @@ import {
   JSONDiff,
   printJsonDiff,
 } from "../processing/json_diff.ts";
+import { ensureNestDir } from "../config/nest.ts";
 import { confirm } from "../utilities/interact.ts";
 import { downloadConfig, uploadConfig } from "../../lib/api/_todo.ts";
 import { getActiveUser } from "./login.ts";
@@ -42,6 +43,7 @@ export async function sync(module?: Module) {
       lastSync: 0,
       nextAutoSync: 0,
     };
+    await ensureNestDir();
     await updateFiles(meta, project, ignore);
   }
 
