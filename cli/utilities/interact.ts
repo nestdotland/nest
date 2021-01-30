@@ -111,9 +111,10 @@ export async function promptAndValidate({
   defaultValue?: string;
 }) {
   if (!isatty(stdin.rid)) {
-    const response = defaultValue || ""
+    const response = defaultValue || "";
     if (validate(response)) return response;
-    throw new NestCLIError("Could not validate default value.")
+    log.error("stdin is not a tty. Could not validate default value.");
+    throw new NestCLIError("Could not validate default value.");
   }
 
   while (true) {
