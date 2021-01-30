@@ -23,11 +23,11 @@ jobs:
       - name: Setup Nest
         run: |
           deno install -qA ./nest.ts
-          nest login nest ${{ secrets.NEST_TOKEN }}
-          nest setup nest nest
+          nest login nest ${{ secrets.NEST_TOKEN }} -L debug
+          nest setup nest nest -L debug
 
       - name: Publish
-        run: nest publish -Y ${{ github.event.inputs.version }}
+        run: nest publish -Y ${{ github.event.inputs.version }} -L debug
 
       # TODO(@maximousblk): Add a changelog generator
 

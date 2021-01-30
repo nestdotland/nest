@@ -23,11 +23,11 @@ jobs:
       - name: Setup Nest
         run: |
           deno install -qA ./nest.ts
-          nest login nest ${{ secrets.NEST_TOKEN }}
-          nest setup nest nest
+          nest login nest ${{ secrets.NEST_TOKEN }} -L debug
+          nest setup nest nest -L debug
 
       - name: Dry publish
-        run: nest publish -Yd 0.0.0 --pre dev
+        run: nest publish -Yd 0.0.0 --pre dev -L debug
 
       - name: Upload debug file
         uses: actions/upload-artifact@v2
