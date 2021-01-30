@@ -57,4 +57,4 @@ jobs:
           deno-version: v1.x
 
       - name: Check Formatting
-        run: deno fmt --check
+        run: deno fmt --check --ignore=".github"
