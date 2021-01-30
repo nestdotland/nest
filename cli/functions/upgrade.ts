@@ -3,8 +3,7 @@ import { log } from "../utilities/log.ts";
 import { version as CLIVersion } from "../version.ts";
 
 export async function upgrade(givenVersion?: string) {
-  // TODO: change `eggs` to `nest`
-  const versions = await NestLand.sortedVersions("eggs", "nestdotland");
+  const versions = await NestLand.sortedVersions("nest", "nest");
 
   const latest = versions[versions.length - 1];
 
@@ -33,7 +32,7 @@ export async function upgrade(givenVersion?: string) {
       "deno",
       "install",
       "-Afq",
-      `https://x.nest.land/nest@${version}/nest.ts`,
+      `https://nest.land/-/nest@${version}/nest.ts`,
     ],
     stdout: "piped",
     stderr: "piped",
