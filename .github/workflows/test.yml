@@ -18,7 +18,7 @@ jobs:
           deno-version: v1.x
 
       - name: Run Tests
-        run: deno test
+        run: deno test -A
 
       - name: Setup Nest
         run: |
