@@ -34,4 +34,4 @@ jobs:
         if: failure()
         with:
           name: debug-files
-          path: ${{ env.HOME }}/.nest/logs/*
+          path: /home/runner/.nest/logs/*
