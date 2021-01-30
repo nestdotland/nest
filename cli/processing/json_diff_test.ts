@@ -1,4 +1,4 @@
-import { assert, assertEquals } from "../../test/deps.ts";
+import { assert, assertEquals } from "../test/deps.ts";
 import { Json } from "../utilities/types.ts";
 import { applyJsonDiff, compareJson, isJsonUnchanged } from "./json_diff.ts";
 
@@ -266,6 +266,7 @@ Deno.test({
             },
           ],
         },
+        "a",
         "new_2",
         "b",
         "new_3",

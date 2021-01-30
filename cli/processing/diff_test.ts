@@ -1,4 +1,4 @@
-import { assert, assertEquals } from "../../test/deps.ts";
+import { assert, assertEquals } from "../test/deps.ts";
 import { applyStringDiff, compareString } from "./diff.ts";
 
 const obj1 = [

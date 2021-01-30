@@ -1,4 +1,4 @@
-import { assertEquals, projectRoot, resolve } from "../../test/deps.ts";
+import { assertEquals, projectRoot, resolve } from "../test/deps.ts";
 import { Ignore } from "./ignore.ts";
 
 Deno.test({
