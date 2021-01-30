@@ -1,0 +1,42 @@
+# Nest CLI
+
+Nest's afficial CLI to manage your modules
+
+## Getting started
+
+**INSTALL**
+
+```sh
+deno install -Af https://nest.land/-/nest/nest.ts
+```
+
+**PUBLISH**
+
+Log into your Nest account
+
+```sh
+nest login <username> <auth_token>
+```
+
+Initialize a nest module
+
+```sh
+cd <module directory>
+nest init <name> # follow the prompts
+```
+
+Publish to Nest
+
+```sh
+nest publish <version>
+```
+
+## Contributing
+
+**REQUIREMENTS**
+
+Deno: `>=v1.7.0`
+
+## License
+
+The contents of this repository are licensed under [The MIT license](LICENSE).

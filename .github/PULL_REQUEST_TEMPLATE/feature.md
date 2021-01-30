@@ -4,6 +4,8 @@ about: Suggest a feature or idea for this project
 labels: 'feature request, needs triage'
 ---
 
+<!-- NOTE: The title must follow Conventional Commit format -->
+
 <!--
 
 🚨 What happens if you delete this entire template and go your own path?

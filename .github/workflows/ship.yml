@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Semver tag
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Setup Deno
+        uses: denolib/setup-deno@v2
+        with:
+          deno-version: v1.x
+
+      - name: Setup Nest
+        run: |
+          deno install -qA ./nest.ts
+          nest login nest ${{ secrets.NEST_TOKEN }}
+          nest setup nest nest
+
+      - name: Publish
+        run: nest publish ${{ github.event.inputs.version }}
+
+      # TODO(@maximousblk): Add a changelog generator
+
+      - name: Release ${{ matrix.tag }}
+        uses: ncipollo/release-action@v1
+        with:
+          tag: '${{ github.event.inputs.repo }}'
+          name: '${{ github.event.inputs.repo }}'
+          body: ""
+          # bodyFile: 'CHANGELOG.md'
+          draft: true
+          token: ${{ secrets.GITHUB_TOKEN }}
