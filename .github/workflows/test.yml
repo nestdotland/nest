@@ -28,3 +28,10 @@ jobs:
 
       - name: Dry publish
         run: nest publish -Yd 0.0.0 --pre dev
+
+      - name: Upload debug file
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: debug-files
+          path: ${{ env.HOME }}/.nest/logs/*

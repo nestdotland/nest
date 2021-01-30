@@ -42,5 +42,5 @@ function assertFlags(args: Args): Flags {
 
   if (typeError()) throw new NestCLIError("Flags: Invalid type");
 
-  return { version: `${version}` } as Flags;
+  return { version: version && `${version}` } as Flags;
 }

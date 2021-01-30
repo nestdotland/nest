@@ -119,13 +119,13 @@ export function setupCheckType(file = "") {
       required = false,
     ) {
       if (
-        type.reduce(
+        !type.reduce(
           (previous: boolean, current: TypeOf) =>
-            previous && current === "array"
-              ? !Array.isArray(value)
-              : typeof value !== current,
-          true,
-        ) && (required ? value === undefined : value !== undefined)
+            previous || current === "array"
+              ? Array.isArray(value)
+              : typeof value === current,
+          false,
+        ) && required && value === undefined
       ) {
         log.error(
           file ? `${file}:` : "",

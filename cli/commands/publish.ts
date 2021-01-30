@@ -90,11 +90,11 @@ function assertFlags(args: Args): Flags {
   if (typeError()) throw new NestCLIError("Flags: Invalid type");
 
   return {
-    version: `${version}`,
+    version: version && `${version}`,
     yes,
     dryRun,
     gitTag,
     pre,
-    wallet: `${wallet}`,
+    wallet: wallet && `${wallet}`,
   } as Flags;
 }

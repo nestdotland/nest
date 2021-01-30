@@ -46,5 +46,5 @@ function assertFlags(args: Args): Flags {
 
   if (typeError()) throw new NestCLIError("Flags: Invalid type");
 
-  return { user, token: `${token}` } as Flags;
+  return { user, token: token && `${token}` } as Flags;
 }
