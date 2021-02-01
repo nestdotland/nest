@@ -11,7 +11,7 @@ import { mainOptions } from "./main/options.ts";
 import { mainCommands } from "./main/commands.ts";
 import { main } from "../functions/main.ts";
 
-import type { Command, Args } from "../utilities/types.ts";
+import type { Args, Command } from "../utilities/types.ts";
 
 export const mainCommand: Command = {
   name: "",

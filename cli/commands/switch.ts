@@ -4,7 +4,7 @@ import { NestCLIError } from "../error.ts";
 import { mainOptions } from "./main/options.ts";
 import { switchUser } from "../functions/switch.ts";
 
-import type { Command, Args } from "../utilities/types.ts";
+import type { Args, Command } from "../utilities/types.ts";
 
 export const switchCommand: Command = {
   name: "switch",

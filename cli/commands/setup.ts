@@ -4,7 +4,7 @@ import { NestCLIError } from "../error.ts";
 import { mainOptions } from "./main/options.ts";
 import { setup } from "../functions/setup.ts";
 
-import type { Command, Args } from "../utilities/types.ts";
+import type { Args, Command } from "../utilities/types.ts";
 
 export const setupCommand: Command = {
   name: "setup",

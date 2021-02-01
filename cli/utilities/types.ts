@@ -1,6 +1,6 @@
 import { Meta } from "../../lib/utilities/types.ts";
 
-type Arg = `[${string}]` | `<${string}>`
+type Arg = `[${string}]` | `\<${string}\>`;
 
 /** Command option */
 export interface Option {

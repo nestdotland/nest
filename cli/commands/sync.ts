@@ -3,7 +3,7 @@ import { limitArgs, limitOptions } from "../utilities/cli.ts";
 import { mainOptions } from "./main/options.ts";
 import { sync } from "../functions/sync.ts";
 
-import type { Command, Args } from "../utilities/types.ts";
+import type { Args, Command } from "../utilities/types.ts";
 
 export const syncCommand: Command = {
   name: "sync",

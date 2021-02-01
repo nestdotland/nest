@@ -4,7 +4,7 @@ import { limitArgs, limitOptions, setupCheckType } from "../utilities/cli.ts";
 import { mainOptions } from "./main/options.ts";
 import { upgrade } from "../functions/upgrade.ts";
 
-import type { Command, Args } from "../utilities/types.ts";
+import type { Args, Command } from "../utilities/types.ts";
 
 export const upgradeCommand: Command = {
   name: "upgrade",
