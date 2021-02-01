@@ -23,6 +23,8 @@ export { ensureDir } from "https://deno.land/std@0.81.0/fs/ensure_dir.ts";
 
 export { readLines } from "https://x.nest.land/std@0.80.0/io/mod.ts";
 
+export { delay } from "https://x.nest.land/std@0.80.0/async/delay.ts";
+
 /**************** hatcher ****************/
 
 export { NestLand } from "https://x.nest.land/hatcher@0.10.1/lib/registries/NestLand.ts";

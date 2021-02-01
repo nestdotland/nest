@@ -1,5 +1,6 @@
 import {
   bold,
+  delay,
   dim,
   gray,
   green,
@@ -98,34 +99,48 @@ export async function publish(
     : new semver.SemVer(rawVersion);
 
   const wd = Deno.cwd();
-  const fileSize = files.map((file) => Deno.lstat(join(wd, file)));
-  const settledFileSize = await Promise.allSettled(fileSize);
+  /* const fileSize = files.map((file) => Deno.stat(join(wd, file))); */
+
+  // BUG(oganexon): Deno can get stuck here
+  // Deno.lstat can freeze so we need to timeout the function
+  /* const settledFileSize = await Promise.allSettled(fileSize.map((p) => {
+    return Promise.race([
+      (async () => {
+        const file = await p;
+        return file.size;
+      })(),
+      (async () => {
+        await delay(1000);
+        return null;
+      })(),
+    ]);
+  }));
   const totalSize = settledFileSize.reduce(
     (previous, current) =>
-      previous + (current.status === "fulfilled" ? current.value.size : 0),
+      previous + (current.status === "fulfilled" ? current.value ?? 0 : 0),
     0,
-  );
+  ); */
 
   const filesToPublish = files.reduce(
     (previous, current, index) => {
-      const fileInfo = settledFileSize[index];
-      const size = fileInfo.status === "fulfilled"
-        ? gray(dim(`(${prettyBytes(fileInfo.value.size)})`))
-        : red(`Error while computing file size: ${fileInfo.reason}`);
-      return `${previous}\n     - ${dim(current)}  ${size}`;
+      /* const fileSize = settledFileSize[index];
+      const size = fileSize.status === "fulfilled"
+        ? gray(dim(`(${prettyBytes(fileSize.value)})`))
+        : red(`Error while computing file size: ${fileSize.reason}`); */
+      return `${previous}\n     - ${dim(current)}  ${"" /* size */}`;
     },
     "Files to publish:",
   );
   log.info(filesToPublish);
   lineBreak();
 
-  if (totalSize > MAX_BUNDLE_SIZE * 1e6 && !wallet) {
+  /* if (totalSize > MAX_BUNDLE_SIZE * 1e6 && !wallet) {
     log.warning(
       `Total ${
         underline("estimated")
       } file size exceed ${MAX_BUNDLE_SIZE}Mb. Use your wallet if greater.`,
     );
-  }
+  } */
 
   if (!await isConfigUpToDate()) {
     log.warning(
@@ -150,7 +165,8 @@ export async function publish(
   );
 }
 
-function prettyBytes(n: number): string {
+function prettyBytes(n: number | null): string {
+  if (n === null) return "unknown";
   const log = Math.floor(Math.log10(n) / 3);
   let suffix: string;
   switch (log) {

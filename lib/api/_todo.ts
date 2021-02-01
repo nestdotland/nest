@@ -4,7 +4,7 @@ export function downloadConfig(
   module: Module,
 ): Promise<{ meta: Meta; ignore: string }> {
   // TODO
-  return Promise.resolve({ meta: {}, ignore: "" });
+  return Promise.resolve({ meta: {}, ignore: ".*" });
 }
 
 export function uploadConfig(
