@@ -57,7 +57,7 @@ export async function action(args = Deno.args) {
       Deno.exit(1);
     }
 
-    await handleError(err, logToFile);
+    await handleError(err instanceof Error ? err : new Error(err), logToFile);
     Deno.exit(2);
   }
 }

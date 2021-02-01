@@ -1,10 +1,10 @@
 import { Meta } from "../../lib/utilities/types.ts";
 
-type Arg = `[${string}]` | `\<${string}\>`;
+type Arg = string; // `[${string}]` | `\<${string}\>`;
 
 /** Command option */
 export interface Option {
-  flag: `${`-${string}, ` | ""}--${string}`;
+  flag: string; // `${`-${string}, ` | ""}--${string}`;
   argument?: Arg;
   description: string;
 }
