@@ -26,5 +26,5 @@ export function assertUser(
 
   if (typeError()) throw new NestCLIError("Config(user): Invalid type");
 
-  return user as unknown as UserManager;
+  return user as UserManager;
 }

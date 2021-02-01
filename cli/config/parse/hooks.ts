@@ -49,5 +49,5 @@ export function assertHooks(
 
   if (typeError()) throw new NestCLIError("Config(hooks): Invalid type");
 
-  return hooks as unknown as Hooks;
+  return hooks as Hooks;
 }

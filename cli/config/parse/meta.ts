@@ -12,26 +12,34 @@ export function assertMeta(meta: Json, file: string, prefix = ""): Meta {
 
   const {
     $schema,
-    name,
     fullName,
     description,
     homepage,
+    repository,
+    issues,
     license,
     unlisted,
     private: isPrivate,
+    main,
+    bin,
+    keywords,
     hooks,
     ...remainingFields
   } = meta;
 
   limitFields(file, remainingFields, [
     "$schema",
-    "name",
     "fullName",
     "description",
     "homepage",
+    "repository",
+    "issues",
     "license",
     "unlisted",
     "private",
+    "main",
+    "bin",
+    "keywords",
     "hooks",
   ]);
 
@@ -41,18 +49,35 @@ export function assertMeta(meta: Json, file: string, prefix = ""): Meta {
   checkType(`${prefix}fullName`, fullName, ["string"]);
   checkType(`${prefix}description`, description, ["string"]);
   checkType(`${prefix}homepage`, homepage, ["string"]);
+  checkType(`${prefix}repository`, repository, ["string"]);
+  checkType(`${prefix}issues`, issues, ["string"]);
   checkType(`${prefix}license`, license, ["string"]);
   checkType(`${prefix}unlisted`, unlisted, ["boolean"]);
   checkType(`${prefix}private`, isPrivate, ["boolean"]);
+  checkType(`${prefix}main`, main, ["string"]);
+  checkType(`${prefix}bin`, bin, ["array"]);
+  checkType(`${prefix}keywords`, keywords, ["array"]);
   checkType(`${prefix}hooks`, hooks, ["object"]);
 
   if (typeof hooks === "object" && hooks !== null) {
     assertHooks(hooks, file, `${prefix}hooks.`);
   }
 
+  if (Array.isArray(bin)) {
+    for (let i = 0; i < bin.length; i++) {
+      checkType(`${prefix}bin[${i}]`, bin[i], ["string"], true);
+    }
+  }
+
+  if (Array.isArray(keywords)) {
+    for (let i = 0; i < keywords.length; i++) {
+      checkType(`${prefix}keywords[${i}]`, keywords[i], ["string"], true);
+    }
+  }
+
   if ($schema) delete meta.$schema;
 
   if (typeError()) throw new NestCLIError("Config(meta): Invalid type");
 
-  return meta as unknown as Meta;
+  return meta as Meta;
 }

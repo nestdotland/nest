@@ -56,7 +56,7 @@ export async function sync(module?: Module) {
   const pendingConfig = downloadConfig(project);
 
   /** 1 - compare the config in module.json (user editable) and data.json. */
-  const metaDiff = compareMeta(meta, project.meta);
+  const metaDiff = compareJson(meta as Json, project.meta as Json);
 
   const metaChanged = isJsonUnchanged(metaDiff);
   const ignoreChanged = ignore === project.ignore;
@@ -66,7 +66,7 @@ export async function sync(module?: Module) {
     /** 2.A.1 - if they are same just download the remote config */
     const remote = await pendingConfig;
 
-    const remoteDiff = compareMeta(meta, remote.meta);
+    const remoteDiff = compareJson(meta as Json, remote.meta as Json);
     if (isJsonUnchanged(remoteDiff) && ignore === remote.ignore) {
       log.info("Already synced !");
       return;
@@ -86,11 +86,11 @@ export async function sync(module?: Module) {
     const ignoreDiff = compareString(ignore_, projectIgnore_);
 
     // Apply file diff
-    const newMeta = applyMetaDiff(metaDiff, remote.meta);
+    const newMeta = applyJsonDiff(metaDiff, remote.meta as Json) as Meta;
     const newIgnore = applyStringDiff(ignoreDiff, remoteIgnore_);
 
     if (metaChanged) {
-      const newMetaDiff = compareMeta(newMeta, meta);
+      const newMetaDiff = compareJson(newMeta as Json, meta as Json);
       printJsonDiff(MODULE_FILE, newMetaDiff);
     }
 
@@ -121,7 +121,7 @@ export async function isConfigUpToDate(): Promise<boolean> {
   const ignore = await readIgnore();
   const remote = await downloadConfig(project);
 
-  const diff = compareMeta(meta, remote.meta);
+  const diff = compareJson(meta as Json, remote.meta as Json);
   return isJsonUnchanged(diff) && ignore === remote.ignore;
 }
 
@@ -136,14 +136,6 @@ async function updateFiles(
   await writeDataJson(project);
   await writeIgnore(ignore);
   log.info("Successfully updated config !");
-}
-
-function compareMeta(actual: Meta, base: Meta): JSONDiff {
-  return compareJson(actual as unknown as Json, base as unknown as Json);
-}
-
-function applyMetaDiff(diff: JSONDiff, target: Meta): Meta {
-  return applyJsonDiff(diff, target as unknown as Json) as unknown as Meta;
 }
 
 function splitLines(text: string): string[] {

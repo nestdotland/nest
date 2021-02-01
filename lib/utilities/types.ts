@@ -1,4 +1,9 @@
-export interface Hooks {
+export interface Module {
+  author: string;
+  name: string;
+}
+
+export type Hooks = {
   presync?: string;
   postsync?: string;
   prepack?: string;
@@ -7,21 +12,23 @@ export interface Hooks {
   postpublish?: string;
   preaudit?: string;
   postaudit?: string;
-}
+};
 
-export interface Meta {
+/** module.json file */
+export type Meta = {
   fullName?: string;
   description?: string;
   homepage?: string;
+  repository?: string;
+  issues?: string;
   license?: string;
 
   unlisted?: boolean;
   private?: boolean;
 
-  hooks?: Hooks;
-}
+  main?: string;
+  bin?: string[];
 
-export interface Module {
-  author: string;
-  name: string;
-}
+  keywords?: string[];
+  hooks?: Hooks;
+};

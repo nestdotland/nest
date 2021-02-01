@@ -36,5 +36,5 @@ export function assertApi(api: Json, file: string, prefix = ""): Api {
 
   if (typeError()) throw new NestCLIError("Config(api): Invalid type");
 
-  return api as unknown as Api;
+  return api as Api;
 }

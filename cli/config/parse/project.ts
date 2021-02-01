@@ -64,5 +64,5 @@ export function assertProject(
 
   if (typeError()) throw new NestCLIError("Config(project): Invalid type");
 
-  return module as unknown as Project;
+  return module as Project;
 }

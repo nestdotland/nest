@@ -38,5 +38,5 @@ export function assertUserManager(
 
   if (typeError()) throw new NestCLIError("Config(user-manager): Invalid type");
 
-  return manager as unknown as UserManager;
+  return manager as UserManager;
 }

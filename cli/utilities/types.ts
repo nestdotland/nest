@@ -1,4 +1,4 @@
-import { Hooks, Meta } from "../../lib/utilities/types.ts";
+import { Meta } from "../../lib/utilities/types.ts";
 
 /** Command option */
 export interface Option {
@@ -22,13 +22,14 @@ export interface Command {
   action: (args?: string[]) => Promise<void> | void;
 }
 
-export interface Api {
+export type Api = {
   versions: string[];
   latestVersion: string;
   lastPublished: number;
-}
+};
 
-export interface Project {
+/** data.json file */
+export type Project = {
   meta: Meta;
 
   ignore: string;
@@ -41,17 +42,17 @@ export interface Project {
   version: string;
   lastSync: number;
   nextAutoSync: number;
-}
+};
 
-export interface UserManager {
+export type UserManager = {
   activeUser: string;
   users: Record<string, User>;
-}
+};
 
-export interface User {
+export type User = {
   name: string;
   token: string;
-}
+};
 
 export type JSONObject = { [key: string]: JSONValue };
 export type JSONArray = JSONValue[];
