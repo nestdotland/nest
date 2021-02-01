@@ -1,5 +1,4 @@
 import { parse } from "../deps.ts";
-import type { Args } from "../deps.ts";
 import {
   handleError,
   log,
@@ -8,12 +7,11 @@ import {
 } from "../utilities/log.ts";
 import { NestCLIError, NestError } from "../error.ts";
 import { aliasesFromOptions, setupCheckType } from "../utilities/cli.ts";
-import type { Command } from "../utilities/types.ts";
-
 import { mainOptions } from "./main/options.ts";
 import { mainCommands } from "./main/commands.ts";
-
 import { main } from "../functions/main.ts";
+
+import type { Command, Args } from "../utilities/types.ts";
 
 export const mainCommand: Command = {
   name: "",

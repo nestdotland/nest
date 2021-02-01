@@ -1,11 +1,10 @@
 import { parse } from "../deps.ts";
-import type { Args } from "../deps.ts";
 import { limitArgs, limitOptions, setupCheckType } from "../utilities/cli.ts";
-import type { Command } from "../utilities/types.ts";
 import { NestCLIError } from "../error.ts";
 import { mainOptions } from "./main/options.ts";
-
 import { logout } from "../functions/logout.ts";
+
+import type { Command, Args } from "../utilities/types.ts";
 
 export const logoutCommand: Command = {
   name: "logout",

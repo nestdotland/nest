@@ -1,13 +1,11 @@
 import { parse } from "../deps.ts";
-import type { Args } from "../deps.ts";
 import { NestCLIError } from "../error.ts";
 import { limitOptions, setupCheckType } from "../utilities/cli.ts";
-import type { Command } from "../utilities/types.ts";
-
 import { mainOptions } from "./main/options.ts";
 import { mainCommand } from "../commands/main.ts";
-
 import { help } from "../functions/help.ts";
+
+import type { Args, Command } from "../utilities/types.ts";
 
 export const helpCommand: Command = {
   name: "help",

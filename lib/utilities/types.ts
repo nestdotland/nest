@@ -3,21 +3,20 @@ export interface Module {
   name: string;
 }
 
+export type HookPrefix = "pre" | "post";
+export type Hook = "sync" | "pack" | "publish" | "audit";
 export type Hooks = {
-  presync?: string;
-  postsync?: string;
-  prepack?: string;
-  postpack?: string;
-  prepublish?: string;
-  postpublish?: string;
-  preaudit?: string;
-  postaudit?: string;
+  [K in `${HookPrefix}${Capitalize<Hook>}`]?: string;
 };
 
 /** module.json file */
 export type Meta = {
+  main?: string;
+  bin?: string[];
+
   fullName?: string;
   description?: string;
+  logo?: string;
   homepage?: string;
   repository?: string;
   issues?: string;
@@ -25,9 +24,6 @@ export type Meta = {
 
   unlisted?: boolean;
   private?: boolean;
-
-  main?: string;
-  bin?: string[];
 
   keywords?: string[];
   hooks?: Hooks;

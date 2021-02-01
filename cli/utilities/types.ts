@@ -1,15 +1,17 @@
 import { Meta } from "../../lib/utilities/types.ts";
 
+type Arg = `[${string}]` | `<${string}>`
+
 /** Command option */
 export interface Option {
-  flag: string;
-  argument?: string;
+  flag: `${`-${string}, ` | ""}--${string}`;
+  argument?: Arg;
   description: string;
 }
 
 /** Command argument */
 export interface Argument {
-  name: string;
+  name: Arg;
   description: string;
 }
 
@@ -65,4 +67,5 @@ export type JSONValue =
   | null;
 export type Json = JSONArray | JSONObject;
 
+export type { Args } from "../deps.ts";
 export * from "../../lib/utilities/types.ts";

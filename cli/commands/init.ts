@@ -1,11 +1,9 @@
 import { parse } from "../deps.ts";
-import type { Args } from "../deps.ts";
-import { limitArgs, limitOptions, setupCheckType } from "../utilities/cli.ts";
-import type { Command } from "../utilities/types.ts";
-
+import { limitArgs, limitOptions } from "../utilities/cli.ts";
 import { mainOptions } from "./main/options.ts";
-
 import { init } from "../functions/init.ts";
+
+import type { Command, Args } from "../utilities/types.ts";
 
 export const initCommand: Command = {
   name: "init",

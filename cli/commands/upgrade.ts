@@ -1,12 +1,10 @@
 import { parse } from "../deps.ts";
-import type { Args } from "../deps.ts";
 import { NestCLIError } from "../error.ts";
 import { limitArgs, limitOptions, setupCheckType } from "../utilities/cli.ts";
-import type { Command } from "../utilities/types.ts";
-
 import { mainOptions } from "./main/options.ts";
-
 import { upgrade } from "../functions/upgrade.ts";
+
+import type { Command, Args } from "../utilities/types.ts";
 
 export const upgradeCommand: Command = {
   name: "upgrade",

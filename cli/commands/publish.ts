@@ -1,5 +1,4 @@
 import { parse, underline } from "../deps.ts";
-import type { Args } from "../deps.ts";
 import { NestCLIError } from "../error.ts";
 import {
   aliasesFromOptions,
@@ -7,12 +6,11 @@ import {
   limitOptions,
   setupCheckType,
 } from "../utilities/cli.ts";
-import type { Command, Option } from "../utilities/types.ts";
-import type { PublishOptions as Flags } from "../functions/publish.ts";
-
 import { mainOptions } from "./main/options.ts";
-
 import { publish } from "../functions/publish.ts";
+
+import type { Args, Command, Option } from "../utilities/types.ts";
+import type { PublishOptions as Flags } from "../functions/publish.ts";
 
 const options: Option[] = [
   ...mainOptions,

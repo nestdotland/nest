@@ -11,6 +11,3 @@ nest-debug.log
 # Benchmarks
 benchmarks/**
 !benchmarks/README.md
-
-foo.ts
-.nest

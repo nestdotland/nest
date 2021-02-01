@@ -12,16 +12,17 @@ export function assertMeta(meta: Json, file: string, prefix = ""): Meta {
 
   const {
     $schema,
+    main,
+    bin,
     fullName,
     description,
+    logo,
     homepage,
     repository,
     issues,
     license,
     unlisted,
     private: isPrivate,
-    main,
-    bin,
     keywords,
     hooks,
     ...remainingFields
@@ -29,16 +30,17 @@ export function assertMeta(meta: Json, file: string, prefix = ""): Meta {
 
   limitFields(file, remainingFields, [
     "$schema",
+    "main",
+    "bin",
     "fullName",
     "description",
+    "logo",
     "homepage",
     "repository",
     "issues",
     "license",
     "unlisted",
     "private",
-    "main",
-    "bin",
     "keywords",
     "hooks",
   ]);
@@ -46,16 +48,17 @@ export function assertMeta(meta: Json, file: string, prefix = ""): Meta {
   const { checkType, typeError } = setupCheckType(file);
 
   checkType(`${prefix}$schema`, $schema, ["string"]);
+  checkType(`${prefix}main`, main, ["string"]);
+  checkType(`${prefix}bin`, bin, ["array"]);
   checkType(`${prefix}fullName`, fullName, ["string"]);
   checkType(`${prefix}description`, description, ["string"]);
+  checkType(`${prefix}logo`, logo, ["string"]);
   checkType(`${prefix}homepage`, homepage, ["string"]);
   checkType(`${prefix}repository`, repository, ["string"]);
   checkType(`${prefix}issues`, issues, ["string"]);
   checkType(`${prefix}license`, license, ["string"]);
   checkType(`${prefix}unlisted`, unlisted, ["boolean"]);
   checkType(`${prefix}private`, isPrivate, ["boolean"]);
-  checkType(`${prefix}main`, main, ["string"]);
-  checkType(`${prefix}bin`, bin, ["array"]);
   checkType(`${prefix}keywords`, keywords, ["array"]);
   checkType(`${prefix}hooks`, hooks, ["object"]);
 
