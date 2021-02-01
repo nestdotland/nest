@@ -5,8 +5,9 @@ on:
   pull_request:
 
 jobs:
-  lint:
+  test:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
 
     steps:
       - name: Checkout Code
@@ -27,11 +28,11 @@ jobs:
           nest setup nest nest -L debug
 
       - name: Dry publish
-        run: nest publish -Yd 0.0.0 --pre dev -L debug
+        run: nest publish 0.0.0 --pre dev -Yd -L debug
 
       - name: Upload debug file
         uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: debug-files
-          path: /home/runner/.nest/logs/*
+          path: ~/.nest/logs/*
