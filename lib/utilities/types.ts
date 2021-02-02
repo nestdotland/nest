@@ -8,7 +8,7 @@ export interface Module {
 export type HookPrefix = (typeof hookPrefix)[number];
 export type Hook = (typeof hook)[number];
 export type Hooks = {
-  [K in `${HookPrefix}-${Hook}`]?: string;
+  [K in `${HookPrefix}${Hook}`]?: string;
 };
 
 /** module.json file */

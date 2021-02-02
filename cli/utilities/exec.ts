@@ -1,12 +1,10 @@
-export async function exec(command?: string): Promise<boolean> {
-  if (command === undefined) return true;
-
+export async function exec(command: string): Promise<number> {
   const process = Deno.run({
     cmd: tokenize(command),
   });
 
   const status = await process.status();
-  return status.success;
+  return status.code;
 }
 
 enum TokenState {

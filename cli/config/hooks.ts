@@ -1,4 +1,4 @@
-import { cyan } from "../deps.ts";
+import { bold, green } from "../deps.ts";
 import { exec } from "../utilities/exec.ts";
 import { log } from "../utilities/log.ts";
 import { hook } from "../utilities/const.ts";
@@ -7,8 +7,10 @@ import * as config from "./config.ts";
 import type { Hook } from "../utilities/types.ts";
 
 export type Hooks = {
-  [K in Hook]: (action: Promise<unknown>) => Promise<void>;
+  [K in Hook]: (action: () => Promise<unknown>) => Promise<void>;
 };
+
+const prefix = bold(green("$"));
 
 export async function getHooks(): Promise<Hooks> {
   await config.local.ensure();
@@ -20,35 +22,39 @@ export async function getHooks(): Promise<Hooks> {
   for (const key of hook) {
     hooks[key] = async (action) => {
       const postHook = meta.hooks
-        ? meta.hooks[(`post-${key}`) as const]
+        ? meta.hooks[(`post${key}`) as const]
         : undefined;
       const preHook = meta.hooks
-        ? meta.hooks[(`pre-${key}`) as const]
+        ? meta.hooks[(`pre${key}`) as const]
         : undefined;
 
-      if (postHook) {
-        log.info(`Executing post ${key} hook: ${cyan(`$ ${postHook}`)} ...`);
-        if (await exec(preHook)) {
-          log.info("Done.");
-        } else {
-          log.error("Previous command didn't exit successfully.");
-          throw new NestCLIError("Unsuccessful post hook execution (config)");
-        }
+      if (preHook) {
+        await run(preHook)
       }
 
-      await action;
+      await action();
 
-      if (preHook) {
-        log.info(`Executing pre ${key} hook: ${cyan(`$ ${preHook}`)} ...`);
-        if (await exec(preHook)) {
-          log.info("Done.");
-        } else {
-          log.error("Previous command didn't exit successfully.");
-          throw new NestCLIError("Unsuccessful pre hook execution (config)");
-        }
+      if (postHook) {
+        await run(postHook)
       }
     };
   }
 
   return hooks as Hooks;
+}
+
+async function run(command: string) {
+  log.plain(prefix, command);
+        
+  const t0 = performance.now();
+  const statusCode = await exec(command);
+  const t1 = performance.now();
+
+  if (statusCode === 0) {
+    const seconds = (t1 - t0) / 1000
+    log.info(`Done in ${seconds.toFixed(3)}s.`);
+  } else {
+    log.error(`Command failed with exit code ${statusCode}.`);
+    throw new NestCLIError("Unsuccessful post hook execution (config)");
+  }
 }

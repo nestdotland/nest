@@ -62,7 +62,7 @@ export async function action(args = Deno.args) {
 
   const hooks = await getHooks();
 
-  await hooks.publish(publish(flags));
+  await hooks.publish(async () => publish(flags));
 }
 
 function assertFlags(args: Args): Flags {

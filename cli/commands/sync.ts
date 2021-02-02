@@ -20,7 +20,7 @@ export async function action(args = Deno.args) {
 
   const hooks = await getHooks();
 
-  await hooks.sync(sync());
+  await hooks.sync(async () => sync());
 }
 
 function assertFlags(args: Args): void {
