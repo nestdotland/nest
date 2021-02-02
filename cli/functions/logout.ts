@@ -1,5 +1,5 @@
 import { gray, green, italic } from "../deps.ts";
-import { parseUsersJson, writeUsersJson } from "../config/users.json.ts";
+import * as usersConfig from "../config/files/users.json.ts";
 import { NestCLIError } from "../error.ts";
 import { lineBreak, log } from "../utilities/log.ts";
 import { ensureUserLogged } from "./login.ts";
@@ -8,7 +8,7 @@ import { promptAndValidate } from "../utilities/interact.ts";
 export async function logout(username?: string) {
   await ensureUserLogged();
 
-  const manager = await parseUsersJson();
+  const manager = await usersConfig.parse();
 
   const users = Object.keys(manager.users);
 
@@ -44,7 +44,7 @@ export async function logout(username?: string) {
       : "";
   }
 
-  await writeUsersJson(manager);
+  await usersConfig.write(manager);
 
   lineBreak();
   log.info("Successfully logged out", green(username), "!");

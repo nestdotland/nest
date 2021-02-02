@@ -1,4 +1,4 @@
-import { bold, cyan, gray, green } from "../deps.ts";
+import { bold, gray, green } from "../deps.ts";
 import { NestCLIError } from "../error.ts";
 import { lineBreak, log, prefix } from "../utilities/log.ts";
 

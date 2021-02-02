@@ -1,29 +1,20 @@
 import { log } from "../utilities/log.ts";
-import { parseDataJson, writeDataJson } from "../config/data.json.ts";
-import { IGNORE_FILE, readIgnore, writeIgnore } from "../config/ignore.ts";
-import { ensureConfig } from "../config/all.ts";
-import {
-  MODULE_FILE,
-  parseModuleJson,
-  writeModuleJson,
-} from "../config/module.json.ts";
+import { confirm } from "../utilities/interact.ts";
+import { downloadConfig, uploadConfig } from "../../lib/api/_todo.ts";
+import { getActiveUser } from "./login.ts";
+import * as config from "../config/config.ts";
 import {
   applyJsonDiff,
   compareJson,
   isJsonUnchanged,
-  JSONDiff,
   printJsonDiff,
 } from "../processing/json_diff.ts";
-import { ensureNestDir } from "../config/nest.ts";
-import { confirm } from "../utilities/interact.ts";
-import { downloadConfig, uploadConfig } from "../../lib/api/_todo.ts";
-import { getActiveUser } from "./login.ts";
-import type { Json, Meta, Module, Project } from "../utilities/types.ts";
 import {
   applyStringDiff,
   compareString,
   printStringDiff,
 } from "../processing/diff.ts";
+import type { Json, Meta, Module, Project } from "../utilities/types.ts";
 
 export async function sync(module?: Module) {
   const user = await getActiveUser();
@@ -43,16 +34,14 @@ export async function sync(module?: Module) {
       lastSync: 0,
       nextAutoSync: 0,
     };
-    await ensureNestDir();
+    await config.dir.ensure();
     await updateFiles(meta, project, ignore);
     return;
   }
 
-  await ensureConfig();
-
-  const project = await parseDataJson();
-  const meta = await parseModuleJson();
-  const ignore = await readIgnore();
+  const project = await config.project.parse();
+  const meta = await config.meta.parse();
+  const ignore = await config.ignore.read();
   const pendingConfig = downloadConfig(project);
 
   /** 1 - compare the config in module.json (user editable) and data.json. */
@@ -91,12 +80,12 @@ export async function sync(module?: Module) {
 
     if (metaChanged) {
       const newMetaDiff = compareJson(newMeta as Json, meta as Json);
-      printJsonDiff(MODULE_FILE, newMetaDiff);
+      printJsonDiff(config.meta.FILE, newMetaDiff);
     }
 
     if (ignoreChanged) {
       const newIgnoreDiff = compareString(newIgnore, ignore_);
-      printStringDiff(IGNORE_FILE, newIgnoreDiff);
+      printStringDiff(config.ignore.FILE, newIgnoreDiff);
     }
 
     const confirmation = await confirm("Accept incoming changes ?");
@@ -116,9 +105,9 @@ export async function sync(module?: Module) {
 }
 
 export async function isConfigUpToDate(): Promise<boolean> {
-  const meta = await parseModuleJson();
-  const project = await parseDataJson();
-  const ignore = await readIgnore();
+  const meta = await config.meta.parse();
+  const project = await config.project.parse();
+  const ignore = await config.ignore.read();
   const remote = await downloadConfig(project);
 
   const diff = compareJson(meta as Json, remote.meta as Json);
@@ -130,11 +119,11 @@ async function updateFiles(
   project: Project,
   ignore: string,
 ): Promise<void> {
-  await writeModuleJson(meta);
   project.meta = meta;
   project.lastSync = new Date().getTime();
-  await writeDataJson(project);
-  await writeIgnore(ignore);
+  await config.meta.write(meta);
+  await config.project.write(project);
+  await config.ignore.write(ignore);
   log.info("Successfully updated config !");
 }
 

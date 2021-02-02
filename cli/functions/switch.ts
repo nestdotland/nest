@@ -1,5 +1,5 @@
 import { gray, green, italic } from "../deps.ts";
-import { parseUsersJson, writeUsersJson } from "../config/users.json.ts";
+import * as config from "../config/config.ts";
 import { NestCLIError } from "../error.ts";
 import { lineBreak, log } from "../utilities/log.ts";
 import { ensureUserLogged } from "./login.ts";
@@ -8,7 +8,7 @@ import { promptAndValidate } from "../utilities/interact.ts";
 export async function switchUser(username?: string) {
   await ensureUserLogged();
 
-  const manager = await parseUsersJson();
+  const manager = await config.users.parse();
 
   const inactiveUsers = Object.keys(manager.users)
     .filter((user) => user !== manager.activeUser);
@@ -46,7 +46,7 @@ export async function switchUser(username?: string) {
 
   manager.activeUser = username;
 
-  await writeUsersJson(manager);
+  await config.users.write(manager);
 
   log.info("Successfully switched to", green(username), "!");
 }

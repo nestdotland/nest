@@ -12,13 +12,11 @@ import {
 import { lineBreak, log, underlineBold } from "../utilities/log.ts";
 import { getLatestTag, isGitRepository } from "../utilities/git.ts";
 import { NestCLIError } from "../error.ts";
-import { parseIgnore } from "../config/ignore.ts";
-import { DATA_FILE, parseDataJson } from "../config/data.json.ts";
-import { ensureConfig } from "../config/all.ts";
 import { getActiveUser } from "./login.ts";
 import { confirm } from "../utilities/interact.ts";
 import { publish as directPublish } from "../../lib/publish.ts";
 import { isConfigUpToDate } from "./sync.ts";
+import * as config from "../config/config.ts";
 
 export interface PublishOptions {
   yes?: boolean;
@@ -42,13 +40,10 @@ export async function publish(
   }: PublishOptions,
 ): Promise<void> {
   const user = await getActiveUser();
-  await ensureConfig();
-
-  const files = await parseIgnore();
+  const project = await config.project.parse();
+  const files = await config.ignore.parse();
 
   log.info("Found", files.length, "files.");
-
-  const project = await parseDataJson();
 
   const isReleaseType = ["patch", "minor", "major"].includes(rawVersion);
 
@@ -57,11 +52,10 @@ export async function publish(
     throw new NestCLIError("Invalid version (publish)");
   }
 
-  // shouldn't happen after a sync
   if (!semver.valid(project.version)) {
     log.error(
       "The project version was altered in the file",
-      underlineBold(DATA_FILE),
+      underlineBold(config.project.FILE),
       "Report this issue.",
     );
     throw new NestCLIError("Invalid project version (publish)");

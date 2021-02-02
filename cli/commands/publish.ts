@@ -8,6 +8,7 @@ import {
 } from "../utilities/cli.ts";
 import { mainOptions } from "./main/options.ts";
 import { publish } from "../functions/publish.ts";
+import { getHooks } from "../config/hooks.ts";
 
 import type { Args, Command, Option } from "../utilities/types.ts";
 import type { PublishOptions as Flags } from "../functions/publish.ts";
@@ -59,7 +60,9 @@ export async function action(args = Deno.args) {
     { alias: aliasesFromOptions(options) },
   ));
 
-  await publish(flags);
+  const hooks = await getHooks();
+
+  await hooks.publish(publish(flags));
 }
 
 function assertFlags(args: Args): Flags {

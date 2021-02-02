@@ -1,10 +1,5 @@
 import { green } from "../deps.ts";
-import {
-  ensureUsersJson,
-  parseUsersJson,
-  usersJsonExists,
-  writeUsersJson,
-} from "../config/users.json.ts";
+import * as config from "../config/config.ts";
 import { NestCLIError } from "../error.ts";
 import { log } from "../utilities/log.ts";
 import { promptAndValidate } from "../utilities/interact.ts";
@@ -13,10 +8,10 @@ import { User, UserManager } from "../utilities/types.ts";
 export async function login(username?: string, token?: string) {
   let manager: UserManager;
 
-  if (await usersJsonExists()) {
-    manager = await parseUsersJson();
+  if (await config.users.exists()) {
+    manager = await config.users.parse();
   } else {
-    await ensureUsersJson();
+    await config.users.ensure();
     manager = {
       activeUser: "",
       users: {},
@@ -50,7 +45,7 @@ export async function login(username?: string, token?: string) {
     token,
   };
 
-  await writeUsersJson(manager);
+  await config.users.write(manager);
 
   log.info("Successfully logged in under", green(username), "!");
 }
@@ -58,8 +53,8 @@ export async function login(username?: string, token?: string) {
 export async function ensureUserLogged(): Promise<UserManager> {
   let manager: UserManager;
   if (
-    !await usersJsonExists() ||
-    (manager = await parseUsersJson()).activeUser === ""
+    !await config.users.exists() ||
+    (manager = await config.users.parse()).activeUser === ""
   ) {
     log.error("No user logged in, use", green("nest login"), "to add users.");
     throw new NestCLIError("No user logged in (login)");

@@ -1,9 +1,6 @@
-import { basename, cyan, ensureDir, green } from "../deps.ts";
+import { basename, cyan, green } from "../deps.ts";
 import { log } from "../utilities/log.ts";
-import { NEST_DIRECTORY } from "../config/nest.ts";
-import { writeDataJson } from "../config/data.json.ts";
-import { writeModuleJson } from "../config/module.json.ts";
-import { writeIgnore } from "../config/ignore.ts";
+import * as config from "../config/config.ts";
 import { addToGitIgnore } from "../utilities/git.ts";
 import { setup } from "./setup.ts";
 import { getActiveUser } from "./login.ts";
@@ -57,9 +54,9 @@ export async function init() {
   const ignoreContent =
     "# List here the files and directories to be ignored, one by line as a glob expression.\n\n# Dotfiles are ignored by default.\n.*\n";
 
-  await ensureDir(NEST_DIRECTORY);
-  await writeModuleJson(meta);
-  await writeDataJson({
+  await config.dir.ensure();
+  await config.meta.write(meta);
+  await config.project.write({
     meta,
     ignore: ignoreContent,
     api: {
@@ -73,13 +70,13 @@ export async function init() {
     lastSync: 0,
     nextAutoSync: 0,
   });
-  await writeIgnore(ignoreContent);
+  await config.ignore.write(ignoreContent);
 
-  await addToGitIgnore([NEST_DIRECTORY]);
+  await addToGitIgnore([config.dir.PATH]);
 
   log.info(
     `Linked to ${cyan(`${user.name}/${name}`)} (created ${
-      green(NEST_DIRECTORY)
+      green(config.dir.PATH)
     })`,
   );
 }

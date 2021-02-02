@@ -1,12 +1,14 @@
+import { hook, hookPrefix } from "./const.ts";
+
 export interface Module {
   author: string;
   name: string;
 }
 
-export type HookPrefix = "pre" | "post";
-export type Hook = "sync" | "pack" | "publish" | "audit";
+export type HookPrefix = (typeof hookPrefix)[number];
+export type Hook = (typeof hook)[number];
 export type Hooks = {
-  [K in `${HookPrefix}${Capitalize<Hook>}`]?: string;
+  [K in `${HookPrefix}-${Hook}`]?: string;
 };
 
 /** module.json file */
