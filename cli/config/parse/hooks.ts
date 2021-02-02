@@ -1,6 +1,7 @@
 import { limitFields, setupCheckType } from "../../utilities/cli.ts";
 import { NestCLIError } from "../../error.ts";
 import { log } from "../../utilities/log.ts";
+import { hook, hookPrefix } from "../../utilities/const.ts";
 import type { Hooks, Json } from "../../utilities/types.ts";
 
 export function assertHooks(
@@ -15,37 +16,22 @@ export function assertHooks(
     throw new NestCLIError("Config(hooks): received an array");
   }
 
-  const {
-    presync,
-    postsync,
-    prepack,
-    postpack,
-    prepublish,
-    postpublish,
-    preaudit,
-    postaudit,
-    ...remainingFields
-  } = hooks;
+  let remainingFields = hooks;
+  const hooksName = [];
 
-  limitFields(file, remainingFields, [
-    "presync",
-    "postsync",
-    "prepack",
-    "postpack",
-    "prepublish",
-    "postpublish",
-    "preaudit",
-    "postaudit",
-  ]);
+  for (const key of hook) {
+    for (const prefix of hookPrefix) {
+      hooksName.push(`${prefix}${key}`);
+    }
+  }
 
-  checkType(`${prefix}presync`, presync, ["string"]);
-  checkType(`${prefix}postsync`, postsync, ["string"]);
-  checkType(`${prefix}prepack`, prepack, ["string"]);
-  checkType(`${prefix}postpack`, postpack, ["string"]);
-  checkType(`${prefix}prepublish`, prepublish, ["string"]);
-  checkType(`${prefix}postpublish`, postpublish, ["string"]);
-  checkType(`${prefix}preaudit`, preaudit, ["string"]);
-  checkType(`${prefix}postaudit`, postaudit, ["string"]);
+  for (const hookName of hooksName) {
+    const { [hookName]: value, ...remaining } = remainingFields;
+    checkType(`${prefix}${hookName}`, value, ["string"]);
+    remainingFields = remaining;
+  }
+
+  limitFields(file, remainingFields, hooksName);
 
   if (typeError()) throw new NestCLIError("Config(hooks): Invalid type");
 

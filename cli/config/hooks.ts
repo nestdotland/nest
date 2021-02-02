@@ -29,13 +29,13 @@ export async function getHooks(): Promise<Hooks> {
         : undefined;
 
       if (preHook) {
-        await run(preHook)
+        await run(preHook);
       }
 
       await action();
 
       if (postHook) {
-        await run(postHook)
+        await run(postHook);
       }
     };
   }
@@ -45,13 +45,13 @@ export async function getHooks(): Promise<Hooks> {
 
 async function run(command: string) {
   log.plain(prefix, command);
-        
+
   const t0 = performance.now();
   const statusCode = await exec(command);
   const t1 = performance.now();
 
   if (statusCode === 0) {
-    const seconds = (t1 - t0) / 1000
+    const seconds = (t1 - t0) / 1000;
     log.info(`Done in ${seconds.toFixed(3)}s.`);
   } else {
     log.error(`Command failed with exit code ${statusCode}.`);
