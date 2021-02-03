@@ -1,4 +1,4 @@
-import { desc, run, sh, task } from "https://x.nest.land/drake@1.4.4/mod.ts";
+import { desc, run, sh, task } from "https://x.nest.land/drake@1.4.6/mod.ts";
 import { version } from "../cli/version.ts";
 
 const NEST_TOKEN = "nest_token";
