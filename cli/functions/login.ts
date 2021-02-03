@@ -5,6 +5,7 @@ import { log } from "../utilities/log.ts";
 import { promptAndValidate } from "../utilities/interact.ts";
 import { User, UserManager } from "../utilities/types.ts";
 
+/** Add an existing user account */
 export async function login(username?: string, token?: string) {
   let manager: UserManager;
 
@@ -50,6 +51,8 @@ export async function login(username?: string, token?: string) {
   log.info("Successfully logged in under", green(username), "!");
 }
 
+/** Checks if an user is logged in and returns a user manager object.
+ * If not logged in, throws an error. */
 export async function ensureUserLogged(): Promise<UserManager> {
   let manager: UserManager;
   if (
@@ -62,6 +65,7 @@ export async function ensureUserLogged(): Promise<UserManager> {
   return manager;
 }
 
+/** Get active user. Throws if no user is logged in. */
 export async function getActiveUser(): Promise<User> {
   const { users, activeUser } = await ensureUserLogged();
   return users[activeUser];

@@ -2,9 +2,10 @@ import { lineBreak, log, setupLogLevel } from "../utilities/log.ts";
 import { version as currentVersion } from "../version.ts";
 import { help as displayHelp } from "./help.ts";
 import { NestCLIError } from "../error.ts";
-import { mainCommand } from "../commands/main.ts";
 import { didYouMean } from "../utilities/cli.ts";
+import { mainCommand } from "../commands/main.ts";
 
+/** Command handler */
 export async function main(
   command?: string,
   logLevel?: string,

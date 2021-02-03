@@ -1,3 +1,4 @@
+/** Executes a command and returns the status code. */
 export async function exec(command: string): Promise<number> {
   const process = Deno.run({
     cmd: tokenize(command),

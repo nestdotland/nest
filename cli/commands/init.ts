@@ -7,7 +7,7 @@ import type { Args, Command } from "../utilities/types.ts";
 
 export const initCommand: Command = {
   name: "init",
-  description: "Initiates a new module for the nest.land registry",
+  description: "Initiate a new module for the nest.land registry",
   arguments: [],
   options: mainOptions,
   subCommands: {},

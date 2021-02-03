@@ -3,10 +3,13 @@ import { log } from "../utilities/log.ts";
 import { NestCLIError } from "../error.ts";
 import type { Command } from "../utilities/types.ts";
 
+/** Determines the target command and displays help for it */
 export function help(command: Command, names: string[] = []): void {
+  // current command
   const name = names[0];
   if (name) {
     if (name in command.subCommands) {
+      // if sub-command
       if (names[1]) {
         names.shift();
         return help(command.subCommands[name], names);
@@ -23,6 +26,7 @@ export function help(command: Command, names: string[] = []): void {
       throw new NestCLIError("Invalid command name (help)");
     }
   } else {
+    // root command help
     printHelp(command);
   }
 }

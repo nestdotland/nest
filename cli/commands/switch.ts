@@ -8,7 +8,7 @@ import type { Args, Command } from "../utilities/types.ts";
 
 export const switchCommand: Command = {
   name: "switch",
-  description: "Change currently logged in user.",
+  description: "Change currently logged in user",
   arguments: [{
     name: "[username]",
     description: "",

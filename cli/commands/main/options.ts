@@ -1,4 +1,4 @@
-import { underline } from "../../deps.ts";
+import { cyan } from "../../deps.ts";
 import type { Option } from "../../utilities/types.ts";
 
 export const mainOptions: Option[] = [
@@ -13,13 +13,13 @@ export const mainOptions: Option[] = [
   {
     flag: "-L, --log-level",
     argument: "<level>",
-    description: `Set log level, ${underline("info")} by default`,
+    description: `Set log level, ${cyan("info")} by default`,
   },
   {
     flag: "-l, --log",
     argument: "<path>",
     description: `Specify filepath to output logs, ${
-      underline("nest-debug.log")
+      cyan("nest-debug.log")
     } by default`,
   },
   {

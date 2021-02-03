@@ -19,11 +19,13 @@ export function aliasesFromOptions(options: Option[]): Record<string, string> {
   return aliases;
 }
 
+/** Transform a string into an option: a => -a, foo => --foo */
 function keyToOption(key: string): string {
   return key.length === 1 ? `-${key}` : `--${key}`;
 }
 
-function extractFlags(options: Option[]) {
+/** Returns a list of flags from options */
+function extractFlags(options: Option[]): string[] {
   const flags: string[] = [];
 
   for (let i = 0; i < options.length; i++) {
@@ -49,7 +51,7 @@ function extractFlags(options: Option[]) {
 export function limitOptions(
   options: Record<string, unknown>,
   baseOptions: Option[],
-) {
+): void {
   const reference = extractFlags(baseOptions);
   const misspelled = Object.keys(options).filter((flag) =>
     !reference.includes(flag)
@@ -87,6 +89,7 @@ export function limitArgs(args: unknown[]) {
   throw new NestCLIError("Too many arguments (limitArgs)");
 }
 
+/** Displays most likely string from reference */
 export function didYouMean(
   reference: string[],
   misspelled: string[],

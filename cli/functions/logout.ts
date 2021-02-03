@@ -5,6 +5,7 @@ import { lineBreak, log } from "../utilities/log.ts";
 import { ensureUserLogged } from "./login.ts";
 import { promptAndValidate } from "../utilities/interact.ts";
 
+/** Remove an existing user account */
 export async function logout(username?: string) {
   await ensureUserLogged();
 

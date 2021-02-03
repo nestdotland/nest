@@ -1,5 +1,5 @@
 import { assert, assertEquals } from "../test/deps.ts";
-import { applyStringDiff, compareString } from "./diff.ts";
+import * as diff from "./diff.ts";
 
 const obj1 = [
   "same",
@@ -31,10 +31,10 @@ const obj4 = [
 ];
 
 Deno.test({
-  name: "CLI | diff | compareString",
+  name: "CLI | diff | compare",
   fn() {
     assertEquals(
-      compareString(obj1, obj3),
+      diff.compare(obj1, obj3),
       [{
         type: "common",
         value: "same",
@@ -69,11 +69,9 @@ Deno.test({
 });
 
 Deno.test({
-  name: "CLI | diff | applyStringDiff",
+  name: "CLI | diff | apply",
   fn() {
-    const diff = compareString(obj1, obj3);
-
-    const result = applyStringDiff(diff, obj4);
+    const result = diff.apply(diff.compare(obj1, obj3), obj4);
 
     assertEquals(result, [
       "new1",

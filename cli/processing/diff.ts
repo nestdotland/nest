@@ -20,7 +20,8 @@ export type DiffResult<T> = {
 
 export type StringDiff = DiffResult<string>[];
 
-export function compareString(actual: string[], base: string[]): StringDiff {
+/** Compares two string arrays and returns a diff */
+export function compare(actual: string[], base: string[]): StringDiff {
   const diff: StringDiff = [];
   const LCS = longestCommonSubsequence(actual, base);
   let actualIndex = 0;
@@ -65,7 +66,8 @@ export function compareString(actual: string[], base: string[]): StringDiff {
   return diff;
 }
 
-export function applyStringDiff(diff: StringDiff, target: string[]) {
+/** Apply a diff to an array of string */
+export function apply(diff: StringDiff, target: string[]) {
   let j = 0;
   const res: string[] = [];
   for (let i = 0; i < diff.length; i++, j++) {
@@ -91,7 +93,7 @@ export function applyStringDiff(diff: StringDiff, target: string[]) {
   return res;
 }
 
-export function printStringDiff(title: string, diff: StringDiff) {
+export function print(title: string, diff: StringDiff) {
   log.plain(
     `\n   ${bold(gray(`[${title}]`))} ${bold(red("Deleted"))} / ${
       bold(green("Added"))
@@ -101,17 +103,17 @@ export function printStringDiff(title: string, diff: StringDiff) {
   for (let i = 0; i < diff.length; i++) {
     const current = diff[i];
     if (current.type === DiffType.updated) {
-      print({ type: DiffType.removed, value: current.oldValue });
-      print({ type: DiffType.added, value: current.value });
+      printLine({ type: DiffType.removed, value: current.oldValue });
+      printLine({ type: DiffType.added, value: current.value });
     } else {
-      print(current);
+      printLine(current);
     }
   }
 
   lineBreak();
 }
 
-function print(diff: DiffResult<string>) {
+function printLine(diff: DiffResult<string>) {
   let line: string;
   switch (diff.type) {
     case DiffType.added:

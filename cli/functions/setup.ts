@@ -6,6 +6,7 @@ import { getActiveUser } from "./login.ts";
 import * as config from "../config/config.ts";
 import { promptAndValidate } from "../utilities/interact.ts";
 
+/** Link current directory to an existing module. */
 export async function setup(author?: string, name?: string) {
   const user = await getActiveUser();
 
@@ -28,25 +29,24 @@ export async function setup(author?: string, name?: string) {
     }),
   };
 
-  if (module !== undefined) {
-    const { meta, ignore } = await downloadConfig(module);
-    const project = {
-      meta,
-      ignore,
-      // TODO
-      api: {
-        versions: [],
-        lastPublished: 0,
-        latestVersion: "",
-      },
-      ...module,
-      version: "0.0.0",
-      lastSync: 0,
-      nextAutoSync: 0,
-    };
-    await config.dir.ensure();
-    await updateFiles(meta, project, ignore);
-  }
+  const { meta, ignore } = await downloadConfig(module);
+  const project = {
+    meta,
+    ignore,
+    // TODO: fetch api data
+    api: {
+      versions: [],
+      lastPublished: 0,
+      latestVersion: "",
+    },
+    ...module,
+    version: "0.0.0",
+    lastSync: 0,
+    nextAutoSync: 0,
+  };
+
+  await config.dir.ensure();
+  await updateFiles(meta, project, ignore);
 
   log.info(
     `Linked to ${cyan(`${module.author}/${module.name}`)} (created ${

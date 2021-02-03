@@ -1,4 +1,4 @@
-import { parse, underline } from "../deps.ts";
+import { cyan, parse } from "../deps.ts";
 import { NestCLIError } from "../error.ts";
 import {
   aliasesFromOptions,
@@ -42,12 +42,12 @@ const options: Option[] = [
 
 export const publishCommand: Command = {
   name: "publish",
-  description: "Publishes your module to the nest.land registry",
+  description: "Publish your module to the nest.land registry",
   arguments: [{
     name: "[version]",
-    description: `The version to publish or a release type, ${
-      underline("patch")
-    } by default`,
+    description: `semver tag or one of ${cyan("major")}, ${cyan("minor")}, ${
+      cyan("patch")
+    } (default: ${cyan("patch")})`,
   }],
   options,
   subCommands: {},

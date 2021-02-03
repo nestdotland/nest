@@ -5,6 +5,7 @@ import { lineBreak, log } from "../utilities/log.ts";
 import { ensureUserLogged } from "./login.ts";
 import { promptAndValidate } from "../utilities/interact.ts";
 
+/** Change currently logged in user. */
 export async function switchUser(username?: string) {
   await ensureUserLogged();
 

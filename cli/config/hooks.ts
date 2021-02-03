@@ -6,12 +6,14 @@ import { NestCLIError } from "../error.ts";
 import * as config from "./config.ts";
 import type { Hook } from "../utilities/types.ts";
 
+/** Will execute the pre hook, the action then the post hook */
 export type Hooks = {
   [K in Hook]: (action: () => Promise<unknown>) => Promise<void>;
 };
 
 const prefix = bold(green("$"));
 
+/** A wrapper around hooks */
 export async function getHooks(): Promise<Hooks> {
   await config.local.ensure();
 
@@ -21,11 +23,11 @@ export async function getHooks(): Promise<Hooks> {
 
   for (const key of hook) {
     hooks[key] = async (action) => {
-      const postHook = meta.hooks
-        ? meta.hooks[(`post${key}`) as const]
-        : undefined;
       const preHook = meta.hooks
         ? meta.hooks[(`pre${key}`) as const]
+        : undefined;
+      const postHook = meta.hooks
+        ? meta.hooks[(`post${key}`) as const]
         : undefined;
 
       if (preHook) {
@@ -45,6 +47,7 @@ export async function getHooks(): Promise<Hooks> {
   return hooks as Hooks;
 }
 
+/** Runs the given command, throws if unsuccessful. */
 async function run(command: string) {
   log.plain(prefix, command);
 

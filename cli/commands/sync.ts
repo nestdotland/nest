@@ -8,7 +8,7 @@ import type { Args, Command } from "../utilities/types.ts";
 
 export const syncCommand: Command = {
   name: "sync",
-  description: "Synchronize remote and local configuration.",
+  description: "Synchronize remote and local configuration",
   arguments: [],
   options: mainOptions,
   subCommands: {},

@@ -8,7 +8,7 @@ import type { Args, Command } from "../utilities/types.ts";
 
 export const setupCommand: Command = {
   name: "setup",
-  description: "Link current directory to an existing module.",
+  description: "Link current directory to an existing module",
   arguments: [{
     name: "[author]",
     description: "",

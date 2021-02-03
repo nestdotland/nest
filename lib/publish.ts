@@ -11,6 +11,7 @@ interface PublishOptions {
   wallet?: string;
 }
 
+/** Publish your module to the nest.land registry. */
 export async function publish(
   { module, version, files, token, wallet }: PublishOptions,
 ) {

@@ -29,6 +29,7 @@ export interface PublishOptions {
 
 const MAX_BUNDLE_SIZE = 200;
 
+/** Publish your module to the nest.land registry. */
 export async function publish(
   {
     yes = false,
@@ -92,10 +93,10 @@ export async function publish(
     )
     : new semver.SemVer(rawVersion);
 
-  const wd = Deno.cwd();
-  /* const fileSize = files.map((file) => Deno.stat(join(wd, file))); */
-
   // BUG(oganexon): Deno can get stuck here
+  /* const wd = Deno.cwd();
+  const fileSize = files.map((file) => Deno.stat(join(wd, file))); */
+
   // Deno.lstat can freeze so we need to timeout the function
   /* const settledFileSize = await Promise.allSettled(fileSize.map((p) => {
     return Promise.race([

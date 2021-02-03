@@ -1,4 +1,4 @@
-import { basename, cyan, green } from "../deps.ts";
+import { basename, cyan, green, yellow } from "../deps.ts";
 import { log } from "../utilities/log.ts";
 import * as config from "../config/config.ts";
 import { addToGitIgnore } from "../utilities/git.ts";
@@ -6,6 +6,7 @@ import { setup } from "./setup.ts";
 import { getActiveUser } from "./login.ts";
 import { confirm, prompt, promptAndValidate } from "../utilities/interact.ts";
 
+/** Initiate a new module for the nest.land registry */
 export async function init() {
   const user = await getActiveUser();
 
@@ -24,19 +25,18 @@ export async function init() {
 
   const name = await promptAndValidate({
     message: "Module name",
-    invalidMessage:
-      "The length of a module name must be between 2 and 40 characters.",
+    invalidMessage: `A module name must have length ${yellow("2")} to ${
+      yellow("40")
+    } with characters ${cyan("a-z")}, ${cyan("A-Z")}, ${cyan("0-9")}, ${
+      cyan("_")
+    }, ${cyan("-")}, ${cyan(".")} and ${cyan(":")}.`,
     defaultValue: dirName,
-    validate: (name) => name.length > 1 && name.length < 41,
+    validate: (name) =>
+      name.length > 1 && name.length < 41 &&
+      !!name.match(/^(\d|\w|[_\-:\.])*$/),
   });
 
-  const fullName = await promptAndValidate({
-    message: "Module full name",
-    invalidMessage:
-      "The length of a module name must be longer than 2 characters.",
-    defaultValue: name,
-    validate: (name) => name.length > 1,
-  });
+  const fullName = await prompt("Module full name", name);
 
   const description = await prompt("Description");
 
@@ -68,6 +68,7 @@ export async function init() {
     author: user.name,
     version: "0.0.0",
     lastSync: 0,
+    // TODO: implement auto sync
     nextAutoSync: 0,
   });
   await config.ignore.write(ignoreContent);

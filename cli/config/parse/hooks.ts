@@ -4,11 +4,7 @@ import { log } from "../../utilities/log.ts";
 import { hook, hookPrefix } from "../../utilities/const.ts";
 import type { Hooks, Json } from "../../utilities/types.ts";
 
-export function assertHooks(
-  hooks: Json,
-  file: string,
-  prefix = "",
-): Hooks {
+export function assertHooks(hooks: Json, file: string, prefix = ""): Hooks {
   const { checkType, typeError } = setupCheckType(file);
 
   if (Array.isArray(hooks)) {

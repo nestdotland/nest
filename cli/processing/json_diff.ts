@@ -10,32 +10,32 @@ export type JSONDiff =
   | Map<string, JSONDiff>;
 
 /** Compares two objects and returns a diff */
-export function compareJson(actual: Json, base: Json): JSONDiff {
-  return compare(actual, base);
+export function compare(actual: Json, base: Json): JSONDiff {
+  return compare_(actual, base);
 }
 
 /** Apply a diff to an object */
-export function applyJsonDiff(diff: JSONDiff, target: Json): Json {
+export function apply(diff: JSONDiff, target: Json): Json {
   return applyDiff(diff, target) as Json;
 }
 
 /** Checks if diff contains added, removed, or updated fields */
-export function isJsonUnchanged(diff: JSONDiff): boolean {
+export function isUnchanged(diff: JSONDiff): boolean {
   if (Array.isArray(diff)) {
     for (let i = 0; i < diff.length; i++) {
-      if (!isJsonUnchanged(diff[i])) return false;
+      if (!isUnchanged(diff[i])) return false;
     }
     return true;
   } else if (diff instanceof Map) {
     for (const [_, value] of diff) {
-      if (!isJsonUnchanged(value)) return false;
+      if (!isUnchanged(value)) return false;
     }
     return true;
   }
   return diff.type === DiffType.common;
 }
 
-function compare(actual?: JSONValue, base?: JSONValue): JSONDiff {
+function compare_(actual?: JSONValue, base?: JSONValue): JSONDiff {
   if (actual === undefined) {
     return {
       type: DiffType.removed,
@@ -65,7 +65,7 @@ function compare(actual?: JSONValue, base?: JSONValue): JSONDiff {
         if (
           !equal(LCS[i], actual[actualIndex]) && actualIndex < actual.length
         ) {
-          diff.push(compare(actual[actualIndex], base[baseIndex]));
+          diff.push(compare_(actual[actualIndex], base[baseIndex]));
           actualIndex++;
         } else {
           diff.push({
@@ -106,12 +106,12 @@ function compare(actual?: JSONValue, base?: JSONValue): JSONDiff {
     for (const key in base) {
       const actualValue = actual[key];
       const baseValue = base[key];
-      diff.set(key, compare(actualValue, baseValue));
+      diff.set(key, compare_(actualValue, baseValue));
     }
     for (const key in actual) {
       if (diff.get(key) !== undefined) continue;
       const actualValue = actual[key];
-      diff.set(key, compare(actualValue, undefined));
+      diff.set(key, compare_(actualValue, undefined));
     }
     return diff;
   }
@@ -182,43 +182,43 @@ function applyDiff(
   if (diff.type === DiffType.removed) return undefined;
 }
 
-export function printJsonDiff(title: string, diff: JSONDiff) {
+export function print(title: string, diff: JSONDiff) {
   log.plain(
     `\n   ${bold(gray(`[${title}]`))} ${bold(red("Deleted"))} / ${
       bold(green("Added"))
     }\n`,
   );
 
-  printDiff(diff, "");
+  print_(diff, "");
 
   lineBreak();
 }
 
-function printDiff(diff: JSONDiff, indent: string, key?: string) {
+function print_(diff: JSONDiff, indent: string, key?: string) {
   const newIndent = indent + "  ";
   if (diff instanceof Map) {
     log.plain(`${indent}   ${key ? `${key}: ` : ""}{`);
     for (const [key, value] of diff) {
-      printDiff(value, newIndent, key);
+      print_(value, newIndent, key);
     }
     log.plain(`${indent}   },`);
   } else if (Array.isArray(diff)) {
     log.plain(`${indent}   ${key ? `${key}: ` : ""}[`);
     for (let i = 0; i < diff.length; i++) {
-      printDiff(diff[i], newIndent);
+      print_(diff[i], newIndent);
     }
     log.plain(`${indent}   ],`);
   } else {
     if (diff.type === DiffType.updated) {
-      print({ type: DiffType.removed, value: diff.oldValue }, indent, key);
-      print({ type: DiffType.added, value: diff.value }, indent, key);
+      printLine({ type: DiffType.removed, value: diff.oldValue }, indent, key);
+      printLine({ type: DiffType.added, value: diff.value }, indent, key);
     } else {
-      print(diff, indent, key);
+      printLine(diff, indent, key);
     }
   }
 }
 
-function print(diff: DiffResult<JSONValue>, indent: string, key?: string) {
+function printLine(diff: DiffResult<JSONValue>, indent: string, key?: string) {
   const value = `${indent}${key ? `${key}: ` : ""}${
     Deno.inspect(diff.value, { depth: Infinity, compact: false }).replaceAll(
       "\n",

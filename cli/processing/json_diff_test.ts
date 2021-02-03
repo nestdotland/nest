@@ -1,6 +1,6 @@
 import { assert, assertEquals } from "../test/deps.ts";
 import { Json } from "../utilities/types.ts";
-import { applyJsonDiff, compareJson, isJsonUnchanged } from "./json_diff.ts";
+import * as jsonDiff from "./json_diff.ts";
 
 const obj1: Json = {
   a: "i am unchanged",
@@ -109,10 +109,10 @@ const obj4: Json = {
 };
 
 Deno.test({
-  name: "CLI | json_diff | compareJson",
+  name: "CLI | json_diff | compare",
   fn() {
     assertEquals(
-      compareJson(obj1, obj3),
+      jsonDiff.compare(obj1, obj3),
       new Map<string, unknown>([
         ["a", {
           type: "common",
@@ -216,24 +216,22 @@ Deno.test({
 });
 
 Deno.test({
-  name: "CLI | json_diff | isJsonUnchanged",
+  name: "CLI | json_diff | isUnchanged",
   fn() {
-    const diff1 = compareJson(obj1, obj1);
-    const diff2 = compareJson(obj1, obj2);
-    const diff3 = compareJson(obj2, obj3);
+    const diff1 = jsonDiff.compare(obj1, obj1);
+    const diff2 = jsonDiff.compare(obj1, obj2);
+    const diff3 = jsonDiff.compare(obj2, obj3);
 
-    assert(isJsonUnchanged(diff1), "obj1 vs obj1");
-    assert(isJsonUnchanged(diff2), "obj1 vs obj2");
-    assert(!isJsonUnchanged(diff3), "obj2 vs obj3");
+    assert(jsonDiff.isUnchanged(diff1), "obj1 vs obj1");
+    assert(jsonDiff.isUnchanged(diff2), "obj1 vs obj2");
+    assert(!jsonDiff.isUnchanged(diff3), "obj2 vs obj3");
   },
 });
 
 Deno.test({
-  name: "CLI | json_diff | applyJsonDiff",
+  name: "CLI | json_diff | apply",
   fn() {
-    const diff = compareJson(obj1, obj3);
-
-    const result = applyJsonDiff(diff, obj4);
+    const result = jsonDiff.apply(jsonDiff.compare(obj1, obj3), obj4);
 
     assertEquals(result, {
       a: "new_a",
