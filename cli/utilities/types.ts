@@ -30,7 +30,6 @@ export type Api = {
   lastPublished: number;
 };
 
-/** data.json file */
 export type Project = {
   meta: Meta;
 

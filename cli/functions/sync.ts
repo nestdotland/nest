@@ -24,7 +24,7 @@ export async function sync() {
   const ignore = await config.ignore.read();
   const pendingConfig = downloadConfig(project);
 
-  /** 1 - compare the config in module.json (user editable) and data.json. */
+  /** 1 - compare the config in the meta file (user editable) and in the project file. */
   const metaDiff = compareJson(meta as Json, project.meta as Json);
 
   const metaChanged = isJsonUnchanged(metaDiff);

@@ -8,28 +8,29 @@ import type { Json, UserManager } from "../../utilities/types.ts";
 export const FILE = "users.json";
 export const PATH = join(envHOMEDIR(), DIR_PATH, FILE);
 
-/** Test whether or not the `users.json` file exists by checking with the file system */
+/** Test whether or not the users file exists by checking with the file system */
 export function exists(): Promise<boolean> {
   return exists_(PATH);
 }
 
-/** Ensures that the `users.json` file exists. */
+/** Ensures that the users file exists. */
 export async function ensure(): Promise<void> {
   await ensureFile(PATH);
 }
 
-/** Reads the `users.json` file. */
+/** Reads the users file. */
 export function read(): Promise<string> {
   return Deno.readTextFile(PATH);
 }
 
-/** Reads and parses the `users.json` file. */
+/** Reads and parses the users file. */
 export async function parse(path = PATH): Promise<UserManager> {
   const json = await readJson(path) as Json;
 
   return assertUserManager(json, FILE);
 }
 
+/** Writes a user object to the users file. */
 export async function write(
   content: UserManager,
   path = PATH,

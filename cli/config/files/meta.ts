@@ -7,22 +7,24 @@ import type { Json, Meta } from "../../utilities/types.ts";
 export const FILE = "module.json";
 export const PATH = join(DIR_PATH, FILE);
 
+/** Test whether or not the meta file exists by checking with the file system */
 export function exists(): Promise<boolean> {
   return exists_(PATH);
 }
 
-/** Reads the `module.json` file. */
+/** Reads the meta file. */
 export function read(): Promise<string> {
   return Deno.readTextFile(PATH);
 }
 
-/** Reads and parses the `module.json` file. */
+/** Reads and parses the meta file. */
 export async function parse(path = PATH): Promise<Meta> {
   const json = await readJson(path) as Json;
 
   return assertMeta(json, FILE);
 }
 
+/** Writes a meta object to the meta file. */
 export async function write(
   content: Meta,
   path = PATH,

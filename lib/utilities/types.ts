@@ -11,7 +11,6 @@ export type Hooks = {
   [K in `${HookPrefix}${Hook}`]?: string;
 };
 
-/** module.json file */
 export type Meta = {
   main?: string;
   bin?: string[];

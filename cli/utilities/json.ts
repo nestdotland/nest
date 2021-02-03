@@ -27,7 +27,7 @@ function serialize(
   }
 }
 
-/* Writes an object to a JSON file. */
+/** Writes an object to a JSON file. */
 export async function writeJson(
   filePath: string,
   object: unknown,
