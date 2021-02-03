@@ -14,30 +14,10 @@ import {
   compareString,
   printStringDiff,
 } from "../processing/diff.ts";
-import type { Json, Meta, Module, Project } from "../utilities/types.ts";
+import type { Json, Meta, Project } from "../utilities/types.ts";
 
-export async function sync(module?: Module) {
+export async function sync() {
   const user = await getActiveUser();
-
-  if (module !== undefined) {
-    const { meta, ignore } = await downloadConfig(module);
-    const project = {
-      meta,
-      ignore,
-      api: {
-        versions: [],
-        lastPublished: 0,
-        latestVersion: "",
-      },
-      ...module,
-      version: "0.0.0",
-      lastSync: 0,
-      nextAutoSync: 0,
-    };
-    await config.dir.ensure();
-    await updateFiles(meta, project, ignore);
-    return;
-  }
 
   const project = await config.project.parse();
   const meta = await config.meta.parse();
@@ -114,7 +94,7 @@ export async function isConfigUpToDate(): Promise<boolean> {
   return isJsonUnchanged(diff) && ignore === remote.ignore;
 }
 
-async function updateFiles(
+export async function updateFiles(
   meta: Meta,
   project: Project,
   ignore: string,

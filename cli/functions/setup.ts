@@ -1,7 +1,9 @@
 import { basename, cyan, green } from "../deps.ts";
 import { log } from "../utilities/log.ts";
-import { sync } from "./sync.ts";
+import { updateFiles } from "./sync.ts";
+import { downloadConfig } from "../../lib/api/_todo.ts";
 import { getActiveUser } from "./login.ts";
+import * as config from "../config/config.ts";
 import { promptAndValidate } from "../utilities/interact.ts";
 
 export async function setup(author?: string, name?: string) {
@@ -26,7 +28,25 @@ export async function setup(author?: string, name?: string) {
     }),
   };
 
-  await sync(module);
+  if (module !== undefined) {
+    const { meta, ignore } = await downloadConfig(module);
+    const project = {
+      meta,
+      ignore,
+      // TODO
+      api: {
+        versions: [],
+        lastPublished: 0,
+        latestVersion: "",
+      },
+      ...module,
+      version: "0.0.0",
+      lastSync: 0,
+      nextAutoSync: 0,
+    };
+    await config.dir.ensure();
+    await updateFiles(meta, project, ignore);
+  }
 
   log.info(
     `Linked to ${cyan(`${module.author}/${module.name}`)} (created ${
