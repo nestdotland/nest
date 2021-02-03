@@ -1,5 +1,6 @@
 import {
   bold,
+  cyan,
   delay,
   dim,
   gray,
@@ -23,6 +24,7 @@ export interface PublishOptions {
   dryRun?: boolean;
   gitTag?: boolean;
   pre?: boolean | string;
+  deno?: string;
   version?: string;
   wallet?: string;
 }
@@ -36,6 +38,7 @@ export async function publish(
     dryRun = false,
     gitTag = false,
     pre = false,
+    deno,
     version: rawVersion = "patch",
     wallet,
   }: PublishOptions,
@@ -84,14 +87,26 @@ export async function publish(
 
   const baseVersion = gitTag ? latestTag : project.version;
 
-  const version = isReleaseType
-    ? new semver.SemVer(baseVersion).inc(
-      pre
-        ? `pre${rawVersion}` as semver.ReleaseType
+  const version = project.version === "0.0.0"
+    ? new semver.SemVer("0.1.0")
+    : (isReleaseType
+      ? new semver.SemVer(baseVersion).inc(
+        pre ? `pre${rawVersion}` as semver.ReleaseType
         : rawVersion as semver.ReleaseType,
-      typeof pre === "string" ? pre : undefined,
-    )
-    : new semver.SemVer(rawVersion);
+        typeof pre === "string" ? pre : undefined,
+      )
+      : new semver.SemVer(rawVersion));
+
+  let range: semver.Range | undefined = undefined;
+
+  if (deno) {
+    if (semver.validRange(deno)) {
+      range = new semver.Range(deno);
+    } else {
+      log.error(deno, "is not a valid semantic range.");
+      throw new NestCLIError("Invalid range (publish)");
+    }
+  }
 
   // BUG(oganexon): Deno can get stuck here
   /* const wd = Deno.cwd();
@@ -139,10 +154,14 @@ export async function publish(
 
   if (!await isConfigUpToDate()) {
     log.warning(
-      "Local config is not up to date. You should synchronize by running",
+      "Local config is not up to date. You should synchronize it by running",
       bold(green("nest sync")),
     );
   }
+
+  log.info(
+    `Resulting module: ${cyan(`${project.author}/${project.name}@${version}`)}`,
+  );
 
   if (!yes) {
     const confirmation = await confirm("Proceed with publication ?", false);
@@ -156,8 +175,11 @@ export async function publish(
   if (dryRun) return;
 
   await directPublish(
-    { module: project, version, files, token: user.token, wallet },
+    { module: project, version, files, token: user.token, range, wallet },
   );
+
+  project.version = version.format();
+  config.project.write(project);
 }
 
 function prettyBytes(n: number | null): string {

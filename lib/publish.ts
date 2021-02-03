@@ -9,11 +9,12 @@ interface PublishOptions {
   files: string[];
   token: string;
   wallet?: string;
+  range?: semver.Range;
 }
 
 /** Publish your module to the nest.land registry. */
 export async function publish(
-  { module, version, files, token, wallet }: PublishOptions,
+  { module, version, files, token, range, wallet }: PublishOptions,
 ) {
   const uuid = generateUUID();
   const tar = new Tar();

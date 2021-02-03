@@ -26,17 +26,23 @@ const options: Option[] = [
   },
   {
     flag: "-g, --git-tag",
-    description: "Version will be the latest tag from git",
+    description:
+      "Use the latest git tag as version (ignored if <version> is provided)",
   },
   {
     flag: "--pre",
     argument: "[tag]",
-    description: "Publish version as prerelease",
+    description: "Publish as a prerelease with optional identifier",
+  },
+  {
+    flag: "--deno",
+    argument: "<semver>",
+    description: "Semver range for supported deno versions",
   },
   {
     flag: "-w, --wallet",
     argument: "<path>",
-    description: "Use arweave user wallet for large uploads",
+    description: "Path to custom arweave wallet",
   },
 ];
 
@@ -72,6 +78,7 @@ function assertFlags(args: Args): Flags {
     "dry-run": dryRun,
     "git-tag": gitTag,
     pre,
+    deno,
     wallet,
     ...remainingOptions
   } = args;
@@ -85,6 +92,7 @@ function assertFlags(args: Args): Flags {
   checkType("--dry-run", dryRun, ["boolean"]);
   checkType("--git-tag", gitTag, ["boolean"]);
   checkType("--pre", pre, ["string", "boolean"]);
+  checkType("--deno", pre, ["string"]);
   checkType("--wallet", pre, ["string", "number"]);
   checkType("[version]", version, ["string", "number"]);
 
@@ -96,6 +104,7 @@ function assertFlags(args: Args): Flags {
     dryRun,
     gitTag,
     pre,
+    deno,
     wallet: wallet && `${wallet}`,
   } as Flags;
 }
