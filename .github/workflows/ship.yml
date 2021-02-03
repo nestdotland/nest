@@ -28,7 +28,7 @@ jobs:
           nest setup nest nest -L debug
 
       - name: Publish
-        run: nest publish -Y ${{ github.event.inputs.version }} -L debug
+        run: nest publish ${{ github.event.inputs.version }} -Y -L debug
 
       # TODO(@maximousblk): Add a changelog generator
 

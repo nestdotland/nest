@@ -1,4 +1,3 @@
-import { Command } from "../../utilities/types.ts";
 import { helpCommand } from "../help.ts";
 import { publishCommand } from "../publish.ts";
 import { upgradeCommand } from "../upgrade.ts";
@@ -8,6 +7,8 @@ import { loginCommand } from "../login.ts";
 import { logoutCommand } from "../logout.ts";
 import { switchCommand } from "../switch.ts";
 import { setupCommand } from "../setup.ts";
+
+import type { Command } from "../../utilities/types.ts";
 
 export const mainCommands: Record<string, Command> = {
   [helpCommand.name]: helpCommand,
