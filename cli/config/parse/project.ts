@@ -43,22 +43,18 @@ export function assertProject(
   const { checkType, typeError } = setupCheckType(file);
 
   checkType(`${prefix}$comment`, $comment, ["string"]);
-  checkType(`${prefix}meta`, meta, ["object"], true);
+  if (checkType(`${prefix}meta`, meta, ["object"], true)) {
+    assertMeta(meta, file, `${prefix}meta.`);
+  }
   checkType(`${prefix}ignore`, ignore, ["string"], true);
-  checkType(`${prefix}api`, api, ["object"], true);
+  if (checkType(`${prefix}api`, api, ["object"], true)) {
+    assertApi(api, file, `${prefix}api.`);
+  }
   checkType(`${prefix}name`, name, ["string"], true);
   checkType(`${prefix}author`, author, ["string"], true);
   checkType(`${prefix}version`, version, ["string"], true);
   checkType(`${prefix}lastSync`, lastSync, ["number"], true);
   checkType(`${prefix}nextAutoSync`, nextAutoSync, ["number"], true);
-
-  if (typeof meta === "object" && meta !== null) {
-    assertMeta(meta, file, `${prefix}meta.`);
-  }
-
-  if (typeof api === "object" && api !== null) {
-    assertApi(api, file, `${prefix}api.`);
-  }
 
   if ($comment) delete module.$comment;
 

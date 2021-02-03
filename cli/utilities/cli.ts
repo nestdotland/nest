@@ -107,22 +107,65 @@ export function didYouMean(
 
 type TypeOf = "boolean" | "string" | "number" | "object" | "array";
 
-export function setupCheckType(file = "") {
+interface CheckType {
+  checkType(
+    name: string,
+    value: unknown,
+    type: ["boolean"],
+    required?: boolean,
+  ): value is boolean;
+  checkType(
+    name: string,
+    value: unknown,
+    type: ["string"],
+    required?: boolean,
+  ): value is string;
+  checkType(
+    name: string,
+    value: unknown,
+    type: ["number"],
+    required?: boolean,
+  ): value is number;
+  checkType(
+    name: string,
+    value: unknown,
+    type: ["object"],
+    required?: boolean,
+  ): value is Record<string, unknown>;
+  checkType(
+    name: string,
+    value: unknown,
+    type: ["array"],
+    required?: boolean,
+  ): value is unknown[];
+  checkType(
+    name: string,
+    value: unknown,
+    type: TypeOf[],
+    required?: boolean,
+  ): boolean;
+  typeError(): boolean;
+}
+
+export function setupCheckType(file = ""): CheckType {
   file = file ? bold(file) : "";
   let wrongType = false;
   return {
-    checkType(
+    checkType: function (
       name: string,
       value: unknown,
       type: TypeOf[],
       required = false,
-    ) {
+    ): boolean {
       if (
         !type.reduce(
           (previous: boolean, current: TypeOf) =>
             previous || current === "array"
               ? Array.isArray(value)
-              : typeof value === current,
+              : (current === "object"
+                ? typeof value === "object" && value !== null &&
+                  !Array.isArray(value)
+                : typeof value === current),
           false,
         ) && required && value === undefined
       ) {
@@ -135,8 +178,8 @@ export function setupCheckType(file = "") {
         wrongType = true;
         return false;
       }
-      return true;
-    },
+      return !(required && value === undefined);
+    } as CheckType["checkType"],
     typeError() {
       return wrongType;
     },

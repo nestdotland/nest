@@ -49,7 +49,11 @@ export function assertMeta(meta: Json, file: string, prefix = ""): Meta {
 
   checkType(`${prefix}$schema`, $schema, ["string"]);
   checkType(`${prefix}main`, main, ["string"]);
-  checkType(`${prefix}bin`, bin, ["array"]);
+  if (checkType(`${prefix}bin`, bin, ["array"])) {
+    for (let i = 0; i < bin.length; i++) {
+      checkType(`${prefix}bin[${i}]`, bin[i], ["string"], true);
+    }
+  }
   checkType(`${prefix}fullName`, fullName, ["string"]);
   checkType(`${prefix}description`, description, ["string"]);
   checkType(`${prefix}logo`, logo, ["string"]);
@@ -59,23 +63,13 @@ export function assertMeta(meta: Json, file: string, prefix = ""): Meta {
   checkType(`${prefix}license`, license, ["string"]);
   checkType(`${prefix}unlisted`, unlisted, ["boolean"]);
   checkType(`${prefix}private`, isPrivate, ["boolean"]);
-  checkType(`${prefix}keywords`, keywords, ["array"]);
-  checkType(`${prefix}hooks`, hooks, ["object"]);
-
-  if (typeof hooks === "object" && hooks !== null) {
-    assertHooks(hooks, file, `${prefix}hooks.`);
-  }
-
-  if (Array.isArray(bin)) {
-    for (let i = 0; i < bin.length; i++) {
-      checkType(`${prefix}bin[${i}]`, bin[i], ["string"], true);
-    }
-  }
-
-  if (Array.isArray(keywords)) {
+  if (checkType(`${prefix}keywords`, keywords, ["array"])) {
     for (let i = 0; i < keywords.length; i++) {
       checkType(`${prefix}keywords[${i}]`, keywords[i], ["string"], true);
     }
+  }
+  if (checkType(`${prefix}hooks`, hooks, ["object"])) {
+    assertHooks(hooks, file, `${prefix}hooks.`);
   }
 
   if ($schema) delete meta.$schema;

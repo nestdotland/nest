@@ -9,9 +9,7 @@ export function assertUser(
 ): UserManager {
   const { checkType, typeError } = setupCheckType(file);
 
-  checkType(`${prefix}`, user, ["object"], true);
-
-  if (typeof user === "object" && user !== null && !Array.isArray(user)) {
+  if (checkType(`${prefix}`, user, ["object"], true)) {
     const {
       name,
       token,

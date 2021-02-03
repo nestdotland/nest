@@ -26,9 +26,7 @@ export function assertUserManager(
   limitFields(file, remainingFields, ["$comment", "activeUser", "users,"]);
 
   checkType(`${prefix}activeUser`, activeUser, ["string"], true);
-  checkType(`${prefix}users`, users, ["array"], true);
-
-  if (Array.isArray(users)) {
+  if (checkType(`${prefix}users`, users, ["array"], true)) {
     for (let i = 0; i < users.length; i++) {
       assertUser(users[i], file, `${prefix}users[${i}].`);
     }
