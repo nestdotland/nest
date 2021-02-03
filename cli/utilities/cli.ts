@@ -178,7 +178,7 @@ export function setupCheckType(file = ""): CheckType {
         wrongType = true;
         return false;
       }
-      return !(required && value === undefined);
+      return value !== undefined;
     } as CheckType["checkType"],
     typeError() {
       return wrongType;

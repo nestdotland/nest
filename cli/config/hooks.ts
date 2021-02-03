@@ -1,6 +1,6 @@
 import { bold, green } from "../deps.ts";
 import { exec } from "../utilities/exec.ts";
-import { log } from "../utilities/log.ts";
+import { lineBreak, log } from "../utilities/log.ts";
 import { hook } from "../utilities/const.ts";
 import { NestCLIError } from "../error.ts";
 import * as config from "./config.ts";
@@ -30,11 +30,13 @@ export async function getHooks(): Promise<Hooks> {
 
       if (preHook) {
         await run(preHook);
+        lineBreak();
       }
 
       await action();
 
       if (postHook) {
+        lineBreak();
         await run(postHook);
       }
     };

@@ -1,3 +1,5 @@
+import { green } from "../deps.ts";
+import { log } from "./log.ts";
 import { NestCLIError } from "../error.ts";
 
 type Replacer = (key: string, value: unknown) => unknown;
@@ -20,7 +22,7 @@ function serialize(
     );
     return `${jsonString}\n`;
   } catch (err) {
-    err.message = `${filePath}: ${err.message}`;
+    err.message = `${green(filePath)}: ${err.message}`;
     throw err;
   }
 }
@@ -48,7 +50,12 @@ export async function readJson(filePath: string): Promise<unknown> {
   try {
     return JSON.parse(content);
   } catch (err) {
-    err.message = `${filePath}: ${err.message}`;
-    throw err instanceof SyntaxError ? new NestCLIError(err.message) : err;
+    err.message = `${green(filePath)}: ${err.message}`;
+    if (err instanceof SyntaxError) {
+      log.error(`Syntax error in ${err.message}`);
+      throw new NestCLIError(err.message);
+    } else {
+      throw err;
+    }
   }
 }
