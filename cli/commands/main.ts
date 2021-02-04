@@ -1,15 +1,17 @@
 import { parse } from "../deps.ts";
 import {
   handleError,
+  lineBreak,
   log,
   setupLogLevel,
   writeLogFile,
 } from "../utilities/log.ts";
 import { NestCLIError, NestError } from "../error.ts";
 import { aliasesFromOptions, setupCheckType } from "../utilities/cli.ts";
+import { version as currentVersion } from "../version.ts";
+import { help as displayHelp } from "../functions/help.ts";
+import { didYouMean } from "../utilities/cli.ts";
 import { mainOptions } from "./main/options.ts";
-import { mainCommands } from "./main/commands.ts";
-import { main } from "../functions/main.ts";
 
 import type { Args, Command } from "../utilities/types.ts";
 
@@ -22,7 +24,7 @@ export const mainCommand: Command = {
     name: "[command]",
     description: "A command to run, help by default.",
   }],
-  subCommands: mainCommands,
+  subCommands: new Map(),
   action,
 };
 
@@ -59,6 +61,41 @@ export async function action(args = Deno.args) {
 
     await handleError(err instanceof Error ? err : new Error(err), logToFile);
     Deno.exit(2);
+  }
+}
+
+/** Command handler */
+async function main(
+  command?: string,
+  logLevel?: string,
+  version?: boolean,
+  help?: unknown,
+) {
+  if (version) {
+    log.plain(currentVersion);
+    return;
+  }
+
+  lineBreak();
+
+  if (help) {
+    displayHelp(mainCommand, [command ?? ""]);
+    return;
+  }
+
+  setupLogLevel(logLevel);
+
+  if (command) {
+    const subCommands = mainCommand.subCommands;
+    if (subCommands.has(command)) {
+      await subCommands.get(command)!.action();
+    } else {
+      didYouMean([...mainCommand.subCommands.keys()], [command]);
+      throw new NestCLIError("Unknown command");
+    }
+  } else {
+    // default action
+    displayHelp(mainCommand);
   }
 }
 

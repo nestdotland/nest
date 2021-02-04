@@ -1,6 +1,7 @@
 import { parse } from "../deps.ts";
 import { limitArgs, limitOptions } from "../utilities/cli.ts";
 import { mainOptions } from "./main/options.ts";
+import { mainCommand } from "./main.ts";
 import { init } from "../functions/init.ts";
 
 import type { Args, Command } from "../utilities/types.ts";
@@ -10,9 +11,11 @@ export const initCommand: Command = {
   description: "Initiate a new module for the nest.land registry",
   arguments: [],
   options: mainOptions,
-  subCommands: {},
+  subCommands: new Map(),
   action,
 };
+
+mainCommand.subCommands.set(initCommand.name, initCommand);
 
 export async function action(args = Deno.args) {
   assertFlags(parse(args));

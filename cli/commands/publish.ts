@@ -6,9 +6,10 @@ import {
   limitOptions,
   setupCheckType,
 } from "../utilities/cli.ts";
-import { mainOptions } from "./main/options.ts";
-import { publish } from "../functions/publish.ts";
 import { getHooks } from "../config/hooks.ts";
+import { mainOptions } from "./main/options.ts";
+import { mainCommand } from "./main.ts";
+import { publish } from "../functions/publish.ts";
 
 import type { Args, Command, Option } from "../utilities/types.ts";
 import type { PublishOptions as Flags } from "../functions/publish.ts";
@@ -60,9 +61,11 @@ export const publishCommand: Command = {
     } (default: ${cyan("patch")})`,
   }],
   options,
-  subCommands: {},
+  subCommands: new Map(),
   action,
 };
+
+mainCommand.subCommands.set(publishCommand.name, publishCommand);
 
 export async function action(args = Deno.args) {
   const flags = assertFlags(parse(

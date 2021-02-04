@@ -51,7 +51,7 @@ export async function publish(
 
   log.info("Found", files.length, "files.");
 
-  const version = await computeVersion(
+  const version = await resolveVersion(
     rawVersion ?? "patch",
     project.version,
     pre,
@@ -152,7 +152,7 @@ export async function publish(
   config.project.write(project);
 }
 
-export async function computeVersion(
+export async function resolveVersion(
   rawVersion: string,
   projectVersion: string,
   pre?: boolean | string,

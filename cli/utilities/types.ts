@@ -20,7 +20,7 @@ export interface Command {
   description: string;
   arguments: Argument[];
   options: Option[];
-  subCommands: Record<string, Command>;
+  subCommands: Map<string, Command>;
   action: (args?: string[]) => Promise<void> | void;
 }
 

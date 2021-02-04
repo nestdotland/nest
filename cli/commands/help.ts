@@ -15,9 +15,11 @@ export const helpCommand: Command = {
     description: "A command",
   }],
   options: mainOptions,
-  subCommands: {},
+  subCommands: new Map(),
   action,
 };
+
+mainCommand.subCommands.set(helpCommand.name, helpCommand);
 
 export function action() {
   const { commands } = assertFlags(parse(Deno.args));

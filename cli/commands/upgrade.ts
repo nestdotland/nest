@@ -2,6 +2,7 @@ import { parse } from "../deps.ts";
 import { NestCLIError } from "../error.ts";
 import { limitArgs, limitOptions, setupCheckType } from "../utilities/cli.ts";
 import { mainOptions } from "./main/options.ts";
+import { mainCommand } from "./main.ts";
 import { upgrade } from "../functions/upgrade.ts";
 
 import type { Args, Command } from "../utilities/types.ts";
@@ -14,9 +15,11 @@ export const upgradeCommand: Command = {
     description: "A given version, the latest by default",
   }],
   options: mainOptions,
-  subCommands: {},
+  subCommands: new Map(),
   action,
 };
+
+mainCommand.subCommands.set(upgradeCommand.name, upgradeCommand);
 
 export async function action(args = Deno.args) {
   const { version } = assertFlags(parse(args));

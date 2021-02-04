@@ -7,14 +7,13 @@ import type { Command } from "../utilities/types.ts";
 export function help(command: Command, names: string[] = []): void {
   // current command
   const name = names[0];
-  if (name) {
-    if (name in command.subCommands) {
-      // if sub-command
+  if (name && command.subCommands.size > 0) {
+    if (command.subCommands.has(name)) {
       if (names[1]) {
         names.shift();
-        return help(command.subCommands[name], names);
+        return help(command.subCommands.get(name)!, names);
       } else {
-        printHelp(command.subCommands[name]);
+        return printHelp(command.subCommands.get(name)!);
       }
     } else {
       log.error(underline(name), "is not valid command name.");
@@ -26,7 +25,6 @@ export function help(command: Command, names: string[] = []): void {
       throw new NestCLIError("Invalid command name (help)");
     }
   } else {
-    // root command help
     printHelp(command);
   }
 }
@@ -61,20 +59,17 @@ function getArgs(command: Command) {
 
 function getCommands(command: Command) {
   let commands = "";
-  if (Object.keys(command.subCommands).length > 0) {
+  if (command.subCommands.size > 0) {
     commands += `${underline("Commands:")}\n\n`;
-    for (const key in command.subCommands) {
-      if (Object.prototype.hasOwnProperty.call(command.subCommands, key)) {
-        const subCommand = command.subCommands[key];
-        commands += `  ${
-          sprintf(
-            "%-39s",
-            `${bold(subCommand.name)} ${
-              subCommand.arguments.map((arg) => arg.name).join(" ")
-            }`,
-          )
-        } ${subCommand.description.replaceAll("\n", sprintf("\n%33s", ""))}\n`;
-      }
+    for (const [_, subCommand] of command.subCommands) {
+      commands += `  ${
+        sprintf(
+          "%-39s",
+          `${bold(subCommand.name)} ${
+            subCommand.arguments.map((arg) => arg.name).join(" ")
+          }`,
+        )
+      } ${subCommand.description.replaceAll("\n", sprintf("\n%33s", ""))}\n`;
     }
     commands += "\n";
   }
