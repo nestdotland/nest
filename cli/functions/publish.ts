@@ -152,7 +152,7 @@ export async function publish(
   config.project.write(project);
 }
 
-async function computeVersion(
+export async function computeVersion(
   rawVersion: string,
   projectVersion: string,
   pre?: boolean | string,
@@ -196,15 +196,22 @@ async function computeVersion(
 
   const baseVersion = gitTag ? latestTag : projectVersion;
 
-  return projectVersion === "0.0.0"
-    ? new semver.SemVer("0.1.0")
-    : (isReleaseType
-      ? new semver.SemVer(baseVersion).inc(
-        pre ? `pre${rawVersion}` as semver.ReleaseType
-        : rawVersion as semver.ReleaseType,
+  if (projectVersion === "0.0.0") return new semver.SemVer("0.1.0");
+  if (isReleaseType) {
+    // raw version is a release type
+    return new semver.SemVer(baseVersion)
+      .inc(
+        (pre ? `pre${rawVersion}` : rawVersion) as semver.ReleaseType,
         typeof pre === "string" ? pre : undefined,
-      )
-      : new semver.SemVer(rawVersion));
+      );
+  } else {
+    if (pre) {
+      return new semver.SemVer(rawVersion)
+        .inc("pre", typeof pre === "string" ? pre : undefined);
+    } else {
+      return new semver.SemVer(rawVersion);
+    }
+  }
 }
 
 function prettyBytes(n: number | null): string {
