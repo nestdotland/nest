@@ -1,6 +1,6 @@
 # Nest CLI
 
-Nest's afficial CLI to manage your modules
+Nest's official CLI to manage your modules
 
 ## Getting started
 

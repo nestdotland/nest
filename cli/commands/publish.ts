@@ -44,6 +44,10 @@ const options: Option[] = [
     argument: "<path>",
     description: "Path to custom arweave wallet",
   },
+  {
+    flag: "--unlisted",
+    description: "Publish as an unlisted version",
+  },
 ];
 
 export const publishCommand: Command = {
@@ -80,6 +84,7 @@ function assertFlags(args: Args): Flags {
     pre,
     deno,
     wallet,
+    unlisted,
     ...remainingOptions
   } = args;
 
@@ -92,8 +97,9 @@ function assertFlags(args: Args): Flags {
   checkType("--dry-run", dryRun, ["boolean"]);
   checkType("--git-tag", gitTag, ["boolean"]);
   checkType("--pre", pre, ["string", "boolean"]);
-  checkType("--deno", pre, ["string"]);
-  checkType("--wallet", pre, ["string", "number"]);
+  checkType("--deno", deno, ["string"]);
+  checkType("--wallet", wallet, ["string", "number"]);
+  checkType("--unlisted", unlisted, ["boolean"]);
   checkType("[version]", version, ["string", "number"]);
 
   if (typeError()) throw new NestCLIError("Flags: Invalid type");
@@ -106,5 +112,6 @@ function assertFlags(args: Args): Flags {
     pre,
     deno,
     wallet: wallet && `${wallet}`,
+    unlisted,
   } as Flags;
 }

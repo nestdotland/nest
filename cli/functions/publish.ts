@@ -27,6 +27,7 @@ export interface PublishOptions {
   deno?: string;
   version?: string;
   wallet?: string;
+  unlisted?: boolean;
 }
 
 const MAX_BUNDLE_SIZE = 200;
@@ -39,8 +40,9 @@ export async function publish(
     gitTag = false,
     pre = false,
     deno,
-    version: rawVersion = "patch",
+    version: rawVersion,
     wallet,
+    unlisted,
   }: PublishOptions,
 ): Promise<void> {
   const user = await getActiveUser();
@@ -49,53 +51,12 @@ export async function publish(
 
   log.info("Found", files.length, "files.");
 
-  const isReleaseType = ["patch", "minor", "major"].includes(rawVersion);
-
-  if (!isReleaseType && !semver.valid(rawVersion)) {
-    log.error(rawVersion, "is not a valid semantic version.");
-    throw new NestCLIError("Invalid version (publish)");
-  }
-
-  if (!semver.valid(project.version)) {
-    log.error(
-      "The project version was altered in the file",
-      underlineBold(config.project.FILE),
-      "Report this issue.",
-    );
-    throw new NestCLIError("Invalid project version (publish)");
-  }
-
-  let latestTag = "";
-
-  if (gitTag) {
-    if (!await isGitRepository()) {
-      log.error(
-        bold("--git-tag"),
-        "option was provided but the current directory is not a git repository.",
-      );
-      throw new NestCLIError("Not a git repository (publish)");
-    }
-    latestTag = await getLatestTag();
-    if (latestTag === "") {
-      log.error(
-        bold("--git-tag"),
-        "option was provided but the current repository doesn't contain any tag",
-      );
-      throw new NestCLIError("No git tag (publish)");
-    }
-  }
-
-  const baseVersion = gitTag ? latestTag : project.version;
-
-  const version = project.version === "0.0.0"
-    ? new semver.SemVer("0.1.0")
-    : (isReleaseType
-      ? new semver.SemVer(baseVersion).inc(
-        pre ? `pre${rawVersion}` as semver.ReleaseType
-        : rawVersion as semver.ReleaseType,
-        typeof pre === "string" ? pre : undefined,
-      )
-      : new semver.SemVer(rawVersion));
+  const version = await computeVersion(
+    rawVersion ?? "patch",
+    project.version,
+    pre,
+    rawVersion ? false : gitTag,
+  );
 
   let range: semver.Range | undefined = undefined;
 
@@ -109,6 +70,7 @@ export async function publish(
   }
 
   // BUG(oganexon): Deno can get stuck here
+
   /* const wd = Deno.cwd();
   const fileSize = files.map((file) => Deno.stat(join(wd, file))); */
 
@@ -175,11 +137,74 @@ export async function publish(
   if (dryRun) return;
 
   await directPublish(
-    { module: project, version, files, token: user.token, range, wallet },
+    {
+      module: project,
+      version,
+      files,
+      token: user.token,
+      deno: range,
+      wallet,
+      unlisted,
+    },
   );
 
   project.version = version.format();
   config.project.write(project);
+}
+
+async function computeVersion(
+  rawVersion: string,
+  projectVersion: string,
+  pre?: boolean | string,
+  gitTag?: boolean,
+): Promise<semver.SemVer> {
+  const isReleaseType = ["patch", "minor", "major"].includes(rawVersion);
+
+  if (!isReleaseType && !semver.valid(rawVersion)) {
+    log.error(rawVersion, "is not a valid semantic version.");
+    throw new NestCLIError("Invalid version (publish)");
+  }
+
+  if (!semver.valid(projectVersion)) {
+    log.error(
+      "The project version was altered in the file",
+      underlineBold(config.project.FILE),
+      "Report this issue.",
+    );
+    throw new NestCLIError("Invalid project version (publish)");
+  }
+
+  let latestTag = "";
+
+  if (gitTag) {
+    if (!await isGitRepository()) {
+      log.error(
+        bold("--git-tag"),
+        "option was provided but the current directory is not a git repository.",
+      );
+      throw new NestCLIError("Not a git repository (publish)");
+    }
+    latestTag = await getLatestTag();
+    if (latestTag === "") {
+      log.error(
+        bold("--git-tag"),
+        "option was provided but the current repository doesn't contain any tag",
+      );
+      throw new NestCLIError("No git tag (publish)");
+    }
+  }
+
+  const baseVersion = gitTag ? latestTag : projectVersion;
+
+  return projectVersion === "0.0.0"
+    ? new semver.SemVer("0.1.0")
+    : (isReleaseType
+      ? new semver.SemVer(baseVersion).inc(
+        pre ? `pre${rawVersion}` as semver.ReleaseType
+        : rawVersion as semver.ReleaseType,
+        typeof pre === "string" ? pre : undefined,
+      )
+      : new semver.SemVer(rawVersion));
 }
 
 function prettyBytes(n: number | null): string {
