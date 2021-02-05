@@ -12,10 +12,10 @@ export const loginCommand: Command = {
   description: "Add an existing user account",
   arguments: [{
     name: "[username]",
-    description: "",
+    description: "A username",
   }, {
     name: "[token]",
-    description: "",
+    description: "A login token",
   }],
   options: mainOptions,
   subCommands: new Map(),

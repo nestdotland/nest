@@ -12,7 +12,7 @@ export const helpCommand: Command = {
   description: "Show this help or the help of a sub-command",
   arguments: [{
     name: "[...command]",
-    description: "A command",
+    description: "A command or a sub-command",
   }],
   options: mainOptions,
   subCommands: new Map(),

@@ -12,7 +12,7 @@ export const switchCommand: Command = {
   description: "Change currently logged in user",
   arguments: [{
     name: "[username]",
-    description: "",
+    description: "A username",
   }],
   options: mainOptions,
   subCommands: new Map(),

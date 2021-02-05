@@ -12,7 +12,7 @@ export const upgradeCommand: Command = {
   description: "Upgrade nest cli to the given version",
   arguments: [{
     name: "[version]",
-    description: "A given version, the latest by default",
+    description: "A given semver version, the latest by default",
   }],
   options: mainOptions,
   subCommands: new Map(),

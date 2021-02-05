@@ -12,10 +12,10 @@ export const setupCommand: Command = {
   description: "Link current directory to an existing module",
   arguments: [{
     name: "[author]",
-    description: "",
+    description: "A module author",
   }, {
     name: "[module]",
-    description: "",
+    description: "A module name",
   }],
   options: mainOptions,
   subCommands: new Map(),
