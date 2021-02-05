@@ -78,10 +78,11 @@ function getCommands(command: Command) {
 
 function getOption(command: Command) {
   return `${underline("Options:")}\n\n${
-    command.options.map((option) =>
-      `  ${
+    command.options.map((option, i) =>
+      // line separation with global options
+      `${i === 5 ? "\n" : ""}  ${
         sprintf("%-40s", `${option.flag} ${magenta(option.argument || "")}`)
       } ${option.description.replaceAll("\n", sprintf("\n%28s", ""))}`
     ).join("\n")
-  }\n`;
+  }`;
 }

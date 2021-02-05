@@ -7,8 +7,7 @@ import {
   setupCheckType,
 } from "../utilities/cli.ts";
 import { getHooks } from "../config/hooks.ts";
-import { mainOptions } from "./main/options.ts";
-import { mainCommand } from "./main.ts";
+import { mainCommand, mainOptions } from "./main.ts";
 import { publish } from "../functions/publish.ts";
 
 import type { Args, Command, Option } from "../utilities/types.ts";

@@ -1,8 +1,7 @@
 import { parse } from "../deps.ts";
 import { limitArgs, limitOptions } from "../utilities/cli.ts";
-import { mainOptions } from "./main/options.ts";
 import { getHooks } from "../config/hooks.ts";
-import { mainCommand } from "./main.ts";
+import { mainCommand, mainOptions } from "./main.ts";
 import { sync } from "../functions/sync.ts";
 
 import type { Args, Command } from "../utilities/types.ts";

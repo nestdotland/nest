@@ -1,8 +1,7 @@
 import { parse } from "../deps.ts";
 import { NestCLIError } from "../error.ts";
 import { limitArgs, limitOptions, setupCheckType } from "../utilities/cli.ts";
-import { mainOptions } from "./main/options.ts";
-import { mainCommand } from "./main.ts";
+import { mainCommand, mainOptions } from "./main.ts";
 import { upgrade } from "../functions/upgrade.ts";
 
 import type { Args, Command } from "../utilities/types.ts";

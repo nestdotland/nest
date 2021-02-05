@@ -1,4 +1,4 @@
-import { parse } from "../deps.ts";
+import { cyan, parse } from "../deps.ts";
 import {
   handleError,
   lineBreak,
@@ -11,9 +11,35 @@ import { aliasesFromOptions, setupCheckType } from "../utilities/cli.ts";
 import { version as currentVersion } from "../version.ts";
 import { help as displayHelp } from "../functions/help.ts";
 import { didYouMean } from "../utilities/cli.ts";
-import { mainOptions } from "./main/options.ts";
 
-import type { Args, Command } from "../utilities/types.ts";
+import type { Args, Command, Option } from "../utilities/types.ts";
+
+export const mainOptions: Option[] = [
+  {
+    flag: "-h, --help",
+    description: "Show this help",
+  },
+  {
+    flag: "-V, --version",
+    description: "Display version number",
+  },
+  {
+    flag: "-L, --log-level",
+    argument: "<level>",
+    description: `Set log level, ${cyan("info")} by default`,
+  },
+  {
+    flag: "-l, --log",
+    argument: "<path>",
+    description: `Specify filepath to output logs, ${
+      cyan("nest-debug.log")
+    } by default`,
+  },
+  {
+    flag: "-G, --gui",
+    description: "Perform the task in the gui (not implemented yet)",
+  },
+];
 
 export const mainCommand: Command = {
   name: "",
