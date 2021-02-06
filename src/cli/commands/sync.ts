@@ -8,7 +8,8 @@ import { downloadConfig, uploadConfig } from "../../mod/api/_todo.ts";
 import * as config from "../config/config.ts";
 import * as diff from "../processing/diff.ts";
 import * as jsonDiff from "../processing/json_diff.ts";
-import type { Json, Meta, Project } from "../utils/types.ts";
+import { updateFiles } from "../config/utils.ts";
+import type { Json, Meta } from "../utils/types.ts";
 
 import type { Args, Command } from "../utils/types.ts";
 
@@ -109,29 +110,6 @@ export async function sync() {
     // 2.B.3 - upload the final result to the api
     await uploadConfig(project, newMeta, newIgnoreJoined, user.token);
   }
-}
-
-export async function isConfigUpToDate(): Promise<boolean> {
-  const meta = await config.meta.parse();
-  const project = await config.project.parse();
-  const ignore = await config.ignore.read();
-  const remote = await downloadConfig(project);
-
-  const diff = jsonDiff.compare(meta as Json, remote.meta as Json);
-  return jsonDiff.isUnchanged(diff) && ignore === remote.ignore;
-}
-
-export async function updateFiles(
-  meta: Meta,
-  project: Project,
-  ignore: string,
-): Promise<void> {
-  project.meta = meta;
-  project.lastSync = new Date().getTime();
-  await config.meta.write(meta);
-  await config.project.write(project);
-  await config.ignore.write(ignore);
-  log.info("Successfully updated config !");
 }
 
 function splitLines(text: string): string[] {

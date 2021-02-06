@@ -20,7 +20,7 @@ import { lineBreak, log } from "../utils/log.ts";
 import { resolveVersion } from "../processing/version.ts";
 import { confirm } from "../utils/interact.ts";
 import { publish as directPublish } from "../../mod/publish.ts";
-import { isConfigUpToDate } from "./sync.ts";
+import { isConfigUpToDate } from "../config/utils.ts";
 import { prettyBytes } from "../utils/number.ts";
 import * as config from "../config/config.ts";
 

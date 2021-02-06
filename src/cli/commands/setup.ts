@@ -4,7 +4,7 @@ import { setupCheckType } from "../processing/check_type.ts";
 import { NestCLIError } from "../utils/error.ts";
 import { mainCommand, mainOptions } from "./main.ts";
 import { log } from "../utils/log.ts";
-import { updateFiles } from "./sync.ts";
+import { updateFiles } from "../config/utils.ts";
 import { downloadConfig } from "../../mod/api/_todo.ts";
 import * as config from "../config/config.ts";
 import { promptAndValidate } from "../utils/interact.ts";

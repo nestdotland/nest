@@ -1,4 +1,5 @@
 /** Register commands */
+import "./src/cli/commands//config/config.ts";
 import "./src/cli/commands/help.ts";
 import "./src/cli/commands/init.ts";
 import "./src/cli/commands/login.ts";
