@@ -1,5 +1,5 @@
-import { assertEquals } from "../../test/deps.ts";
-import { resolveVersion } from "./publish.ts";
+import { assertEquals } from "../test/deps.ts";
+import { resolveVersion } from "./version.ts";
 
 Deno.test({
   name: "CLI | publish | resolveVersion",

@@ -1,4 +1,5 @@
-import { limitFields, setupCheckType } from "../../utils/cli.ts";
+import { limitFields } from "../../utils/cli.ts";
+import { setupCheckType } from "../../processing/check_type.ts";
 import { NestCLIError } from "../../utils/error.ts";
 import { assertHooks } from "./hooks.ts";
 import { log } from "../../utils/log.ts";

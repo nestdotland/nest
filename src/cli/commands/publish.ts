@@ -1,17 +1,41 @@
-import { cyan, parse } from "../deps.ts";
-import { NestCLIError } from "../utils/error.ts";
 import {
-  aliasesFromOptions,
-  limitArgs,
-  limitOptions,
-  setupCheckType,
-} from "../utils/cli.ts";
+  bold,
+  cyan,
+  delay,
+  dim,
+  gray,
+  green,
+  join,
+  parse,
+  red,
+  semver,
+  underline,
+} from "../deps.ts";
+import { NestCLIError } from "../utils/error.ts";
+import { aliasesFromOptions, limitArgs, limitOptions } from "../utils/cli.ts";
+import { setupCheckType } from "../processing/check_type.ts";
 import { getHooks } from "../config/hooks.ts";
 import { mainCommand, mainOptions } from "./main.ts";
-import { publish } from "./functions/publish.ts";
+import { lineBreak, log } from "../utils/log.ts";
+import { resolveVersion } from "../processing/version.ts";
+import { confirm } from "../utils/interact.ts";
+import { publish as directPublish } from "../../mod/publish.ts";
+import { isConfigUpToDate } from "./sync.ts";
+import { prettyBytes } from "../utils/number.ts";
+import * as config from "../config/config.ts";
 
 import type { Args, Command, Option } from "../utils/types.ts";
-import type { PublishOptions as Flags } from "./functions/publish.ts";
+
+interface Flags {
+  yes?: boolean;
+  dryRun?: boolean;
+  gitTag?: boolean;
+  pre?: boolean | string;
+  deno?: string;
+  version?: string;
+  wallet?: string;
+  unlisted?: boolean;
+}
 
 const options: Option[] = [
   ...mainOptions,
@@ -79,7 +103,7 @@ export async function action(args = Deno.args) {
 
 function assertFlags(args: Args): Flags {
   const {
-    _: [_, version, ...remainingArgs],
+    _: [version, ...remainingArgs],
     yes,
     "dry-run": dryRun,
     "git-tag": gitTag,
@@ -116,4 +140,128 @@ function assertFlags(args: Args): Flags {
     wallet: wallet && `${wallet}`,
     unlisted,
   } as Flags;
+}
+
+// **************** logic ****************
+
+const MAX_BUNDLE_SIZE = 200;
+
+/** Publish your module to the nest.land registry. */
+export async function publish(
+  {
+    yes = false,
+    dryRun = false,
+    gitTag = false,
+    pre = false,
+    deno,
+    version: rawVersion,
+    wallet,
+    unlisted,
+  }: Flags,
+): Promise<void> {
+  const user = await config.users.getActive();
+  const project = await config.project.parse();
+  const files = await config.ignore.parse();
+
+  log.info("Found", files.length, "files.");
+
+  const version = await resolveVersion(
+    rawVersion ?? "patch",
+    project.version,
+    pre,
+    rawVersion ? false : gitTag,
+  );
+
+  let range: semver.Range | undefined = undefined;
+
+  if (deno) {
+    if (semver.validRange(deno)) {
+      range = new semver.Range(deno);
+    } else {
+      log.error(deno, "is not a valid semantic range.");
+      throw new NestCLIError("Invalid range (publish)");
+    }
+  }
+
+  // BUG(oganexon): Deno can get stuck here
+
+  /* const wd = Deno.cwd();
+  const fileSize = files.map((file) => Deno.stat(join(wd, file))); */
+
+  // Deno.lstat can freeze so we need to timeout the function
+  /* const settledFileSize = await Promise.allSettled(fileSize.map((p) => {
+    return Promise.race([
+      (async () => {
+        const file = await p;
+        return file.size;
+      })(),
+      (async () => {
+        await delay(1000);
+        return null;
+      })(),
+    ]);
+  }));
+  const totalSize = settledFileSize.reduce(
+    (previous, current) =>
+      previous + (current.status === "fulfilled" ? current.value ?? 0 : 0),
+    0,
+  ); */
+
+  const filesToPublish = files.reduce(
+    (previous, current, index) => {
+      /* const fileSize = settledFileSize[index];
+      const size = fileSize.status === "fulfilled"
+        ? gray(dim(`(${prettyBytes(fileSize.value)})`))
+        : red(`Error while computing file size: ${fileSize.reason}`); */
+      return `${previous}\n     - ${dim(current)}  ${"" /* size */}`;
+    },
+    "Files to publish:",
+  );
+  log.info(filesToPublish);
+  lineBreak();
+
+  /* if (totalSize > MAX_BUNDLE_SIZE * 1e6 && !wallet) {
+    log.warning(
+      `Total ${
+        underline("estimated")
+      } file size exceed ${MAX_BUNDLE_SIZE}Mb. Use your wallet if greater.`,
+    );
+  } */
+
+  if (!await isConfigUpToDate()) {
+    log.warning(
+      "Local config is not up to date. You should synchronize it by running",
+      bold(green("nest sync")),
+    );
+  }
+
+  log.info(
+    `Resulting module: ${cyan(`${project.author}/${project.name}@${version}`)}`,
+  );
+
+  if (!yes) {
+    const confirmation = await confirm("Proceed with publication ?", false);
+
+    if (!confirmation) {
+      log.info("Publish cancelled.");
+      return;
+    }
+  }
+
+  if (dryRun) return;
+
+  await directPublish(
+    {
+      module: project,
+      version,
+      files,
+      token: user.token,
+      deno: range,
+      wallet,
+      unlisted,
+    },
+  );
+
+  project.version = version.format();
+  config.project.write(project);
 }

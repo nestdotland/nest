@@ -1,4 +1,5 @@
-import { limitFields, setupCheckType } from "../../utils/cli.ts";
+import { limitFields } from "../../utils/cli.ts";
+import { setupCheckType } from "../../processing/check_type.ts";
 import { NestCLIError } from "../../utils/error.ts";
 import { log } from "../../utils/log.ts";
 import { assertUser } from "./user.ts";
@@ -26,9 +27,9 @@ export function assertUserManager(
   limitFields(file, remainingFields, ["$comment", "activeUser", "users,"]);
 
   checkType(`${prefix}activeUser`, activeUser, ["string"], true);
-  if (checkType(`${prefix}users`, users, ["array"], true)) {
-    for (let i = 0; i < users.length; i++) {
-      assertUser(users[i], file, `${prefix}users[${i}].`);
+  if (checkType(`${prefix}users`, users, ["object"], true)) {
+    for (const key in users) {
+      assertUser(users[key], file, `${prefix}users.${key}.`);
     }
   }
 

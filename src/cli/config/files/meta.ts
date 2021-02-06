@@ -2,6 +2,7 @@ import { exists as exists_, join } from "../../deps.ts";
 import { readJson, writeJson } from "../../utils/json.ts";
 import { PATH as DIR_PATH } from "./nest.ts";
 import { assertMeta } from "../parse/meta.ts";
+import { version } from "../../../version.ts";
 import type { Json, Meta } from "../../utils/types.ts";
 
 export const FILE = "module.json";
@@ -30,7 +31,9 @@ export async function write(
   path = PATH,
 ): Promise<void> {
   await writeJson(path, {
-    $schema: "../cli/module.json",
+    // $schema: `https://nest.land/-/nest@${version}/src/config/module.schema.json`,
+    $schema:
+      "https://raw.githubusercontent.com/nestdotland/nest/main/src/cli/config/module.schema.json",
     ...content,
   }, { spaces: 2 });
 }

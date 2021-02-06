@@ -7,12 +7,22 @@ import {
   writeLogFile,
 } from "../utils/log.ts";
 import { NestCLIError, NestError } from "../utils/error.ts";
-import { aliasesFromOptions, setupCheckType } from "../utils/cli.ts";
+import { aliasesFromOptions } from "../utils/cli.ts";
 import { version as currentVersion } from "../../version.ts";
-import { help as displayHelp } from "./functions/help.ts";
+import { setupCheckType } from "../processing/check_type.ts";
+import { shift } from "../utils/array.ts";
 import { didYouMean } from "../utils/cli.ts";
 
 import type { Args, Command, Option } from "../utils/types.ts";
+
+interface Flags {
+  command?: string;
+  logLevel?: string;
+  logFile?: string;
+  version?: boolean;
+  help: unknown;
+  gui?: boolean;
+}
 
 export const mainOptions: Option[] = [
   {
@@ -67,12 +77,7 @@ export async function action(args = Deno.args) {
 
     logToFile = flags.logFile;
 
-    await main(
-      flags.command,
-      flags.logLevel,
-      flags.version,
-      flags.help,
-    );
+    await main(flags);
 
     if (flags.logFile) {
       await writeLogFile(logToFile);
@@ -88,50 +93,6 @@ export async function action(args = Deno.args) {
     await handleError(err instanceof Error ? err : new Error(err), logToFile);
     Deno.exit(2);
   }
-}
-
-/** Command handler */
-async function main(
-  command?: string,
-  logLevel?: string,
-  version?: boolean,
-  help?: unknown,
-) {
-  if (version) {
-    log.plain(currentVersion);
-    return;
-  }
-
-  lineBreak();
-
-  if (help) {
-    displayHelp(mainCommand, [command ?? ""]);
-    return;
-  }
-
-  setupLogLevel(logLevel);
-
-  if (command) {
-    const subCommands = mainCommand.subCommands;
-    if (subCommands.has(command)) {
-      await subCommands.get(command)!.action();
-    } else {
-      didYouMean([...mainCommand.subCommands.keys()], [command]);
-      throw new NestCLIError("Unknown command");
-    }
-  } else {
-    // default action
-    displayHelp(mainCommand);
-  }
-}
-
-interface Flags {
-  command?: string;
-  logLevel?: string;
-  logFile?: string;
-  version?: boolean;
-  help: unknown;
-  gui?: boolean;
 }
 
 function assertFlags(args: Args): Flags {
@@ -155,4 +116,50 @@ function assertFlags(args: Args): Flags {
   if (typeError()) throw new NestCLIError("Flags: Invalid type");
 
   return { command, logLevel, version, help, gui, logFile } as Flags;
+}
+
+// **************** logic ****************
+
+/** Command handler */
+async function main({ command, logLevel, version, help, gui }: Flags) {
+  if (version) {
+    log.plain(currentVersion);
+    return;
+  }
+
+  lineBreak();
+
+  if (help) {
+    displayHelp();
+    return;
+  }
+
+  setupLogLevel(logLevel);
+
+  if (gui) {
+    log.error("GUI not implemented");
+    throw new NestCLIError("GUI not implemented");
+  }
+
+  if (command) {
+    const subCommands = mainCommand.subCommands;
+    if (subCommands.has(command)) {
+      await subCommands.get(command)!.action(shift(Deno.args));
+    } else {
+      didYouMean([...mainCommand.subCommands.keys()], [command]);
+      throw new NestCLIError("Unknown command");
+    }
+  } else {
+    // default action
+    displayHelp();
+  }
+}
+
+async function displayHelp(): Promise<void> {
+  const helpCommand = mainCommand.subCommands.get("help");
+  if (helpCommand === undefined) {
+    log.error("No help command registered.");
+    throw new NestCLIError("No Help command registered (main)");
+  }
+  await helpCommand.action(Deno.args);
 }

@@ -1,6 +1,6 @@
 export * from "../mod/deps.ts";
 
-/**************** std ****************/
+// **************** std ****************
 export * from "https://x.nest.land/std@0.85.0/fmt/printf.ts";
 
 export { parse } from "https://x.nest.land/std@0.85.0/flags/mod.ts";
@@ -24,6 +24,6 @@ export { readLines } from "https://x.nest.land/std@0.85.0/io/mod.ts";
 
 export { delay } from "https://x.nest.land/std@0.85.0/async/delay.ts";
 
-/**************** hatcher ****************/
+// **************** hatcher ****************
 
 export { NestLand } from "https://x.nest.land/hatcher@0.10.1/lib/registries/NestLand.ts";
