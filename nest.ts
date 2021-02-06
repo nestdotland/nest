@@ -1,14 +1,14 @@
 /** Register commands */
-import "./cli/commands/help.ts";
-import "./cli/commands/init.ts";
-import "./cli/commands/login.ts";
-import "./cli/commands/logout.ts";
-import "./cli/commands/publish.ts";
-import "./cli/commands/setup.ts";
-import "./cli/commands/switch.ts";
-import "./cli/commands/sync.ts";
-import "./cli/commands/upgrade.ts";
+import "./src/cli/commands/help.ts";
+import "./src/cli/commands/init.ts";
+import "./src/cli/commands/login.ts";
+import "./src/cli/commands/logout.ts";
+import "./src/cli/commands/publish.ts";
+import "./src/cli/commands/setup.ts";
+import "./src/cli/commands/switch.ts";
+import "./src/cli/commands/sync.ts";
+import "./src/cli/commands/upgrade.ts";
 
-import { mainCommand } from "./cli/commands/main.ts";
+import { mainCommand } from "./src/cli/commands/main.ts";
 
 await mainCommand.action();
