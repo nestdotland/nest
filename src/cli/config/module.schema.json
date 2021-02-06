@@ -2,89 +2,116 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "nestdotland/module.json",
   "properties": {
-    "name": {
-      "description": "The name of your module. Must not contain spaces.",
-      "type": ["string"],
-      "examples": ["my_module"]
-    },
     "fullName": {
-      "description": "The full name of your module.",
-      "type": ["string"],
-      "examples": ["My Awesome Module"]
+      "description": "A longer name, without character restrictions or length limit.",
+      "type": [
+        "string"
+      ]
     },
     "description": {
-      "description": "Your module description.",
+      "description": "This helps people discover your module by explaining its purpose.",
       "type": "string",
-      "examples": ["I swear my module is the best out there"]
+      "examples": [
+        "Made with &hearts; for the Deno community"
+      ]
+    },
+    "main": {
+      "description": "A file path to the primary entry point to your program.",
+      "type": "string",
+      "examples": [
+        "mod.ts"
+      ]
+    },
+    "bin": {
+      "description": "An array of file path to one or more executable files.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "examples": [
+        [
+          "cli.ts"
+        ]
+      ]
+    },
+    "logo": {
+      "type": "string",
+      "description": "A file path to your module logo. Will be displayed when module is featured.",
+      "examples": [
+        "logo.png",
+        "assets/logo.png"
+      ]
     },
     "homepage": {
       "type": "string",
-      "description": "A link to your homepage. Usually a repository",
-      "examples": ["https://nest.land/x/user/module","https://github.com/user/module"],
-      "default": "https://nest.land/x/user/module"
+      "description": "The url to the project homepage.",
+      "examples": [
+        "https://nest.land/x/author/module"
+      ]
+    },
+    "repository": {
+      "type": "string",
+      "description": "Specify the place where your code lives. This is helpful for people who want to contribute.",
+      "examples": [
+        "https://github.com/author/module"
+      ]
+    },
+    "issues": {
+      "type": "string",
+      "description": "The url to your project's issue tracker and / or the email address to which issues should be reported.",
+      "examples": [
+        "https://github.com/author/module/issues"
+      ]
     },
     "license": {
       "type": "string",
-      "description": "Your module license.",
-      "examples": ["MIT"],
+      "description": "You should specify a license for your module so that people know how they are permitted to use it, and any restrictions you're placing on it.",
+      "examples": [
+        "MIT"
+      ],
       "default": "UNKNOWN"
     },
     "unlisted": {
       "type": "boolean",
-      "description": "Hide or not this module on the gallery.",
+      "description": "The module will not be found on the website unless you have the exact link.",
       "default": false
     },
     "private": {
       "type": "boolean",
-      "description": "Set this module private user-scoped or private organization-scoped.",
+      "description": "Encrypts your module on the blockweave. You can fetch it and decrypt it through the eggs CLI. (not implemented yet)",
       "default": false
+    },
+    "keywords": {
+      "description": "It helps people to find your module when searching for it.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
     },
     "hooks": {
       "type": "object",
-      "description": "Add pre and post middleware hooks",
+      "description": "Hooks are scripts that nest executes before or after events such as: publish, and sync.",
       "properties": {
         "presync": {
           "description": "",
-          "type": "string",
-          "examples": []
+          "type": "string"
         },
         "postsync": {
           "description": "",
-          "type": "string",
-          "examples": []
-        },
-        "prepack": {
-          "description": "",
-          "type": "string",
-          "examples": []
-        },
-        "postpack": {
-          "description": "",
-          "type": "string",
-          "examples": []
+          "type": "string"
         },
         "prepublish": {
           "description": "",
           "type": "string",
-          "examples": []
+          "examples": ["deno fmt --check"]
         },
         "postpublish": {
           "description": "",
-          "type": "string",
-          "examples": []
-        },
-        "preaudit": {
-          "description": "",
-          "type": "string",
-          "examples": []
-        },
-        "postaudit": {
-          "description": "",
-          "type": "string",
-          "examples": []
+          "type": "string"
         }
       }
     }
-  },
-  "required": [ "name" ]
+  }
 }
