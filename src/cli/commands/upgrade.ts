@@ -3,7 +3,7 @@ import { NestCLIError } from "../utils/error.ts";
 import { limitArgs, limitOptions } from "../utils/cli.ts";
 import { setupCheckType } from "../processing/check_type.ts";
 import { mainCommand, mainOptions } from "./main.ts";
-import { bold, gray, NestLand, semver } from "../deps.ts";
+import { bold, gray, /* NestLand, */ semver } from "../deps.ts";
 import { log } from "../utils/log.ts";
 import { version as CLIVersion } from "../../version.ts";
 
@@ -52,7 +52,8 @@ function assertFlags(args: Args): Flags {
 
 /** Upgrade nest cli to the given version. */
 export async function upgrade(givenVersion?: string) {
-  const versions = await NestLand.sortedVersions("nest", "nest");
+  // TODO(@oganexon): recode hatcher
+  const versions = [""] /* await NestLand.sortedVersions("nest", "nest"); */
 
   const latest = versions[versions.length - 1];
 
