@@ -11,6 +11,7 @@ import "./src/cli/commands/config/config.ts";
 import "./src/cli/commands/config/push.ts";
 import "./src/cli/commands/config/pull.ts";
 import "./src/cli/commands/config/diff.ts";
+import "./src/cli/commands/config/status.ts";
 import "./src/cli/commands/upgrade.ts";
 
 import { mainCommand } from "./src/cli/commands/main.ts";
