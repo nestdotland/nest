@@ -8,6 +8,10 @@ nestkey.json
 eggs-debug.log
 nest-debug.log
 
+# bundle
+nest.js
+nest.min.js
+
 # Benchmarks
 benchmarks/**
 !benchmarks/README.md

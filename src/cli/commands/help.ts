@@ -43,34 +43,37 @@ function assertFlags(args: Args): Flags {
 // **************** logic ****************
 
 /** Determines the target command and displays help for it */
-export function help(command: Command, names: string[] = []): void {
+export function help(
+  command: Command,
+  args: string[] = [],
+  parents: string[] = [],
+): void {
   // current command
-  const name = names[0];
+  const name = args[0];
   if (name && command.subCommands.size > 0) {
     if (command.subCommands.has(name)) {
-      if (names[1]) {
-        names.shift();
-        return help(command.subCommands.get(name)!, names);
+      if (args[1]) {
+        const parent = args.shift()!;
+        return help(command.subCommands.get(name)!, args, [...parents, parent]);
       } else {
-        return printHelp(command.subCommands.get(name)!);
+        return printHelp(command.subCommands.get(name)!, parents);
       }
     } else {
-      log.error(underline(name), "is not valid command name.");
+      log.error(underline(bold(name)), "is not valid command name.");
       log.info(
         "List of valid commands:",
-        Object.keys(command.subCommands).map((name) => bold(name)).join(", "),
-        ".",
+        [...command.subCommands.keys()].map((name) => bold(name)).join(", "),
       );
       throw new NestCLIError("Invalid command name (help)");
     }
   } else {
-    printHelp(command);
+    printHelp(command, parents);
   }
 }
 
-export function printHelp(command: Command) {
+export function printHelp(command: Command, parents: string[]) {
   console.log(
-    getDescription(command) + getUsage(command) + getArgs(command) +
+    getDescription(command) + getUsage(command, parents) + getArgs(command) +
       getCommands(command) + getOption(command),
   );
 }
@@ -79,10 +82,14 @@ function getDescription(command: Command) {
   return `  ${command.description.replaceAll("\n", "\n  ")}\n\n`;
 }
 
-function getUsage(command: Command) {
-  return `${underline("Usage:")} ${green("nest")} ${
-    command.name ? `${bold(command.name)} ` : ""
-  }${command.arguments.map((arg) => arg.name).join(" ")}\n\n`;
+function getUsage(command: Command, parents: string[]) {
+  let usage = `${underline("Usage:")} ${green("nest")} `;
+  for (let i = 0; i < parents.length; i++) {
+    usage += `${bold(parents[i])} `;
+  }
+  if (command.name) usage += `${bold(command.name)} `;
+  usage += command.arguments.map((arg) => arg.name).join(" ");
+  return usage + "\n\n";
 }
 
 function getArgs(command: Command) {
@@ -116,12 +123,19 @@ function getCommands(command: Command) {
 }
 
 function getOption(command: Command) {
-  return `${underline("Options:")}\n\n${
-    command.options.map((option, i) =>
-      // line separation with global options
-      `${i === 5 ? "\n" : ""}  ${
-        sprintf("%-40s", `${option.flag} ${magenta(option.argument || "")}`)
-      } ${option.description.replaceAll("\n", sprintf("\n%28s", ""))}`
-    ).join("\n")
-  }`;
+  let options = `${underline("Options:")}\n\n`;
+  for (let i = 0; i < command.options.length; i++) {
+    const option = command.options[i];
+    // line separation with global options
+    if (i === 5) options += "\n";
+    options += "  ";
+    options += sprintf(
+      "%-40s",
+      `${option.flag} ${magenta(option.argument || "")}`,
+    );
+    options += " ";
+    options += option.description.replaceAll("\n", sprintf("\n%28s", ""));
+    options += "\n";
+  }
+  return options;
 }
