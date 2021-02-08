@@ -53,7 +53,7 @@ function assertFlags(args: Args): Flags {
 /** Upgrade nest cli to the given version. */
 export async function upgrade(givenVersion?: string) {
   // TODO(@oganexon): recode hatcher
-  const versions = [""] /* await NestLand.sortedVersions("nest", "nest"); */
+  const versions = [""]; /* await NestLand.sortedVersions("nest", "nest"); */
 
   const latest = versions[versions.length - 1];
 

@@ -3,8 +3,9 @@ import { NestCLIError } from "../../utils/error.ts";
 import { aliasesFromOptions } from "../../utils/cli.ts";
 import { setupCheckType } from "../../processing/check_type.ts";
 import { shift } from "../../utils/array.ts";
+import { log } from "../../utils/log.ts";
 import { didYouMean } from "../../utils/cli.ts";
-import { mainCommand, mainOptions } from "../main.ts";
+import { mainCommand } from "../main.ts";
 
 import type { Args, Command } from "../../utils/types.ts";
 
@@ -15,9 +16,9 @@ interface Flags {
 export const configCommand: Command = {
   name: "config",
   description: "",
-  options: mainOptions,
+  options: mainCommand.options,
   arguments: [{
-    name: "[command]",
+    name: "[subcommand]",
     description: "A command to run.",
   }],
   subCommands: new Map(),
@@ -29,10 +30,10 @@ mainCommand.subCommands.set(configCommand.name, configCommand);
 export async function action(args = Deno.args) {
   const { command } = assertFlags(parse(
     args,
-    { alias: aliasesFromOptions(mainOptions) },
+    { alias: aliasesFromOptions(configCommand.options) },
   ));
 
-  await config(command);
+  await config(args, command);
 }
 
 function assertFlags(args: Args): Flags {
@@ -40,7 +41,7 @@ function assertFlags(args: Args): Flags {
 
   const { checkType, typeError } = setupCheckType("flags");
 
-  checkType("[command]", command, ["string"]);
+  checkType("[subcommand]", command, ["string"]);
 
   if (typeError()) throw new NestCLIError("Flags: Invalid type");
 
@@ -50,16 +51,17 @@ function assertFlags(args: Args): Flags {
 // **************** logic ****************
 
 /** Command handler */
-async function config(command?: string) {
+async function config(args: string[], command?: string) {
   if (command) {
     const subCommands = configCommand.subCommands;
     if (subCommands.has(command)) {
-      await subCommands.get(command)!.action(shift(Deno.args));
+      await subCommands.get(command)!.action(shift(args));
     } else {
       didYouMean([...subCommands.keys()], [command]);
       throw new NestCLIError("Unknown command");
     }
   } else {
-    // default action
+    log.warning("Unimplemented");
+    // default action: config status
   }
 }

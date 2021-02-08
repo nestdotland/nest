@@ -21,7 +21,46 @@ export type DiffResult<T> = {
 export type StringDiff = DiffResult<string>[];
 
 /** Compares two string arrays and returns a diff */
-export function compare(actual: string[], base: string[]): StringDiff {
+export function compare(actual: string, base: string): StringDiff {
+  return compare_(actual.split(/\r?\n/), base.split(/\r?\n/));
+}
+
+/** Apply a diff to a string */
+export function apply(diff: StringDiff, target: string): [string, boolean] {
+  let conflict = false;
+  /** Apply a diff to an array of string */
+  function apply_(diff: StringDiff, target: string[]): string[] {
+    let j = 0;
+    const res: string[] = [];
+    for (let i = 0; i < diff.length; i++, j++) {
+      const current = diff[i];
+      if (current.type === DiffType.common && target[j]) {
+        res.push(target[j]);
+      } else if (current.type === DiffType.updated) {
+        if (target[j]) res.push(target[j]);
+        // in case of conflict
+        if (
+          !equal(current.oldValue, target[j]) &&
+          !equal(current.value, target[j])
+        ) {
+          res.push(current.value);
+          conflict = true;
+        }
+      } else if (current.type === DiffType.added) {
+        res.push(current.value);
+        j--;
+      } else if (current.type === DiffType.removed) j--;
+    }
+    for (; j < target.length; j++) {
+      res.push(target[j]);
+    }
+    return res;
+  }
+  return [apply_(diff, target.split(/\r?\n/)).join("\n"), conflict];
+}
+
+/** Compares two string arrays and returns a diff */
+export function compare_(actual: string[], base: string[]): StringDiff {
   const diff: StringDiff = [];
   const LCS = longestCommonSubsequence(actual, base);
   let actualIndex = 0;
@@ -66,31 +105,12 @@ export function compare(actual: string[], base: string[]): StringDiff {
   return diff;
 }
 
-/** Apply a diff to an array of string */
-export function apply(diff: StringDiff, target: string[]) {
-  let j = 0;
-  const res: string[] = [];
-  for (let i = 0; i < diff.length; i++, j++) {
-    const current = diff[i];
-    if (current.type === DiffType.common && target[j]) {
-      res.push(target[j]);
-    } else if (current.type === DiffType.updated) {
-      if (target[j]) res.push(target[j]);
-      // in case of conflict
-      if (
-        !equal(current.oldValue, target[j]) && !equal(current.value, target[j])
-      ) {
-        res.push(current.value);
-      }
-    } else if (current.type === DiffType.added) {
-      res.push(current.value);
-      j--;
-    } else if (current.type === DiffType.removed) j--;
+/** Checks if diff contains added, removed, or updated fields */
+export function isModified(diff: StringDiff): boolean {
+  for (let i = 0; i < diff.length; i++) {
+    if (diff[i].type !== DiffType.common) return true;
   }
-  for (; j < target.length; j++) {
-    res.push(target[j]);
-  }
-  return res;
+  return false;
 }
 
 export function print(title: string, diff: StringDiff) {

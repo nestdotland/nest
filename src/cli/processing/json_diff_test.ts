@@ -216,22 +216,22 @@ Deno.test({
 });
 
 Deno.test({
-  name: "CLI | json_diff | isUnchanged",
+  name: "CLI | json_diff | isModified",
   fn() {
     const diff1 = jsonDiff.compare(obj1, obj1);
     const diff2 = jsonDiff.compare(obj1, obj2);
     const diff3 = jsonDiff.compare(obj2, obj3);
 
-    assert(jsonDiff.isUnchanged(diff1), "obj1 vs obj1");
-    assert(jsonDiff.isUnchanged(diff2), "obj1 vs obj2");
-    assert(!jsonDiff.isUnchanged(diff3), "obj2 vs obj3");
+    assert(!jsonDiff.isModified(diff1), "obj1 vs obj1");
+    assert(!jsonDiff.isModified(diff2), "obj1 vs obj2");
+    assert(jsonDiff.isModified(diff3), "obj2 vs obj3");
   },
 });
 
 Deno.test({
   name: "CLI | json_diff | apply",
   fn() {
-    const result = jsonDiff.apply(jsonDiff.compare(obj1, obj3), obj4);
+    const [result] = jsonDiff.apply(jsonDiff.compare(obj1, obj3), obj4);
 
     assertEquals(result, {
       a: "new_a",

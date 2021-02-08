@@ -4,7 +4,6 @@ import { setupCheckType } from "../processing/check_type.ts";
 import { NestCLIError } from "../utils/error.ts";
 import { mainCommand, mainOptions } from "./main.ts";
 import { log } from "../utils/log.ts";
-import { updateFiles } from "../config/utils.ts";
 import { downloadConfig } from "../../mod/api/_todo.ts";
 import * as config from "../config/config.ts";
 import { promptAndValidate } from "../utils/interact.ts";
@@ -97,7 +96,7 @@ export async function setup(author?: string, name?: string) {
   };
 
   await config.dir.ensure();
-  await updateFiles(meta, project, ignore);
+  await config.local.update(project, meta, ignore);
 
   log.info(
     `Linked to ${cyan(`${module.author}/${module.name}`)} (created ${

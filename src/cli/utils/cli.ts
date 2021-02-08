@@ -58,7 +58,7 @@ export function limitOptions(
   );
   if (misspelled.length === 0) return;
   log.error(
-    `Unknown option${misspelled.length === 1 ? "" : "s"} in config:`,
+    `Unknown option${misspelled.length === 1 ? "" : "s"}:`,
     misspelled.map((key) => underline(key)).join(", "),
   );
   didYouMean(reference, misspelled, keyToOption);

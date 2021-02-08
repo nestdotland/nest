@@ -15,24 +15,84 @@ export function compare(actual: Json, base: Json): JSONDiff {
 }
 
 /** Apply a diff to an object */
-export function apply(diff: JSONDiff, target: Json): Json {
-  return applyDiff(diff, target) as Json;
+export function apply(diff: JSONDiff, target: Json): [Json, boolean] {
+  let conflict = false;
+  function applyDiff(
+    diff: JSONDiff,
+    target: JSONValue,
+  ): JSONValue | undefined {
+    if (Array.isArray(diff)) {
+      if (Array.isArray(target)) {
+        let j = 0;
+        const res: JSONArray = [];
+        for (let i = 0; i < diff.length; i++, j++) {
+          const current = diff[i];
+          if (Array.isArray(current) || (current instanceof Map)) {
+            res.push(applyDiff(current, target[j]) as JSONValue);
+          } else {
+            if (current.type === DiffType.common && target[j]) {
+              res.push(target[j]);
+            } else if (current.type === DiffType.updated) {
+              if (target[j]) res.push(target[j]);
+              // in case of conflict
+              if (
+                !equal(current.oldValue, target[j]) &&
+                !equal(current.value, target[j])
+              ) {
+                res.push(current.value);
+                conflict = true;
+              }
+            } else if (current.type === DiffType.added) {
+              res.push(current.value);
+              j--;
+            } else if (current.type === DiffType.removed) j--;
+          }
+        }
+        for (; j < target.length; j++) {
+          res.push(target[j]);
+        }
+        return res;
+      }
+      return target;
+    } else if (diff instanceof Map) {
+      if (
+        typeof target === "object" && target !== null && !Array.isArray(target)
+      ) {
+        for (const [key, value] of diff) {
+          const result = applyDiff(value, target[key]);
+          if (result !== undefined) target[key] = result;
+          else delete target[key];
+        }
+      }
+      return target;
+    }
+    if (diff.type === DiffType.common) return target;
+    if (diff.type === DiffType.added) {
+      return diff.value;
+    }
+    if (diff.type === DiffType.updated) {
+      conflict = true;
+      return diff.value;
+    }
+    if (diff.type === DiffType.removed) return undefined;
+  }
+  return [applyDiff(diff, target) as Json, conflict];
 }
 
 /** Checks if diff contains added, removed, or updated fields */
-export function isUnchanged(diff: JSONDiff): boolean {
+export function isModified(diff: JSONDiff): boolean {
   if (Array.isArray(diff)) {
     for (let i = 0; i < diff.length; i++) {
-      if (!isUnchanged(diff[i])) return false;
+      if (isModified(diff[i])) return true;
     }
-    return true;
+    return false;
   } else if (diff instanceof Map) {
     for (const [_, value] of diff) {
-      if (!isUnchanged(value)) return false;
+      if (isModified(value)) return true;
     }
-    return true;
+    return false;
   }
-  return diff.type === DiffType.common;
+  return diff.type !== DiffType.common;
 }
 
 function compare_(actual?: JSONValue, base?: JSONValue): JSONDiff {
@@ -125,61 +185,6 @@ function compare_(actual?: JSONValue, base?: JSONValue): JSONDiff {
       value: actual,
       oldValue: base,
     };
-}
-
-function applyDiff(
-  diff: JSONDiff,
-  target: JSONValue,
-): JSONValue | undefined {
-  if (Array.isArray(diff)) {
-    if (Array.isArray(target)) {
-      let j = 0;
-      const res: JSONArray = [];
-      for (let i = 0; i < diff.length; i++, j++) {
-        const current = diff[i];
-        if (Array.isArray(current) || (current instanceof Map)) {
-          res.push(applyDiff(current, target[j]) as JSONValue);
-        } else {
-          if (current.type === DiffType.common && target[j]) {
-            res.push(target[j]);
-          } else if (current.type === DiffType.updated) {
-            if (target[j]) res.push(target[j]);
-            // in case of conflict
-            if (
-              !equal(current.oldValue, target[j]) &&
-              !equal(current.value, target[j])
-            ) {
-              res.push(current.value);
-            }
-          } else if (current.type === DiffType.added) {
-            res.push(current.value);
-            j--;
-          } else if (current.type === DiffType.removed) j--;
-        }
-      }
-      for (; j < target.length; j++) {
-        res.push(target[j]);
-      }
-      return res;
-    }
-    return target;
-  } else if (diff instanceof Map) {
-    if (
-      typeof target === "object" && target !== null && !Array.isArray(target)
-    ) {
-      for (const [key, value] of diff) {
-        const result = applyDiff(value, target[key]);
-        if (result !== undefined) target[key] = result;
-        else delete target[key];
-      }
-    }
-    return target;
-  }
-  if (diff.type === DiffType.common) return target;
-  if (diff.type === DiffType.updated || diff.type === DiffType.added) {
-    return diff.value;
-  }
-  if (diff.type === DiffType.removed) return undefined;
 }
 
 export function print(title: string, diff: JSONDiff) {

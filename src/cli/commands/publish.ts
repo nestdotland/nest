@@ -20,7 +20,6 @@ import { lineBreak, log } from "../utils/log.ts";
 import { resolveVersion } from "../processing/version.ts";
 import { confirm } from "../utils/interact.ts";
 import { publish as directPublish } from "../../mod/publish.ts";
-import { isConfigUpToDate } from "../config/utils.ts";
 import { prettyBytes } from "../utils/number.ts";
 import * as config from "../config/config.ts";
 
@@ -228,7 +227,10 @@ export async function publish(
     );
   } */
 
-  if (!await isConfigUpToDate()) {
+  // TODO: config status
+  const configUpToDate = true;
+
+  if (!configUpToDate) {
     log.warning(
       "Local config is not up to date. You should synchronize it by running",
       bold(green("nest sync")),
