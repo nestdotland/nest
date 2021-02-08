@@ -4,8 +4,7 @@ import { NestCLIError } from "../utils/error.ts";
 import * as project from "./files/project.ts";
 import * as ignore from "./files/ignore.ts";
 import * as meta from "./files/meta.ts";
-import * as jsonDiff from "../processing/json_diff.ts";
-import type { Json, Meta, Project } from "../utils/types.ts";
+import type { Meta, Project } from "../utils/types.ts";
 
 export * as project from "./files/project.ts";
 export * as ignore from "./files/ignore.ts";
@@ -14,11 +13,13 @@ export * as dir from "./files/nest.ts";
 export * as users from "./files/users.ts";
 
 export const local = {
-  async ensure(): Promise<void> {
-    await ensureFile(project);
-    await ensureFile(meta);
-    await ensureFile(ignore);
+  // Will throw if one of the config file is missing.
+  async ensureExists(): Promise<void> {
+    await ensureFileExists(project);
+    await ensureFileExists(meta);
+    await ensureFileExists(ignore);
   },
+  // Returns the content of config files.
   async get(): Promise<{ project: Project; meta: Meta; ignore: string }> {
     const config = await Promise.all([
       project.parse(),
@@ -31,6 +32,7 @@ export const local = {
       ignore: config[2],
     };
   },
+  // Write to config files with updated properties
   async update(
     projectObj: Project,
     metaObj: Meta,
@@ -43,15 +45,6 @@ export const local = {
     await project.write(projectObj);
     await ignore.write(ignoreStr);
   },
-  unchanged(
-    meta1: Meta,
-    meta2: Meta,
-    ignore1: string,
-    ignore2: string,
-  ): boolean {
-    const diff = jsonDiff.compare(meta1 as Json, meta2 as Json);
-    return jsonDiff.isModified(diff) && ignore1 === ignore2;
-  },
 };
 
 interface File {
@@ -59,7 +52,7 @@ interface File {
   FILE: string;
 }
 
-async function ensureFile(file: File): Promise<void> {
+async function ensureFileExists(file: File): Promise<void> {
   if (!await file.exists()) {
     log.error(
       underline(bold(file.FILE)),

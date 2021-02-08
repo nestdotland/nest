@@ -146,6 +146,7 @@ async function main({ command, logLevel, version, help, gui }: Flags) {
     if (subCommands.has(command)) {
       await subCommands.get(command)!.action(shift(Deno.args));
     } else {
+      log.error("Unknown command:", command);
       didYouMean([...subCommands.keys()], [command]);
       throw new NestCLIError("Unknown command");
     }

@@ -15,7 +15,7 @@ const prefix = bold(green("$"));
 
 /** A wrapper around hooks */
 export async function getHooks(): Promise<Hooks> {
-  await config.local.ensure();
+  await config.local.ensureExists();
 
   const meta = await config.meta.parse();
 

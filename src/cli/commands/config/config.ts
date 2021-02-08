@@ -15,7 +15,7 @@ interface Flags {
 
 export const configCommand: Command = {
   name: "config",
-  description: "",
+  description: "Offers finer control over configuration than sync command",
   options: mainCommand.options,
   arguments: [{
     name: "[subcommand]",

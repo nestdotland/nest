@@ -69,7 +69,7 @@ export async function push(
     lastSync: number;
   },
 ) {
-  await config.local.ensure();
+  await config.local.ensureExists();
   const user = await config.users.getActive();
   const { project, meta, ignore } = localConfig ?? await config.local.get();
   // TODO(oganexon): if remote config doesn't exist just force push

@@ -1,8 +1,10 @@
+import { log } from "../utils/log.ts";
 import type { Meta, Module } from "../utils/types.ts";
 
 export function downloadConfig(
   module: Module,
 ): Promise<{ meta: Meta; ignore: string; lastSync: number }> {
+  log.info("Downloading remote config...");
   // TODO
   return Promise.resolve({
     meta: {},

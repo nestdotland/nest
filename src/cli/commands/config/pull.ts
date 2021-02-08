@@ -72,10 +72,8 @@ export async function pull(
     lastSync: number;
   },
 ): Promise<boolean | undefined> {
-  await config.local.ensure();
+  await config.local.ensureExists();
   const { project, meta, ignore } = localConfig ?? await config.local.get();
-
-  log.info("Downloading remote config...");
   const remote = remoteConfig ?? await downloadConfig(project);
 
   if (force) {

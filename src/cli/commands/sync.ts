@@ -41,7 +41,7 @@ function assertFlags(args: Args): void {
 
 /** Synchronize remote and local configuration. */
 export async function sync() {
-  await config.local.ensure();
+  await config.local.ensureExists();
 
   const localConfig = await config.local.get();
   // TODO(oganexon): if remote config doesn't exist just force push
