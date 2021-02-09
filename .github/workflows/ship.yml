@@ -34,7 +34,7 @@ jobs:
 
       - name: Generate Release Notes
         # TODO(@maximousblk): switch to nest when new registry is released
-        run: deno run -A https://deno.land/x/ghlog@0.2.0/ghlog.ts -v '${{ github.event.inputs.version }}'
+        run: deno run -A https://deno.land/x/ghlog@0.2.0/ghlog.ts ${{ github.repository }} -v '${{ github.event.inputs.version }}'
 
       - name: Release ${{ matrix.tag }}
         uses: ncipollo/release-action@v1
