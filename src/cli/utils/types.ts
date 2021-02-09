@@ -15,12 +15,16 @@ export interface Argument {
   description: string;
 }
 
+interface CommandMap extends Map<string, Command> {
+  add: (c: Command[] | Command) => void;
+}
+
 export interface Command {
   name: string;
   description: string;
   arguments: Argument[];
   options: Option[];
-  subCommands: Map<string, Command>;
+  subCommands: CommandMap;
   action: (args?: string[]) => Promise<void> | void;
 }
 

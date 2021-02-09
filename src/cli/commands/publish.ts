@@ -12,7 +12,12 @@ import {
   underline,
 } from "../deps.ts";
 import { NestCLIError } from "../utils/error.ts";
-import { aliasesFromOptions, limitArgs, limitOptions } from "../utils/cli.ts";
+import {
+  aliasesFromOptions,
+  CommandMap,
+  limitArgs,
+  limitOptions,
+} from "../utils/cli.ts";
 import { setupCheckType } from "../processing/check_type.ts";
 import { getHooks } from "../config/hooks.ts";
 import { mainCommand, mainOptions } from "./main.ts";
@@ -83,11 +88,9 @@ export const publishCommand: Command = {
     } (default: ${cyan("patch")})`,
   }],
   options,
-  subCommands: new Map(),
+  subCommands: new CommandMap(),
   action,
 };
-
-mainCommand.subCommands.set(publishCommand.name, publishCommand);
 
 export async function action(args = Deno.args) {
   const flags = assertFlags(parse(

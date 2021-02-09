@@ -1,5 +1,5 @@
 import { green, parse } from "../deps.ts";
-import { limitArgs, limitOptions } from "../utils/cli.ts";
+import { CommandMap, limitArgs, limitOptions } from "../utils/cli.ts";
 import { NestCLIError } from "../utils/error.ts";
 import { mainCommand, mainOptions } from "./main.ts";
 import * as config from "../config/config.ts";
@@ -21,11 +21,9 @@ export const loginCommand: Command = {
     description: "A login token",
   }],
   options: mainOptions,
-  subCommands: new Map(),
+  subCommands: new CommandMap(),
   action,
 };
-
-mainCommand.subCommands.set(loginCommand.name, loginCommand);
 
 export async function action(args = Deno.args) {
   const { user, token } = assertFlags(parse(args));

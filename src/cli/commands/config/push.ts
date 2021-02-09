@@ -1,6 +1,7 @@
 import { parse } from "../../deps.ts";
 import {
   aliasesFromOptions,
+  CommandMap,
   limitArgs,
   limitOptions,
 } from "../../utils/cli.ts";
@@ -29,11 +30,9 @@ export const pushCommand: Command = {
       description: "Overwrite remote config",
     },
   ],
-  subCommands: new Map(),
+  subCommands: new CommandMap(),
   action,
 };
-
-configCommand.subCommands.set(pushCommand.name, pushCommand);
 
 export async function action(args = Deno.args) {
   const { force } = assertFlags(

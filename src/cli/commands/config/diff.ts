@@ -1,10 +1,10 @@
 import { parse } from "../../deps.ts";
 import {
   aliasesFromOptions,
+  CommandMap,
   limitArgs,
   limitOptions,
 } from "../../utils/cli.ts";
-import { log } from "../../utils/log.ts";
 import { setupCheckType } from "../../processing/check_type.ts";
 import { NestCLIError } from "../../utils/error.ts";
 import { downloadConfig } from "../../../mod/api/_todo.ts";
@@ -31,11 +31,9 @@ export const diffCommand: Command = {
       description: "Compare with remote config",
     },
   ],
-  subCommands: new Map(),
+  subCommands: new CommandMap(),
   action,
 };
-
-configCommand.subCommands.set(diffCommand.name, diffCommand);
 
 export async function action(args = Deno.args) {
   const { remote } = assertFlags(

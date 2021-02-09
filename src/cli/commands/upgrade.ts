@@ -1,6 +1,6 @@
 import { parse } from "../deps.ts";
 import { NestCLIError } from "../utils/error.ts";
-import { limitArgs, limitOptions } from "../utils/cli.ts";
+import { CommandMap, limitArgs, limitOptions } from "../utils/cli.ts";
 import { setupCheckType } from "../processing/check_type.ts";
 import { mainCommand, mainOptions } from "./main.ts";
 import { bold, gray, /* NestLand, */ semver } from "../deps.ts";
@@ -17,11 +17,9 @@ export const upgradeCommand: Command = {
     description: "A given semver version, the latest by default",
   }],
   options: mainOptions,
-  subCommands: new Map(),
+  subCommands: new CommandMap(),
   action,
 };
-
-mainCommand.subCommands.set(upgradeCommand.name, upgradeCommand);
 
 export async function action(args = Deno.args) {
   const { version } = assertFlags(parse(args));

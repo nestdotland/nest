@@ -1,5 +1,5 @@
 import { basename, cyan, green, parse } from "../deps.ts";
-import { limitArgs, limitOptions } from "../utils/cli.ts";
+import { CommandMap, limitArgs, limitOptions } from "../utils/cli.ts";
 import { setupCheckType } from "../processing/check_type.ts";
 import { NestCLIError } from "../utils/error.ts";
 import { mainCommand, mainOptions } from "./main.ts";
@@ -21,11 +21,9 @@ export const setupCommand: Command = {
     description: "A module name",
   }],
   options: mainOptions,
-  subCommands: new Map(),
+  subCommands: new CommandMap(),
   action,
 };
-
-mainCommand.subCommands.set(setupCommand.name, setupCommand);
 
 export async function action(args = Deno.args) {
   const { author, name } = assertFlags(parse(args));

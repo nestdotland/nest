@@ -1,5 +1,5 @@
 import { parse } from "../deps.ts";
-import { limitArgs, limitOptions } from "../utils/cli.ts";
+import { CommandMap, limitArgs, limitOptions } from "../utils/cli.ts";
 import { getHooks } from "../config/hooks.ts";
 import { mainCommand, mainOptions } from "./main.ts";
 import { downloadConfig } from "../../mod/api/_todo.ts";
@@ -14,11 +14,9 @@ export const syncCommand: Command = {
   description: "Synchronize remote and local configuration",
   arguments: [],
   options: mainOptions,
-  subCommands: new Map(),
+  subCommands: new CommandMap(),
   action,
 };
-
-mainCommand.subCommands.set(syncCommand.name, syncCommand);
 
 export async function action(args = Deno.args) {
   assertFlags(parse(args));

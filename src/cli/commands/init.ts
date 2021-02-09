@@ -1,5 +1,5 @@
 import { basename, cyan, green, parse, yellow } from "../deps.ts";
-import { limitArgs, limitOptions } from "../utils/cli.ts";
+import { CommandMap, limitArgs, limitOptions } from "../utils/cli.ts";
 import { mainCommand, mainOptions } from "./main.ts";
 import { log } from "../utils/log.ts";
 import * as config from "../config/config.ts";
@@ -14,11 +14,9 @@ export const initCommand: Command = {
   description: "Initiate a new module for the nest.land registry",
   arguments: [],
   options: mainOptions,
-  subCommands: new Map(),
+  subCommands: new CommandMap(),
   action,
 };
-
-mainCommand.subCommands.set(initCommand.name, initCommand);
 
 export async function action(args = Deno.args) {
   assertFlags(parse(args));

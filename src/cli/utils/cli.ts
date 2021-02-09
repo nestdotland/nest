@@ -2,7 +2,7 @@ import { bold, underline } from "../deps.ts";
 import { NestCLIError } from "../utils/error.ts";
 import { log } from "../utils/log.ts";
 import { likelyString } from "./string.ts";
-import type { Option } from "./types.ts";
+import type { Command, Option } from "./types.ts";
 
 /** Generates aliases from options for the `parse` function. */
 export function aliasesFromOptions(options: Option[]): Record<string, string> {
@@ -105,5 +105,17 @@ export function didYouMean(
         likelyKeys.map((likely) => bold(format(likely))).join(", ")
       } ?`,
     );
+  }
+}
+
+export class CommandMap extends Map<string, Command> {
+  add(commands: Command[] | Command) {
+    if (Array.isArray(commands)) {
+      for (const command of commands) {
+        this.set(command.name, command);
+      }
+    } else {
+      this.set(commands.name, commands);
+    }
   }
 }

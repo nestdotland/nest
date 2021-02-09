@@ -1,4 +1,5 @@
 import { bold, green, magenta, parse, sprintf, underline } from "../deps.ts";
+import { CommandMap } from "../utils/cli.ts";
 import { mainCommand, mainOptions } from "./main.ts";
 import { log } from "../utils/log.ts";
 import { NestCLIError } from "../utils/error.ts";
@@ -17,11 +18,9 @@ export const helpCommand: Command = {
     description: "A command or a sub-command",
   }],
   options: mainOptions,
-  subCommands: new Map(),
+  subCommands: new CommandMap(),
   action,
 };
-
-mainCommand.subCommands.set(helpCommand.name, helpCommand);
 
 export function action(args = Deno.args) {
   const { commands } = assertFlags(parse(args));

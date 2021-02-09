@@ -7,7 +7,7 @@ import {
   writeLogFile,
 } from "../utils/log.ts";
 import { NestCLIError, NestError } from "../utils/error.ts";
-import { aliasesFromOptions } from "../utils/cli.ts";
+import { aliasesFromOptions, CommandMap } from "../utils/cli.ts";
 import { version as currentVersion } from "../../version.ts";
 import { setupCheckType } from "../processing/check_type.ts";
 import { shift } from "../utils/array.ts";
@@ -60,7 +60,7 @@ export const mainCommand: Command = {
     name: "[command]",
     description: "A command to run, help by default.",
   }],
-  subCommands: new Map(),
+  subCommands: new CommandMap(),
   action,
 };
 

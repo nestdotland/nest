@@ -1,5 +1,5 @@
 import { gray, green, italic, parse } from "../deps.ts";
-import { limitArgs, limitOptions } from "../utils/cli.ts";
+import { CommandMap, limitArgs, limitOptions } from "../utils/cli.ts";
 import { setupCheckType } from "../processing/check_type.ts";
 import { NestCLIError } from "../utils/error.ts";
 import { mainCommand, mainOptions } from "./main.ts";
@@ -17,11 +17,9 @@ export const switchCommand: Command = {
     description: "A username",
   }],
   options: mainOptions,
-  subCommands: new Map(),
+  subCommands: new CommandMap(),
   action,
 };
-
-mainCommand.subCommands.set(switchCommand.name, switchCommand);
 
 export async function action(args = Deno.args) {
   const { user } = assertFlags(parse(args));

@@ -1,6 +1,7 @@
 import { parse } from "../../deps.ts";
 import {
   aliasesFromOptions,
+  CommandMap,
   limitArgs,
   limitOptions,
 } from "../../utils/cli.ts";
@@ -31,11 +32,9 @@ export const pullCommand: Command = {
       description: "Overwrite local config",
     },
   ],
-  subCommands: new Map(),
+  subCommands: new CommandMap(),
   action,
 };
-
-configCommand.subCommands.set(pullCommand.name, pullCommand);
 
 export async function action(args = Deno.args) {
   const { force } = assertFlags(

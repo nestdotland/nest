@@ -1,6 +1,6 @@
 import { parse } from "../../deps.ts";
 import { NestCLIError } from "../../utils/error.ts";
-import { aliasesFromOptions } from "../../utils/cli.ts";
+import { aliasesFromOptions, CommandMap } from "../../utils/cli.ts";
 import { setupCheckType } from "../../processing/check_type.ts";
 import { shift } from "../../utils/array.ts";
 import { log } from "../../utils/log.ts";
@@ -21,11 +21,9 @@ export const configCommand: Command = {
     name: "[subcommand]",
     description: "A command to run.",
   }],
-  subCommands: new Map(),
+  subCommands: new CommandMap(),
   action,
 };
-
-mainCommand.subCommands.set(configCommand.name, configCommand);
 
 export async function action(args = Deno.args) {
   const { command } = assertFlags(parse(

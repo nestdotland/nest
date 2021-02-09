@@ -1,5 +1,5 @@
 import { bold, gray, green, parse, red, yellow } from "../../deps.ts";
-import { limitArgs, limitOptions } from "../../utils/cli.ts";
+import { CommandMap, limitArgs, limitOptions } from "../../utils/cli.ts";
 import { lineBreak, log } from "../../utils/log.ts";
 import { downloadConfig } from "../../../mod/api/_todo.ts";
 import * as diff from "../../processing/diff.ts";
@@ -15,11 +15,9 @@ export const statusCommand: Command = {
   description: "Show the current config status",
   arguments: [],
   options: configCommand.options,
-  subCommands: new Map(),
+  subCommands: new CommandMap(),
   action,
 };
-
-configCommand.subCommands.set(statusCommand.name, statusCommand);
 
 export async function action(args = Deno.args) {
   assertFlags(parse(args));
