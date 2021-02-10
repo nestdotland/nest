@@ -2,10 +2,8 @@
 
 Nest's official CLI to manage your modules
 
-## Notice
-
-This repo is a WIP for the new CLI of nest. Until the stable release of nest, the
-current CLI is [eggs](https://github.com/nestdotland/eggs).
+> **NOTE** `nest` is under development and non operational. Until official
+> release, [eggs](https://github.com/nestdotland/eggs) is the official CLI.
 
 ## Getting started
 
