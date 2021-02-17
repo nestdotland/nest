@@ -76,7 +76,7 @@ export async function pull(
   const remote = remoteConfig ?? await downloadConfig(project);
 
   if (force) {
-    log.warning(`using ${yellow("--force")}.`)
+    log.warning(`using ${yellow("--force")}.`);
     await config.local.update(project, remote.meta, remote.ignore);
     log.info("Config was force pulled to local.");
     return;

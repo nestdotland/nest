@@ -1,4 +1,4 @@
-import { parse, cyan } from "../../deps.ts";
+import { cyan, parse } from "../../deps.ts";
 import { NestCLIError } from "../../utils/error.ts";
 import { aliasesFromOptions, CommandMap } from "../../utils/cli.ts";
 import { setupCheckType } from "../../processing/check_type.ts";
