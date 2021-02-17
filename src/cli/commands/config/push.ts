@@ -1,4 +1,4 @@
-import { parse } from "../../deps.ts";
+import { parse, yellow } from "../../deps.ts";
 import {
   aliasesFromOptions,
   CommandMap,
@@ -75,6 +75,7 @@ export async function push(
   const remote = remoteConfig ?? await downloadConfig(project);
 
   if (force || project.lastSync > remote.lastSync) {
+    if (force) log.warning(`using ${yellow("--force")}.`)
     await uploadConfig(project, meta, ignore, user.token);
     await config.local.update(project, meta, ignore);
     if (force) log.warning("Config was force pushed to remote.");

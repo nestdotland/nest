@@ -58,7 +58,7 @@ export const mainCommand: Command = {
   options: mainOptions,
   arguments: [{
     name: "[command]",
-    description: "A command to run, help by default.",
+    description: `A command to run, ${cyan("help")} by default.`,
   }],
   subCommands: new CommandMap(),
   action,

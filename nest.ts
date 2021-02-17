@@ -16,8 +16,8 @@ import { upgradeCommand } from "./src/cli/commands/upgrade.ts";
 import { mainCommand } from "./src/cli/commands/main.ts";
 
 configCommand.subCommands.add([
-  pushCommand,
   pullCommand,
+  pushCommand,
   diffCommand,
   statusCommand,
 ]);

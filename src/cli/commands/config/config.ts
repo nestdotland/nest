@@ -1,4 +1,4 @@
-import { parse } from "../../deps.ts";
+import { parse, cyan } from "../../deps.ts";
 import { NestCLIError } from "../../utils/error.ts";
 import { aliasesFromOptions, CommandMap } from "../../utils/cli.ts";
 import { setupCheckType } from "../../processing/check_type.ts";
@@ -19,7 +19,7 @@ export const configCommand: Command = {
   options: mainCommand.options,
   arguments: [{
     name: "[subcommand]",
-    description: "A command to run.",
+    description: `A command to run, ${cyan("status")} by default.`,
   }],
   subCommands: new CommandMap(),
   action,
@@ -59,7 +59,12 @@ async function config(args: string[], command?: string) {
       throw new NestCLIError("Unknown command");
     }
   } else {
-    log.warning("Unimplemented");
-    // default action: config status
+    // default action
+    const statusCommand = configCommand.subCommands.get("status");
+    if (statusCommand === undefined) {
+      log.error("No status command registered.");
+      throw new NestCLIError("No status command registered (config)");
+    }
+    await statusCommand.action(shift(args));
   }
 }

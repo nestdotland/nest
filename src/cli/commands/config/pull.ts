@@ -1,4 +1,4 @@
-import { parse } from "../../deps.ts";
+import { parse, yellow } from "../../deps.ts";
 import {
   aliasesFromOptions,
   CommandMap,
@@ -76,7 +76,9 @@ export async function pull(
   const remote = remoteConfig ?? await downloadConfig(project);
 
   if (force) {
+    log.warning(`using ${yellow("--force")}.`)
     await config.local.update(project, remote.meta, remote.ignore);
+    log.info("Config was force pulled to local.");
     return;
   }
 
