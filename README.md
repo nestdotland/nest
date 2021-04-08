@@ -1,9 +1,8 @@
 # Nest CLI
 
-Nest's official CLI to manage your modules
+Nest's (soon to be) official CLI to manage your modules
 
-> **NOTE** `nest` is under development and non operational. Until official
-> release, [eggs](https://github.com/nestdotland/eggs) is the official CLI.
+> ### **NOTE:** _Nest CLI is still under development and non operational. Until official release, [eggs](https://github.com/nestdotland/eggs) is the official CLI._
 
 ## Getting started
 
