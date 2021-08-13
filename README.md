@@ -2,6 +2,7 @@
 
 Nest's (soon to be) official CLI to manage your modules
 
+<!-- TODO(@maximousblk): remove this warning when released -->
 > ### **NOTE:** _Nest CLI is still under development and non operational. Until official release, [eggs](https://github.com/nestdotland/eggs) is the official CLI._
 
 ## Getting started
