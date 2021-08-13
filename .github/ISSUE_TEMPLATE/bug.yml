@@ -91,6 +91,14 @@ body:
     validations:
       required: true
 
+  - type: input
+    attributes:
+      label: Nest CLI Version
+      description: 'Long form of your Nest CLI version (`nest --version`)'
+      placeholder: 'nest 1.0.0 (3E79F4F)'
+    validations:
+      required: true
+
   - type: textarea
     attributes:
       label: Additional context?
